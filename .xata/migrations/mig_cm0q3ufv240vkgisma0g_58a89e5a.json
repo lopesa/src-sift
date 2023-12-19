@@ -1,0 +1,19 @@
+{
+  "id": "mig_cm0q3ufv240vkgisma0g",
+  "parentID": "mig_cm0q34fv240vkgism9vg",
+  "checksum": "1:58a89e5afa808a77a35beea743197ff8c7186dd8bd77be7a1f981ea1fd5079b4",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "resource_source",
+          "type": "link",
+          "link": {
+            "table": "resource_source"
+          }
+        },
+        "table": "resource_source_updates"
+      }
+    }
+  ]
+}

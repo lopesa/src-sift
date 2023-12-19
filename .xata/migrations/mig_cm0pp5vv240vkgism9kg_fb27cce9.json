@@ -1,0 +1,13 @@
+{
+  "id": "mig_cm0pp5vv240vkgism9kg",
+  "parentID": "mig_cm0pkf0ehjuqgg78964g",
+  "checksum": "1:fb27cce98918598b884bf2c0037a71ed0c533d88508b01bb0758fad66fab6bbe",
+  "operations": [
+    {
+      "removeColumn": {
+        "column": "distibution",
+        "table": "resource_item"
+      }
+    }
+  ]
+}

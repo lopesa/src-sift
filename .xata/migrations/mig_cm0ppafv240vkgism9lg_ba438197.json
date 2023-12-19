@@ -1,0 +1,16 @@
+{
+  "id": "mig_cm0ppafv240vkgism9lg",
+  "parentID": "mig_cm0pp5vv240vkgism9kg",
+  "checksum": "1:ba438197fdd45a647ca203cf5e17a0e15df3002b4b2b195255ddebfdd31a71d5",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "distribution",
+          "type": "json"
+        },
+        "table": "resource_item"
+      }
+    }
+  ]
+}

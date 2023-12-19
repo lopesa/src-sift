@@ -1,0 +1,16 @@
+{
+  "id": "mig_cm0vanh89b2om9dr70b0",
+  "parentID": "mig_cm0q3ufv240vkgisma0g",
+  "checksum": "1:a7522c4427cf76ee182954431e827d03c04652b4dba4c64210b15f749e25d7e4",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "full_data",
+          "type": "json"
+        },
+        "table": "resource_item"
+      }
+    }
+  ]
+}

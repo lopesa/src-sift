@@ -1,5 +1,7 @@
+import { ResourceItem } from "@/xata";
 import { DataSourceMetadataRecord, DataSources } from "../const";
 import PapaParse from "papaparse";
+import { cleanString } from ".";
 
 export const fetchNewData = async (dataSource: DataSources) => {
   const fetchedData = await fetch(
@@ -20,14 +22,16 @@ export const fetchNewData = async (dataSource: DataSources) => {
 
 export const mapFetchedDataToSchema = (
   fetchedData: any,
-  dataSource: DataSources
+  dataSource: string
 ) => {
-  const mappedData = fetchedData?.map((data: any) => {
+  const mappedData: ResourceItem[] = fetchedData?.map((data: any) => {
     const mappedData = {
+      source: dataSource,
       title: data.title,
-      description: data.description,
+      description: cleanString(data.description),
       keywords: data.keyword,
-      distribution: JSON.stringify(data.distribution),
+      distribution: data.distribution,
+      full_data: data,
     };
     return mappedData;
   });

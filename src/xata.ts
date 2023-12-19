@@ -9,12 +9,11 @@ import type {
 const tables = [
   {
     name: "resource_source",
-    columns: [
-      { name: "name", type: "string", unique: true },
-      { name: "last_modified", type: "datetime" },
-      { name: "description", type: "text" },
+    columns: [{ name: "name", type: "string", unique: true }],
+    revLinks: [
+      { column: "source", table: "resource_item" },
+      { column: "resource_source", table: "resource_source_updates" },
     ],
-    revLinks: [{ column: "source", table: "resource_item" }],
   },
   {
     name: "resource_item",
@@ -23,7 +22,18 @@ const tables = [
       { name: "keywords", type: "multiple" },
       { name: "title", type: "string" },
       { name: "description", type: "text" },
-      { name: "distibution", type: "string" },
+      { name: "distribution", type: "json" },
+      { name: "full_data", type: "json" },
+    ],
+  },
+  {
+    name: "resource_source_updates",
+    columns: [
+      {
+        name: "resource_source",
+        type: "link",
+        link: { table: "resource_source" },
+      },
     ],
   },
 ] as const;
@@ -37,9 +47,13 @@ export type ResourceSourceRecord = ResourceSource & XataRecord;
 export type ResourceItem = InferredTypes["resource_item"];
 export type ResourceItemRecord = ResourceItem & XataRecord;
 
+export type ResourceSourceUpdates = InferredTypes["resource_source_updates"];
+export type ResourceSourceUpdatesRecord = ResourceSourceUpdates & XataRecord;
+
 export type DatabaseSchema = {
   resource_source: ResourceSourceRecord;
   resource_item: ResourceItemRecord;
+  resource_source_updates: ResourceSourceUpdatesRecord;
 };
 
 const DatabaseClient = buildClient();

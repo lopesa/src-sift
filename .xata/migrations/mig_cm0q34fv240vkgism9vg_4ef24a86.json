@@ -1,0 +1,12 @@
+{
+  "id": "mig_cm0q34fv240vkgism9vg",
+  "parentID": "mig_cm0ppafv240vkgism9lg",
+  "checksum": "1:4ef24a8619e4fe30dfae2330b950dc3aec8395842c61b7d9145d08210b85d395",
+  "operations": [
+    {
+      "addTable": {
+        "table": "resource_source_updates"
+      }
+    }
+  ]
+}
