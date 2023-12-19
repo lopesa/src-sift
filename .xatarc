@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://Tony-Lopes-s-workspace-hk8d1k.us-east-1.xata.sh/db/resource-browser",
+  "codegen": {
+    "output": "src/xata.ts"
+  }
+}

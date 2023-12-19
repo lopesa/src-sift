@@ -1,0 +1,14 @@
+{
+  "id": "mig_cm052b79r4v9fl3h5p1g",
+  "parentID": "mig_cm0523rj4unesutsp630",
+  "checksum": "1:0d2a4ff758a21520cee891507f0208ff82bb3ab6d85e25e65873811fc5bcfa08",
+  "operations": [
+    {
+      "renameColumn": {
+        "newName": "last_modified",
+        "oldName": "date-of-last-update",
+        "table": "resource-source"
+      }
+    }
+  ]
+}

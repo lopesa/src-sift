@@ -1,0 +1,13 @@
+{
+  "id": "mig_cm053ojj4unesutsp66g",
+  "parentID": "mig_cm052b79r4v9fl3h5p1g",
+  "checksum": "1:aa4b91065a5d93be84914b82d8759f8c5f3c1e6779c65cba0a3b64b827e0b362",
+  "operations": [
+    {
+      "renameTable": {
+        "newName": "resource_source",
+        "oldName": "resource-source"
+      }
+    }
+  ]
+}

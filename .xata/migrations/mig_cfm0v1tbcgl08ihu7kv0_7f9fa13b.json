@@ -1,0 +1,16 @@
+{
+  "id": "mig_cfm0v1tbcgl08ihu7kv0",
+  "parentID": "mig_cfm0m2vvf6p35vgbi4sg",
+  "checksum": "1:7f9fa13b24e20caab7e5232e149bf026519318cb0278d83fd908bc62954a454f",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "date-of-last-update",
+          "type": "datetime"
+        },
+        "table": "data-sources"
+      }
+    }
+  ]
+}

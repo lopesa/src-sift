@@ -1,0 +1,13 @@
+{
+  "id": "mig_cfm13i7vf6p35vgbi5r0",
+  "parentID": "mig_cfm0v1tbcgl08ihu7kv0",
+  "checksum": "1:da596a26b1caca64cab018c80df8fb243c0e7308981a0464f9ec4cecc49310b7",
+  "operations": [
+    {
+      "removeColumn": {
+        "column": "data",
+        "table": "data-sources"
+      }
+    }
+  ]
+}

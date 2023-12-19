@@ -1,0 +1,16 @@
+{
+  "id": "mig_cm0cbk7v240vkgism2pg",
+  "parentID": "mig_cm0ath0m1i8eher5on10",
+  "checksum": "1:4781c1b701d173d3994ed1414d3faa4dfdb1ca23fba73eb9d4a57738332f6a5f",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "keywords",
+          "type": "multiple"
+        },
+        "table": "resource_item"
+      }
+    }
+  ]
+}

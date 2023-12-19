@@ -1,0 +1,17 @@
+{
+  "id": "mig_cfm0lrvvf6p35vgbi4s0",
+  "parentID": "mig_cfm0ldlbcgl08ihu7kdg",
+  "checksum": "1:886093e8c202b0f2a4984423fedb8cfd6207e6d301aeb9ee9d2161e3e93d8088",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "name",
+          "type": "string",
+          "unique": true
+        },
+        "table": "data-sources"
+      }
+    }
+  ]
+}

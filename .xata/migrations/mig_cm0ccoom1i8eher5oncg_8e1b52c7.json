@@ -1,0 +1,16 @@
+{
+  "id": "mig_cm0ccoom1i8eher5oncg",
+  "parentID": "mig_cm0cc90ehjuqgg788t1g",
+  "checksum": "1:8e1b52c71fb8ba639017a9e81cd8dcbff3dd17151749740f15369c9a0d9eaf93",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "description",
+          "type": "text"
+        },
+        "table": "resource_item"
+      }
+    }
+  ]
+}
