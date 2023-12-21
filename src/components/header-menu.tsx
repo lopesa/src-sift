@@ -20,7 +20,7 @@ const HeaderMenu = () => {
       <NavigationMenuList className="flex justify-center bg-white p-1 rounded-md list-none m-0">
         <NavigationMenuItem>
           <Link href="/about" legacyBehavior passHref>
-            <NavigationMenuLink className="px-2 py-3 outline-none font-medium rounded text-sky-500 hover:text-sky-700">
+            <NavigationMenuLink className="px-2 py-3 outline-none font-medium rounded text-sky-600 hover:text-sky-800">
               About
             </NavigationMenuLink>
           </Link>
@@ -28,7 +28,7 @@ const HeaderMenu = () => {
 
         <NavigationMenuItem>
           <Link href="/bookmarks" legacyBehavior passHref>
-            <NavigationMenuLink className="px-2 py-3 outline-none font-medium rounded text-sky-500 hover:text-sky-700">
+            <NavigationMenuLink className="px-2 py-3 outline-none font-medium rounded text-sky-600 hover:text-sky-800">
               Bookmarks
             </NavigationMenuLink>
           </Link>
