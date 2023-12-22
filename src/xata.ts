@@ -24,6 +24,7 @@ const tables = [
       { name: "description", type: "text" },
       { name: "distribution", type: "json" },
       { name: "full_data", type: "json" },
+      { name: "data_types_by_file_extension", type: "multiple" },
     ],
   },
   {

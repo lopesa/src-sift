@@ -7,7 +7,7 @@ export const DataSources = {
   //   INTERNATIONAL_COFFEE_ORGANIZATION,
 } as const;
 
-type DataSourcesKeys = keyof typeof DataSources;
+export type DataSourcesKeys = keyof typeof DataSources;
 
 export const DataSourceMetadataRecord: Record<
   DataSourcesKeys,

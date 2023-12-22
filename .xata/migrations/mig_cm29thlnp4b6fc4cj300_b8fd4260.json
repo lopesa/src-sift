@@ -1,0 +1,16 @@
+{
+  "id": "mig_cm29thlnp4b6fc4cj300",
+  "parentID": "mig_cm0vanh89b2om9dr70b0",
+  "checksum": "1:b8fd4260af7d900cf3dd78ba914cdbebf5203690e629c687a9a8e5a010bc3fa1",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "data_types_by_file_extension",
+          "type": "multiple"
+        },
+        "table": "resource_item"
+      }
+    }
+  ]
+}
