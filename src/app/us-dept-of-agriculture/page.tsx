@@ -1,12 +1,14 @@
+import IndexDataList from "@/components/IndexDataList";
 import { DataSources } from "@/lib/const";
-import { getXataClient } from "@/xata";
+import { AppFinalResourceItem } from "@/lib/types";
+import { getDataTypesByFileExtension } from "@/lib/utils/data";
+import { ResourceItemRecord, getXataClient } from "@/xata";
+import { RecordArray, SelectedPick } from "@xata.io/client";
 
 const USDeptOfAgriculturePage = async () => {
-  //   debugger;
   const xata = getXataClient();
   let dataSourceEntry = await xata.db.resource_source
     .filter({ name: DataSources.DEPARTMENT_OF_AGRICULTURE })
-    // .filter({ name: "cats" }) // trow error
     .getFirst()
     .catch((err) => {
       throw err;
@@ -20,21 +22,22 @@ const USDeptOfAgriculturePage = async () => {
 
   let data = await xata.db.resource_item
     .filter({ "source.id": dataSourceID })
-    .getAll()
+    .getAll({ consistency: "eventual" })
+    // .getMany({ consistency: "eventual" })
+    // .getPaginated({ pagination: {
+    //   size: 100, offset: 0 }
+    // })
     .catch((err) => {
       throw err;
     });
+
   if (!data.length) {
     throw new Error("Problem getting data");
   }
+  // const serializedData = data.toSerializable();
+  const serializedData = JSON.parse(JSON.stringify(data));
 
-  debugger;
-
-  return (
-    <div>
-      {/* <h1>Welcome to Us Department of Agriculture Data Page!</h1> */}
-    </div>
-  );
+  return <div>{data && <IndexDataList data={serializedData} />}</div>;
 };
 
 export default USDeptOfAgriculturePage;
