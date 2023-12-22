@@ -1,23 +1,25 @@
 "use client";
 // import DataItemsAccordion from "components/DataItemsAccordion";
 import { useEffect, useState } from "react";
+
 // import { DatasetsAvailable } from "types/dataset-index-type";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { AppFinalResourceItem } from "@/lib/types";
 import { FC } from "react";
-import { JSONData } from "@xata.io/client";
-import { ResourceItem } from "@/xata";
+import { JSONData, SelectedPick } from "@xata.io/client";
+import { ResourceItem, ResourceItemRecord } from "@/xata";
+import DataItemsAccordion from "./DataItemsAccordion";
 
 interface IndexDataListProps {
-  data: JSONData<ResourceItem>[];
-  // data: any[];
+  // data: JSONData<ResourceItem>;
+  // data: any;
+  data: Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[];
 }
 
 type DataType = "xml" | "csv" | "xls" | "xlsx";
 
 const IndexDataList = ({ data }: IndexDataListProps) => {
-  // const IndexDataList: FC<IndexDataListProps> = ({ data }) => {
   const [filteredData, setFilteredData] = useState(data);
   const [showXml, setShowXml] = useState<boolean | "indeterminate">(false);
   const [showXls, setShowXls] = useState<boolean | "indeterminate">(false);
@@ -39,8 +41,6 @@ const IndexDataList = ({ data }: IndexDataListProps) => {
       includesArray.push("xlsx");
     }
 
-    debugger;
-
     // if no filters are set, show everything
     if (!includesArray.length) {
       setFilteredData(data);
@@ -48,11 +48,11 @@ const IndexDataList = ({ data }: IndexDataListProps) => {
     }
 
     const filtered = data.filter((item: any) => {
-      if (!item.dataTypesByFileExtension?.length) {
+      if (!item.data_types_by_file_extension?.length) {
         return false;
       }
       for (let i = 0; i < includesArray.length; i++) {
-        if (item.dataTypesByFileExtension.includes(includesArray[i])) {
+        if (item.data_types_by_file_extension.includes(includesArray[i])) {
           return true;
         }
       }
@@ -82,13 +82,13 @@ const IndexDataList = ({ data }: IndexDataListProps) => {
         <label className="text-xs">Open all accordions</label>
       </form>
 
-      {/* {filteredData && (
+      {filteredData && (
         <DataItemsAccordion
           dataItems={filteredData}
-          datasetId={DatasetsAvailable.departmentOfAgriculture}
+          // datasetId={DatasetsAvailable.departmentOfAgriculture}
           openAll={openAllAccordions}
         />
-      )} */}
+      )}
     </div>
   );
 };

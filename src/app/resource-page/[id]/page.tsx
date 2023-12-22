@@ -5,7 +5,8 @@ import { getDataTypesByFileExtension } from "@/lib/utils/data";
 import { ResourceItemRecord, getXataClient } from "@/xata";
 import { RecordArray, SelectedPick } from "@xata.io/client";
 
-const USDeptOfAgriculturePage = async () => {
+const ResourcePage = async ({ params }: { params: { id: string } }) => {
+  debugger;
   const xata = getXataClient();
   let dataSourceEntry = await xata.db.resource_source
     .filter({ name: DataSources.DEPARTMENT_OF_AGRICULTURE })
@@ -34,10 +35,13 @@ const USDeptOfAgriculturePage = async () => {
   if (!data.length) {
     throw new Error("Problem getting data");
   }
+
+  // const simpleData = data.toArray();
+
   // const serializedData = data.toSerializable();
   const serializedData = JSON.parse(JSON.stringify(data));
 
-  return <div>{data && <IndexDataList data={serializedData} />}</div>;
+  return <div>{serializedData && <IndexDataList data={serializedData} />}</div>;
 };
 
-export default USDeptOfAgriculturePage;
+export default ResourcePage;
