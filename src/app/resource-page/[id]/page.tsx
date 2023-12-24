@@ -1,15 +1,20 @@
 import IndexDataList from "@/components/IndexDataList";
-import { DataSources } from "@/lib/const";
+import { DataSources, getDataSourceFromRoute } from "@/lib/const";
 import { AppFinalResourceItem } from "@/lib/types";
 import { getDataTypesByFileExtension } from "@/lib/utils/data";
 import { ResourceItemRecord, getXataClient } from "@/xata";
 import { RecordArray, SelectedPick } from "@xata.io/client";
 
 const ResourcePage = async ({ params }: { params: { id: string } }) => {
-  debugger;
+  const dataSource = getDataSourceFromRoute(params.id);
+
+  if (!dataSource) {
+    throw new Error("Problem getting data source");
+  }
+
   const xata = getXataClient();
   let dataSourceEntry = await xata.db.resource_source
-    .filter({ name: DataSources.DEPARTMENT_OF_AGRICULTURE })
+    .filter({ name: DataSources[dataSource] })
     .getFirst()
     .catch((err) => {
       throw err;
@@ -22,6 +27,7 @@ const ResourcePage = async ({ params }: { params: { id: string } }) => {
   }
 
   let data = await xata.db.resource_item
+    .select(["title", "description"])
     .filter({ "source.id": dataSourceID })
     .getAll({ consistency: "eventual" })
     // .getMany({ consistency: "eventual" })
@@ -35,8 +41,6 @@ const ResourcePage = async ({ params }: { params: { id: string } }) => {
   if (!data.length) {
     throw new Error("Problem getting data");
   }
-
-  // const simpleData = data.toArray();
 
   // const serializedData = data.toSerializable();
   const serializedData = JSON.parse(JSON.stringify(data));
