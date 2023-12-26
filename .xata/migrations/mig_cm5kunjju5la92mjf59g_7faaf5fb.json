@@ -1,0 +1,16 @@
+{
+  "id": "mig_cm5kunjju5la92mjf59g",
+  "parentID": "mig_cm5kui3ju5la92mjf58g",
+  "checksum": "1:7faaf5fbe08a48d7c8d1ccb67554754cdd83c12cca174499d9e7118ac359eb8c",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "refresh_token",
+          "type": "string"
+        },
+        "table": "nextauth_accounts"
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "mig_cm5kui3ju5la92mjf58g",
+  "parentID": "mig_cm5kuejju5la92mjf57g",
+  "checksum": "1:109027425022eba43bb1f9b32fef14fec7f4ec6708c8470a32950b3a1c75a7f8",
+  "operations": [
+    {
+      "renameColumn": {
+        "newName": "providerAccountId",
+        "oldName": "providerAccountID",
+        "table": "nextauth_accounts"
+      }
+    }
+  ]
+}

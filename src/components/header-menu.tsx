@@ -41,6 +41,18 @@ const HeaderMenu = () => {
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
+
+        <NavigationMenuItem>
+          <Link href="/api/auth/signin" legacyBehavior passHref>
+            <NavigationMenuLink
+              className={cn(
+                "px-2 py-3 outline-none font-medium rounded text-sky-600 hover:text-sky-800"
+              )}
+            >
+              Sign In
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
       </NavigationMenuList>
 
       <div className="absolute flex justify-center w-full top-full left-0">

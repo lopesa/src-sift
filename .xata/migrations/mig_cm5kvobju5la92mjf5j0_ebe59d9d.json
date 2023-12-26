@@ -1,0 +1,16 @@
+{
+  "id": "mig_cm5kvobju5la92mjf5j0",
+  "parentID": "mig_cm5kvnbju5la92mjf5i0",
+  "checksum": "1:ebe59d9de39dffa6f8a75ba7529c475fb0bbfcf3d3b6e3f8418600725604167b",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "token",
+          "type": "string"
+        },
+        "table": "nextauth_verificationTokens"
+      }
+    }
+  ]
+}

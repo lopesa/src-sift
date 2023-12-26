@@ -1,0 +1,12 @@
+{
+  "id": "mig_cm5l0bbju5la92mjf5p0",
+  "parentID": "mig_cm5l07rju5la92mjf5ng",
+  "checksum": "1:7c847bfa6d1af9829018880dbd9583fc577bcf53b2ce1ec7a8fdf8af499b5b17",
+  "operations": [
+    {
+      "addTable": {
+        "table": "nextauth_users_sessions"
+      }
+    }
+  ]
+}

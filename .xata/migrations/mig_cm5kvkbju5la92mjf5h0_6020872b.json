@@ -1,0 +1,12 @@
+{
+  "id": "mig_cm5kvkbju5la92mjf5h0",
+  "parentID": "mig_cm5kvarju5la92mjf5fg",
+  "checksum": "1:6020872bd9f5678b8c5b7f3738b791566aed97cf2cf4cdc4fa0931d30d903e15",
+  "operations": [
+    {
+      "addTable": {
+        "table": "nextauth_verificationTokens"
+      }
+    }
+  ]
+}

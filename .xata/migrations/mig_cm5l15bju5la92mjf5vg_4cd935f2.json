@@ -1,0 +1,19 @@
+{
+  "id": "mig_cm5l15bju5la92mjf5vg",
+  "parentID": "mig_cm5l11bju5la92mjf5ug",
+  "checksum": "1:4cd935f2c7ab9c607fbd72d4b1215ec434e2508a3667d5438b1c78be1b20369f",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "user",
+          "type": "link",
+          "link": {
+            "table": "nextauth_users"
+          }
+        },
+        "table": "nextauth_sessions"
+      }
+    }
+  ]
+}
