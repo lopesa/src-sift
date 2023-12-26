@@ -1,50 +1,21 @@
 "use client";
-// import * as Accordion from "@radix-ui/react-accordion";
-// import {
-//   ChevronDownIcon,
-//   BookmarkIcon,
-//   BookmarkFilledIcon,
-// } from "@radix-ui/react-icons";
-// import styles from "styles/DataItemsAccordion.module.scss";
+
 import { useEffect, useState } from "react";
-// import DataItemDialog from "./DataItemDialog";
-// import { DatasetsAvailable } from "types/dataset-index-type";
-// import {
-//   InitialBookmarkIndexDataItem,
-//   InitialIndexDataItem,
-// } from "types/types-general";
-// import {
-//   addBookmark,
-//   removeBookmark as removeBookmarkLocal,
-//   selectBookmarks,
-// } from "features/bookmarksSlice";
-// import {
-//   useAddBookmarksMutation,
-//   useLazyGetBookmarksQuery,
-//   useRemoveBookmarkMutation,
-// } from "services/apiSlice";
-// import { useAppDispatch, useAppSelector } from "app/hooks";
 // import LoginSignupDialog from "components/LoginSignupDialog";
-// import {
-//   setHasSeenMakeAccountSuggestionDialog,
-//   selectHasSeenMakeAccountSuggestionDialog,
-// } from "app/User.slice";
-// import { useSelector } from "react-redux";
-// import { useNavigate } from "react-router-dom";
-// import { selectToken } from "app/User.slice";
-// import { selectDatasetSelected } from "app/DatasetSelected.slice";
+
 import DOMPurify from "dompurify";
-import { JSONData, SelectedPick } from "@xata.io/client";
-import { ResourceItem, ResourceItemRecord } from "@/xata";
-import { Accordion, AccordionContent, AccordionItem } from "./ui/accordion";
-import { AccordionTrigger } from "@radix-ui/react-accordion";
-import { ChevronDownIcon } from "lucide-react";
+import { SelectedPick } from "@xata.io/client";
+import { ResourceItemRecord } from "@/xata";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./ui/accordion";
+import DataItemDialog from "./DataItemDialog";
 
 interface DataItemsAccordionProps {
-  // dataItems: InitialIndexDataItem[] | InitialBookmarkIndexDataItem[];
-  // dataItems: JSONData<ResourceItem[]>;
   dataItems: Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[];
-  // datasetId: DatasetsAvailable;
   openAll?: boolean | "indeterminate";
 }
 
@@ -59,7 +30,6 @@ const DataItemsAccordion = ({
   const [value, setValue] = useState<string[]>([]);
   const [alertOpen, setAlertOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  // const token = useAppSelector(selectToken);
   // let bookmarks = token ? remoteBookmarks : localBookmarks;
   // const dispatch = useAppDispatch();
 
@@ -84,13 +54,13 @@ const DataItemsAccordion = ({
   //   }
   // }, [token, getRemoteBookmarks]);
 
-  // useEffect(() => {
-  //   if (openAll) {
-  //     setValue(dataItems.map((item) => item.id));
-  //   } else {
-  //     setValue([]);
-  //   }
-  // }, [dataItems, openAll]);
+  useEffect(() => {
+    if (openAll) {
+      setValue(dataItems.map((item) => item.id));
+    } else {
+      setValue([]);
+    }
+  }, [dataItems, openAll]);
 
   // const isBookmarked = (id: string) => {
   //   return (
@@ -170,15 +140,8 @@ const DataItemsAccordion = ({
       <Accordion type="multiple" value={value} onValueChange={setValue}>
         {dataItems?.length &&
           dataItems.map((dataItem, index) => (
-            <AccordionItem
-              key={index}
-              value={dataItem.id}
-              style={{ marginBottom: "5px" }}
-            >
-              <AccordionTrigger className={"flex mb-2"}>
-                <div className="w-5 flex-none mr-1">
-                  <ChevronDownIcon />
-                </div>
+            <AccordionItem key={index} value={dataItem.id}>
+              <AccordionTrigger className="text-sm text-left py-2 [&>svg]:ml-6">
                 {dataItem.title}
 
                 {/* <div className={styles.BookmarkContainer}>
@@ -214,13 +177,8 @@ const DataItemsAccordion = ({
                 ) : (
                   <div>No description available</div>
                 )}
-                {/* {activeDataset && (
-                  <DataItemDialog
-                    key={index}
-                    dataItem={dataItem}
-                    datasetId={activeDataset}
-                  />
-                )} */}
+
+                <DataItemDialog key={index} resourceId={dataItem?.id} />
               </AccordionContent>
             </AccordionItem>
           ))}

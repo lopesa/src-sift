@@ -23,3 +23,14 @@ export type AppFinalResourceItem = Readonly<
 > & {
   dataTypesByFileExtension?: string[];
 };
+
+export type DistributionItem = DataGovDistibutionItem;
+
+export type DataGovDistibutionItem = {
+  "@type"?: string;
+  downloadURL?: string;
+  accessURL?: string;
+  forma?: string;
+  mediaType?: string;
+  title?: string;
+};
