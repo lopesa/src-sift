@@ -95,17 +95,6 @@ const DataItemDialog = ({ resourceId }: DataItemDialogProps) => {
   //   //   )}
   // };
 
-  // const onOpenChange = (open: boolean) => {
-  //   // could also use useLazyQuery
-  //   setSkip(!open);
-  // };
-
-  // useEffect(() => {
-  //   if (data) {
-  //     console.log("Full Data: ", data);
-  //   }
-  // }, [data]);
-
   const getResourceDataOriginalDataHTML = (
     resourceData: JSONData<ResourceItemRecord>
   ) => {
