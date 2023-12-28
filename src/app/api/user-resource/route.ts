@@ -2,13 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getXataClient } from "@/xata";
 
-// const xata = getXataClient();
-
 export async function GET(req: NextRequest, res: NextResponse) {
   const params = req.nextUrl.searchParams;
   const userId = params.get("userId");
   // const resourceId = params.get("resourceId");
   const tempUser = params.get("temporary");
+  const getFullResourceItem = params.get("getFullResourceItem");
 
   // const { resourceId, userId, tempUser } = req.query;
 
@@ -24,6 +23,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
   const xata = getXataClient();
   const data = await xata.db.user_resources
+    .select(getFullResourceItem ? ["*", "resource.*"] : ["*"])
     .filter(filter)
     .getAll()
     .catch((e) => undefined);

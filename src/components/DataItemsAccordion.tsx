@@ -3,7 +3,7 @@
 import { useEffect, useState, useContext } from "react";
 // import LoginSignupDialog from "components/LoginSignupDialog";
 
-import DOMPurify from "dompurify";
+import { sanitize } from "isomorphic-dompurify";
 import {
   Accordion,
   AccordionContent,
@@ -186,7 +186,7 @@ const DataItemsAccordion = ({
                 {dataItem.description ? (
                   <div
                     dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(dataItem.description),
+                      __html: sanitize(dataItem.description),
                     }}
                   ></div>
                 ) : (

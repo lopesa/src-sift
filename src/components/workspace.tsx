@@ -1,12 +1,14 @@
 "use client";
 
-import { ResourceItemRecord } from "@/xata";
+import { ResourceItemRecord, UserResourcesRecord } from "@/xata";
 import { SelectedPick } from "@xata.io/client";
 import DataItemsAccordion from "./DataItemsAccordion";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { DataItemsAccordionItem } from "@/lib/types";
+import { TemporaryUserContext } from "@/context/temporaryUserProvider";
+import IndexDataList from "./IndexDataList";
 
 export type WorkspaceProps = {
   dataItems?: Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[];
@@ -14,17 +16,14 @@ export type WorkspaceProps = {
 
 const Workspace = ({ dataItems }: WorkspaceProps) => {
   const { data: session, status } = useSession();
-  const [temporaryUserId, setTemporaryUserId] = useLocalStorage(
-    "temporaryUserId",
-    ""
-  );
+  const temporaryUser = useContext(TemporaryUserContext);
 
   const [finalDataItems, setFinalDataItems] = useState<
     DataItemsAccordionItem[]
   >([]);
 
   useEffect(() => {
-    // if authenticated data comes down with the page
+    // if user is authenticated data comes down with the page
     if (status === "authenticated") {
       if (dataItems?.length) {
         setFinalDataItems(dataItems);
@@ -32,35 +31,37 @@ const Workspace = ({ dataItems }: WorkspaceProps) => {
       return;
     }
 
-    if (!temporaryUserId) {
-      let uuid = self.crypto.randomUUID();
-      setTemporaryUserId(uuid);
-      return;
-    }
-
     const getTempUserData = async () => {
       const tempUserData = await fetch(
-        `/api/get-resources-for-user?userId=${temporaryUserId}&temporary=true`
+        `/api/user-resource?userId=${temporaryUser?.id}&temporary=true&getFullResourceItem=true`
       ).catch((e) => {
         // console.log(e);
       });
-      const tempUserDataJson = await tempUserData?.json();
-      if (tempUserDataJson) {
-        setFinalDataItems(tempUserDataJson);
-      }
+      const tempUserDataJson: SelectedPick<
+        UserResourcesRecord,
+        ("*" | "resource.*")[]
+      >[] = await tempUserData?.json();
+
+      let data = tempUserDataJson.map(
+        (item) => item.resource as DataItemsAccordionItem
+      );
+
+      setFinalDataItems(data);
     };
 
-    getTempUserData().catch((e) => {
-      // console.log(e);
-    });
+    temporaryUser?.id &&
+      getTempUserData().catch((e) => {
+        // console.log(e);
+      });
   }, []);
 
   return (
     <div>
       <h1>Workspace</h1>
-      <div>
-        {finalDataItems.length && (
-          <DataItemsAccordion dataItems={finalDataItems} />
+      <div className="mx-auto my-0 max-w-[95vw] w-[760px]">
+        {!!finalDataItems.length && (
+          <IndexDataList data={finalDataItems} />
+          // <DataItemsAccordion dataItems={finalDataItems} />
         )}
       </div>
     </div>

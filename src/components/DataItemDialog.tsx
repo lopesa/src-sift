@@ -49,13 +49,13 @@ const DataItemDialog = ({ resourceId }: DataItemDialogProps) => {
       // throw new Error("Problem getting resource id");
     }
 
-    const response = await fetch(
-      `/api/get-resource-item?id=${resourceId}`
-    ).catch((error) => {
-      return error;
-      // debugger;
-      // throw new Error(error);
-    });
+    const response = await fetch(`/api/resource-item?id=${resourceId}`).catch(
+      (error) => {
+        return error;
+        // debugger;
+        // throw new Error(error);
+      }
+    );
 
     const serializedData = await response.json();
     setResourceData(serializedData.data);

@@ -1,9 +1,6 @@
 import IndexDataList from "@/components/IndexDataList";
 import { DataSources, getDataSourceFromRoute } from "@/lib/const";
-import { AppFinalResourceItem } from "@/lib/types";
-import { getDataTypesByFileExtension } from "@/lib/utils/data";
-import { ResourceItemRecord, getXataClient } from "@/xata";
-import { RecordArray, SelectedPick } from "@xata.io/client";
+import { getXataClient } from "@/xata";
 
 const ResourcePage = async ({ params }: { params: { id: string } }) => {
   const dataSource = getDataSourceFromRoute(params.id);
