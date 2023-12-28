@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 // import LoginSignupDialog from "components/LoginSignupDialog";
 
 import DOMPurify from "dompurify";
-import { SelectedPick } from "@xata.io/client";
-import { ResourceItemRecord } from "@/xata";
 import {
   Accordion,
   AccordionContent,
@@ -13,9 +11,15 @@ import {
   AccordionTrigger,
 } from "./ui/accordion";
 import DataItemDialog from "./DataItemDialog";
+import { useSession } from "next-auth/react";
+import { DataItemsAccordionItem, SessionWithUserId } from "@/lib/types";
+import { SaveIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { TemporaryUserContext } from "@/context/temporaryUserProvider";
 
 interface DataItemsAccordionProps {
-  dataItems: Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[];
+  // dataItems: Readonly<SelectedPick<ResourceItemRecord, ["*"]>> & Saved[];
+  dataItems: DataItemsAccordionItem[];
   openAll?: boolean | "indeterminate";
 }
 
@@ -23,13 +27,53 @@ const DataItemsAccordion = ({
   dataItems,
   openAll,
 }: DataItemsAccordionProps) => {
-  // const localBookmarks = useAppSelector(selectBookmarks);
-  // const activeDataset = useSelector(selectDatasetSelected);
-  // const [getRemoteBookmarks, { data: remoteBookmarks, isLoading, error }] =
-  //   useLazyGetBookmarksQuery();
+  const { data: session, status } = useSession();
   const [value, setValue] = useState<string[]>([]);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [savedItemIds, setSavedItemIds] = useState<string[]>([]);
+  const temporaryUser = useContext(TemporaryUserContext);
+
+  // useEffect(() => {
+  //   // if authenticated data comes down with the page
+  //   if (status === "authenticated") {
+  //     const getUserData = async () => {
+  //       const userData = await fetch(
+  //         `/api/get-resources-for-user?userId=${
+  //           (session as SessionWithUserId)?.user?.id
+  //         }`
+  //       ).catch((e) => {
+  //         // console.log(e);
+  //       });
+  //       const userDataJson = await userData?.json();
+  //       if (userDataJson) {
+  //         setSavedItemIds(userDataJson.map((item: any) => item.id));
+  //       }
+  //     };
+  //     getUserData().catch((e) => {
+  //       // console.log(e);
+  //     });
+  //     return;
+  //   }
+
+  //   const getTempUserData = async () => {
+  //     const tempUserData = await fetch(
+  //       `/api/get-resources-for-user?userId=${temporaryUserId}&temporary=true`
+  //     ).catch((e) => {
+  //       // console.log(e);
+  //     });
+  //     const tempUserDataJson = await tempUserData?.json();
+  //     if (tempUserDataJson) {
+  //       setSavedItemIds(tempUserDataJson.map((item: any) => item.id));
+  //     }
+  //   };
+
+  //   getTempUserData().catch((e) => {
+  //     // console.log(e);
+  //   });
+  // }, [setSavedItemIds, status]);
+
+  // useEffect(() => {}, [savedItemIds]);
+
+  // const [savedItems, setSavedItems] = useState<Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[]>([]);
   // let bookmarks = token ? remoteBookmarks : localBookmarks;
   // const dispatch = useAppDispatch();
 
@@ -48,12 +92,6 @@ const DataItemsAccordion = ({
   //   { isLoading: removeBookmarkIsLoading, error: removeBookmarkError },
   // ] = useRemoveBookmarkMutation();
 
-  // useEffect(() => {
-  //   if (token) {
-  //     getRemoteBookmarks();
-  //   }
-  // }, [token, getRemoteBookmarks]);
-
   useEffect(() => {
     if (openAll) {
       setValue(dataItems.map((item) => item.id));
@@ -62,72 +100,84 @@ const DataItemsAccordion = ({
     }
   }, [dataItems, openAll]);
 
-  // const isBookmarked = (id: string) => {
-  //   return (
-  //     bookmarks &&
-  //     bookmarks.find((bookmark) =>
-  //       token
-  //         ? (bookmark as InitialBookmarkIndexDataItem).originalId === id
-  //         : bookmark.id === id
-  //     )
-  //   );
-  // };
+  const onClickSave = async (e: React.MouseEvent<SVGElement>, id: string) => {
+    e.preventDefault();
 
-  // const onClickBookmark = async (e: React.MouseEvent<SVGElement>) => {
-  //   e.preventDefault();
-  //   if (!token && !hasSeenMakeAccountSuggestionDialog) {
-  //     setDialogOpen(true);
-  //     dispatch(setHasSeenMakeAccountSuggestionDialog(true));
-  //   }
+    const userId =
+      status === "authenticated"
+        ? (session as SessionWithUserId)?.user?.id
+        : temporaryUser?.id;
 
-  //   const id = e.currentTarget.dataset.itemId;
-  //   if (!id) {
-  //     return;
-  //   }
+    if (!userId) {
+      return;
+    }
 
-  //   const fullDataItemFromId = dataItems.find((item) =>
-  //     isInitialBookmarkIndexDataItem(item) ? item.originalId : item.id === id
-  //   );
+    const itemIsSaved = isSaved(id, savedItemIds);
 
-  //   if (!fullDataItemFromId) {
-  //     return;
-  //   }
+    // preemtively set the state
+    if (itemIsSaved) {
+      setSavedItemIds(savedItemIds.filter((savedId) => savedId !== id));
+    } else {
+      setSavedItemIds([...savedItemIds, id]);
+    }
 
-  //   if (token) {
-  //     if (!isBookmarked(id)) {
-  //       const bookmarks = [
-  //         { dataItemUuid: id, datasetId: fullDataItemFromId.datasetId },
-  //       ];
-  //       const result = await addBookmarks(bookmarks)
-  //         .unwrap()
-  //         .catch((error) => {
-  //           // debugger;
-  //           // setServerError(true);
-  //           // @TODO: setServerErrors, after getting a better response back from the server
-  //           // actually, keeping this simple for now, just showing a generic error message
-  //         });
-  //     } else {
-  //       // debugger;
-  //       const result = await removeBookmark(id)
-  //         .unwrap()
-  //         .catch((error) => {
-  //           // debugger;
-  //           // setServerError(true);
-  //         });
-  //     }
-  //     getRemoteBookmarks();
-  //   } else {
-  //     isBookmarked(id)
-  //       ? dispatch(removeBookmarkLocal(fullDataItemFromId))
-  //       : dispatch(addBookmark(fullDataItemFromId));
-  //   }
-  // };
+    if (itemIsSaved) {
+      // delete remote
+      const deleteUserDataItem = async () => {
+        const deleted = await fetch(`/api/user-resource`, {
+          method: "DELETE",
+          body: JSON.stringify({
+            userId,
+            resourceId: id,
+            tempUser: status === "unauthenticated",
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).catch((e) => {
+          // console.log(e);
+        });
 
-  // const isInitialBookmarkIndexDataItem = (
-  //   indexItem: InitialBookmarkIndexDataItem | InitialIndexDataItem
-  // ): indexItem is InitialBookmarkIndexDataItem => {
-  //   return (indexItem as InitialBookmarkIndexDataItem).originalId !== undefined;
-  // };
+        if (!deleted) {
+          // failed remotely, undo preemtive state change
+          setSavedItemIds([...savedItemIds, id]);
+        }
+      };
+
+      deleteUserDataItem().catch((e) => {
+        // console.log(e);
+      });
+    } else {
+      const saveUserDataItem = async () => {
+        const userDataItem = await fetch(`/api/user-resource`, {
+          method: "POST",
+          body: JSON.stringify({
+            userId,
+            resourceId: id,
+            tempUser: status === "unauthenticated",
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).catch((e) => {
+          // console.log(e);
+        });
+        const userDataItemJson = await userDataItem?.json();
+
+        if (!userDataItemJson) {
+          // failed remotely, undo preemtive state change
+          setSavedItemIds(savedItemIds.filter((savedId) => savedId !== id));
+        }
+      };
+      saveUserDataItem().catch((e) => {
+        // console.log(e);
+      });
+    }
+  };
+
+  const isSaved = (id: string, savedItemIds: string[]) => {
+    return savedItemIds && savedItemIds.includes(id);
+  };
 
   return (
     <>
@@ -142,29 +192,19 @@ const DataItemsAccordion = ({
           dataItems.map((dataItem, index) => (
             <AccordionItem key={index} value={dataItem.id}>
               <AccordionTrigger className="text-sm text-left py-2 [&>svg]:ml-6">
-                {dataItem.title}
-
-                {/* <div className={styles.BookmarkContainer}>
-                  {isBookmarked(
-                    isInitialBookmarkIndexDataItem(dataItem)
-                      ? dataItem.originalId
-                      : dataItem.id
-                  ) ? (
-                    <BookmarkFilledIcon
-                      data-item-id={
-                        isInitialBookmarkIndexDataItem(dataItem)
-                          ? dataItem.originalId
-                          : dataItem.id
-                      }
-                      onClick={onClickBookmark}
-                    />
-                  ) : (
-                    <BookmarkIcon
-                      data-item-id={dataItem.id}
-                      onClick={onClickBookmark}
-                    />
+                <SaveIcon
+                  size={16}
+                  data-item-id={dataItem.id}
+                  className={cn(
+                    isSaved(dataItem.id, savedItemIds)
+                      ? "text-emerald-600"
+                      : "text-gray-400"
                   )}
-                </div> */}
+                  onClick={(e) => {
+                    onClickSave(e, dataItem.id);
+                  }}
+                />
+                <div className="flex-1 pl-4">{dataItem.title}</div>
               </AccordionTrigger>
 
               <AccordionContent className="text-xs [&*]:m-0 [&p]:mb-2.5 mb-6 pl-8">

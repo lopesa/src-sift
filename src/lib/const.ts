@@ -44,3 +44,9 @@ export const getDataSourceFromRoute = (route: string) => {
   );
   return dataSource as DataSourcesKeys;
 };
+
+export const UserStatus = {
+  AUTHENTICATED: "authenticated",
+  UNAUTHENTICATED: "unauthenticated",
+  LOADING: "loading",
+} as const;

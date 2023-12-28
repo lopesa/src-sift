@@ -1,5 +1,6 @@
 import { ResourceItemRecord } from "@/xata";
 import { SelectedPick } from "@xata.io/client";
+import { Session } from "next-auth";
 
 export type DatasourceMetadata = {
   originalJsonData?: Array<object>;
@@ -34,3 +35,15 @@ export type DataGovDistibutionItem = {
   mediaType?: string;
   title?: string;
 };
+
+export interface Saved {
+  isSaved?: boolean;
+}
+
+export type DataItemsAccordionItem = Readonly<
+  SelectedPick<ResourceItemRecord, ["*"]>
+> &
+  Saved;
+
+type SessionUserWithId = Session["user"] & { id?: string };
+export type SessionWithUserId = Session & { user?: SessionUserWithId };

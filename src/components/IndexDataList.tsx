@@ -12,8 +12,6 @@ import { ResourceItem, ResourceItemRecord } from "@/xata";
 import DataItemsAccordion from "./DataItemsAccordion";
 
 interface IndexDataListProps {
-  // data: JSONData<ResourceItem>;
-  // data: any;
   data: Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[];
 }
 
@@ -85,7 +83,6 @@ const IndexDataList = ({ data }: IndexDataListProps) => {
       {filteredData && (
         <DataItemsAccordion
           dataItems={filteredData}
-          // datasetId={DatasetsAvailable.departmentOfAgriculture}
           openAll={openAllAccordions}
         />
       )}

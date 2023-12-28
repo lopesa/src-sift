@@ -26,6 +26,7 @@ const tables = [
       { name: "full_data", type: "json" },
       { name: "data_types_by_file_extension", type: "multiple" },
     ],
+    revLinks: [{ column: "resource", table: "user_resources" }],
   },
   {
     name: "resource_source_updates",
@@ -50,6 +51,7 @@ const tables = [
       { column: "user", table: "nextauth_users_accounts" },
       { column: "user", table: "nextauth_users_sessions" },
       { column: "user", table: "nextauth_sessions" },
+      { column: "user", table: "user_resources" },
     ],
   },
   {
@@ -101,6 +103,19 @@ const tables = [
     ],
     revLinks: [{ column: "session", table: "nextauth_users_sessions" }],
   },
+  {
+    name: "user_resources",
+    columns: [
+      { name: "resource", type: "link", link: { table: "resource_item" } },
+      { name: "user", type: "link", link: { table: "nextauth_users" } },
+      { name: "temp_user", type: "link", link: { table: "temporary_users" } },
+    ],
+  },
+  {
+    name: "temporary_users",
+    columns: [],
+    revLinks: [{ column: "temp_user", table: "user_resources" }],
+  },
 ] as const;
 
 export type SchemaTables = typeof tables;
@@ -135,6 +150,12 @@ export type NextauthUsersSessionsRecord = NextauthUsersSessions & XataRecord;
 export type NextauthSessions = InferredTypes["nextauth_sessions"];
 export type NextauthSessionsRecord = NextauthSessions & XataRecord;
 
+export type UserResources = InferredTypes["user_resources"];
+export type UserResourcesRecord = UserResources & XataRecord;
+
+export type TemporaryUsers = InferredTypes["temporary_users"];
+export type TemporaryUsersRecord = TemporaryUsers & XataRecord;
+
 export type DatabaseSchema = {
   resource_source: ResourceSourceRecord;
   resource_item: ResourceItemRecord;
@@ -145,6 +166,8 @@ export type DatabaseSchema = {
   nextauth_users_accounts: NextauthUsersAccountsRecord;
   nextauth_users_sessions: NextauthUsersSessionsRecord;
   nextauth_sessions: NextauthSessionsRecord;
+  user_resources: UserResourcesRecord;
+  temporary_users: TemporaryUsersRecord;
 };
 
 const DatabaseClient = buildClient();

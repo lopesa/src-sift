@@ -1,0 +1,19 @@
+{
+  "id": "mig_cm654gi44015etohku0g",
+  "parentID": "mig_cm653ebbg06p0tdtg6fg",
+  "checksum": "1:fb8a908f28c8da0c1209674d912f88e1ebb902c8c2451c940c5dd515f682116e",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "temp_user",
+          "type": "link",
+          "link": {
+            "table": "temporary_users"
+          }
+        },
+        "table": "user_resources"
+      }
+    }
+  ]
+}

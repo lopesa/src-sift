@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/nav";
 import NextAuthProvider from "@/context/nextAuthProvider";
+import TemporaryUserProvider from "@/context/temporaryUserProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description: "Explore publically available datasets, apis, and more",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -22,8 +23,10 @@ export default function RootLayout({
         className={`${inter.className} flex relative flex-col items-center justify-center`}
       >
         <NextAuthProvider>
-          <Nav />
-          {children}
+          <TemporaryUserProvider>
+            <Nav />
+            {children}
+          </TemporaryUserProvider>
         </NextAuthProvider>
       </body>
     </html>

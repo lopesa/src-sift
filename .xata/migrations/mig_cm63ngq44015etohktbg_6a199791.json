@@ -1,0 +1,19 @@
+{
+  "id": "mig_cm63ngq44015etohktbg",
+  "parentID": "mig_cm63ndi44015etohktag",
+  "checksum": "1:6a199791858a1a6f49be452450c3b1c9f3ee58ec50cb799f38c9de2021192b02",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "user",
+          "type": "link",
+          "link": {
+            "table": "nextauth_users"
+          }
+        },
+        "table": "user_resources"
+      }
+    }
+  ]
+}
