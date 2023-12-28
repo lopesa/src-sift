@@ -4,6 +4,33 @@ import { getXataClient } from "@/xata";
 
 // const xata = getXataClient();
 
+export async function GET(req: NextRequest, res: NextResponse) {
+  const params = req.nextUrl.searchParams;
+  const userId = params.get("userId");
+  // const resourceId = params.get("resourceId");
+  const tempUser = params.get("temporary");
+
+  // const { resourceId, userId, tempUser } = req.query;
+
+  if (!userId) {
+    return NextResponse.json({
+      error: "Invalid request body",
+    });
+  }
+
+  const filter = !!tempUser
+    ? { "temp_user.id": userId }
+    : { "user.id": userId };
+
+  const xata = getXataClient();
+  const data = await xata.db.user_resources
+    .filter(filter)
+    .getAll()
+    .catch((e) => undefined);
+
+  return NextResponse.json(JSON.parse(JSON.stringify(data)));
+}
+
 export async function POST(req: NextRequest, res: NextResponse) {
   const requestBody = await req.json().catch((error) => {
     return NextResponse.json({

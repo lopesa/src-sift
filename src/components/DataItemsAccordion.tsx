@@ -30,67 +30,39 @@ const DataItemsAccordion = ({
   const { data: session, status } = useSession();
   const [value, setValue] = useState<string[]>([]);
   const [savedItemIds, setSavedItemIds] = useState<string[]>([]);
+  // const [savedItems, setSavedItems] = useState<Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[]>([]);
   const temporaryUser = useContext(TemporaryUserContext);
 
-  // useEffect(() => {
-  //   // if authenticated data comes down with the page
-  //   if (status === "authenticated") {
-  //     const getUserData = async () => {
-  //       const userData = await fetch(
-  //         `/api/get-resources-for-user?userId=${
-  //           (session as SessionWithUserId)?.user?.id
-  //         }`
-  //       ).catch((e) => {
-  //         // console.log(e);
-  //       });
-  //       const userDataJson = await userData?.json();
-  //       if (userDataJson) {
-  //         setSavedItemIds(userDataJson.map((item: any) => item.id));
-  //       }
-  //     };
-  //     getUserData().catch((e) => {
-  //       // console.log(e);
-  //     });
-  //     return;
-  //   }
+  const getUserId = () => {
+    if (status === "authenticated") {
+      return (session as SessionWithUserId)?.user?.id;
+    }
+    return temporaryUser?.id;
+  };
 
-  //   const getTempUserData = async () => {
-  //     const tempUserData = await fetch(
-  //       `/api/get-resources-for-user?userId=${temporaryUserId}&temporary=true`
-  //     ).catch((e) => {
-  //       // console.log(e);
-  //     });
-  //     const tempUserDataJson = await tempUserData?.json();
-  //     if (tempUserDataJson) {
-  //       setSavedItemIds(tempUserDataJson.map((item: any) => item.id));
-  //     }
-  //   };
+  useEffect(() => {
+    const userId = getUserId();
 
-  //   getTempUserData().catch((e) => {
-  //     // console.log(e);
-  //   });
-  // }, [setSavedItemIds, status]);
+    const getUserData = async () => {
+      const userData = await fetch(
+        `/api/user-resource?userId=${getUserId()}&temporary=${
+          status !== "authenticated"
+        }`
+      ).catch((e) => {
+        // console.log(e);
+      });
+      const userDataJson = await userData?.json();
+      if (userDataJson) {
+        const map = userDataJson.map((item: any) => item.resource.id);
+        setSavedItemIds(map);
+      }
+    };
 
-  // useEffect(() => {}, [savedItemIds]);
-
-  // const [savedItems, setSavedItems] = useState<Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[]>([]);
-  // let bookmarks = token ? remoteBookmarks : localBookmarks;
-  // const dispatch = useAppDispatch();
-
-  // const hasSeenMakeAccountSuggestionDialog = useSelector(
-  //   selectHasSeenMakeAccountSuggestionDialog
-  // );
-  // const navigate = useNavigate();
-
-  // const [
-  //   addBookmarks,
-  //   { isLoading: addBookmarksIsLoading, error: addBookmarksError },
-  // ] = useAddBookmarksMutation();
-
-  // const [
-  //   removeBookmark,
-  //   { isLoading: removeBookmarkIsLoading, error: removeBookmarkError },
-  // ] = useRemoveBookmarkMutation();
+    getUserData().catch((e) => {
+      // console.log(e);
+    });
+    return;
+  }, [setSavedItemIds, status, session, temporaryUser]);
 
   useEffect(() => {
     if (openAll) {
@@ -100,13 +72,14 @@ const DataItemsAccordion = ({
     }
   }, [dataItems, openAll]);
 
+  // const hasSeenMakeAccountSuggestionDialog = useSelector(
+  //   selectHasSeenMakeAccountSuggestionDialog
+  // );
+
   const onClickSave = async (e: React.MouseEvent<SVGElement>, id: string) => {
     e.preventDefault();
 
-    const userId =
-      status === "authenticated"
-        ? (session as SessionWithUserId)?.user?.id
-        : temporaryUser?.id;
+    const userId = getUserId();
 
     if (!userId) {
       return;
@@ -179,6 +152,19 @@ const DataItemsAccordion = ({
     return savedItemIds && savedItemIds.includes(id);
   };
 
+  const SaveIconComponent = ({ resourceId }: { resourceId: string }) => (
+    <SaveIcon
+      size={16}
+      data-item-id={resourceId}
+      className={cn(
+        isSaved(resourceId, savedItemIds) ? "text-emerald-700" : "text-gray-300"
+      )}
+      onClick={(e) => {
+        onClickSave(e, resourceId);
+      }}
+    />
+  );
+
   return (
     <>
       {/* <LoginSignupDialog
@@ -192,18 +178,7 @@ const DataItemsAccordion = ({
           dataItems.map((dataItem, index) => (
             <AccordionItem key={index} value={dataItem.id}>
               <AccordionTrigger className="text-sm text-left py-2 [&>svg]:ml-6">
-                <SaveIcon
-                  size={16}
-                  data-item-id={dataItem.id}
-                  className={cn(
-                    isSaved(dataItem.id, savedItemIds)
-                      ? "text-emerald-600"
-                      : "text-gray-400"
-                  )}
-                  onClick={(e) => {
-                    onClickSave(e, dataItem.id);
-                  }}
-                />
+                <SaveIconComponent resourceId={dataItem.id} />
                 <div className="flex-1 pl-4">{dataItem.title}</div>
               </AccordionTrigger>
 
