@@ -24,7 +24,7 @@ const ResourcePage = async ({ params }: { params: { id: string } }) => {
   }
 
   let data = await xata.db.resource_item
-    .select(["title", "description"])
+    .select(["title", "description", "data_types_by_file_extension"])
     .filter({ "source.id": dataSourceID })
     .getAll({ consistency: "eventual" })
     // .getMany({ consistency: "eventual" })

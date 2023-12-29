@@ -2,10 +2,8 @@
 
 import { ResourceItemRecord, UserResourcesRecord } from "@/xata";
 import { SelectedPick } from "@xata.io/client";
-import DataItemsAccordion from "./DataItemsAccordion";
 import { useSession } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
-import { useLocalStorage } from "usehooks-ts";
 import { DataItemsAccordionItem } from "@/lib/types";
 import { TemporaryUserContext } from "@/context/temporaryUserProvider";
 import IndexDataList from "./IndexDataList";
@@ -59,10 +57,7 @@ const Workspace = ({ dataItems }: WorkspaceProps) => {
     <div>
       <h1>Workspace</h1>
       <div className="mx-auto my-0 max-w-[95vw] w-[760px]">
-        {!!finalDataItems.length && (
-          <IndexDataList data={finalDataItems} />
-          // <DataItemsAccordion dataItems={finalDataItems} />
-        )}
+        {!!finalDataItems.length && <IndexDataList data={finalDataItems} />}
       </div>
     </div>
   );
