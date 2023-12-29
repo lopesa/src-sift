@@ -21,11 +21,13 @@ interface DataItemsAccordionProps {
   // dataItems: Readonly<SelectedPick<ResourceItemRecord, ["*"]>> & Saved[];
   dataItems: DataItemsAccordionItem[];
   openAll?: boolean | "indeterminate";
+  postSaveOrDeleteResourceItemAction?: () => void;
 }
 
 const DataItemsAccordion = ({
   dataItems,
   openAll,
+  postSaveOrDeleteResourceItemAction,
 }: DataItemsAccordionProps) => {
   const { data: session, status } = useSession();
   const [value, setValue] = useState<string[]>([]);
@@ -117,9 +119,10 @@ const DataItemsAccordion = ({
         }
       };
 
-      deleteUserDataItem().catch((e) => {
+      await deleteUserDataItem().catch((e) => {
         // console.log(e);
       });
+      postSaveOrDeleteResourceItemAction?.();
     } else {
       const saveUserDataItem = async () => {
         const userDataItem = await fetch(`/api/user-resource`, {
@@ -142,9 +145,10 @@ const DataItemsAccordion = ({
           setSavedItemIds(savedItemIds.filter((savedId) => savedId !== id));
         }
       };
-      saveUserDataItem().catch((e) => {
+      await saveUserDataItem().catch((e) => {
         // console.log(e);
       });
+      postSaveOrDeleteResourceItemAction?.();
     }
   };
 

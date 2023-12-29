@@ -1,23 +1,22 @@
 "use client";
-// import DataItemsAccordion from "components/DataItemsAccordion";
+
 import { useEffect, useState } from "react";
-
-// import { DatasetsAvailable } from "types/dataset-index-type";
-
 import { Checkbox } from "@/components/ui/checkbox";
-import { AppFinalResourceItem } from "@/lib/types";
-import { FC } from "react";
-import { JSONData, SelectedPick } from "@xata.io/client";
-import { ResourceItem, ResourceItemRecord } from "@/xata";
+import { SelectedPick } from "@xata.io/client";
+import { ResourceItemRecord } from "@/xata";
 import DataItemsAccordion from "./DataItemsAccordion";
 
 interface IndexDataListProps {
   data: Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[];
+  postSaveOrDeleteResourceItemAction?: () => void;
 }
 
 type DataType = "xml" | "csv" | "xls" | "xlsx";
 
-const IndexDataList = ({ data }: IndexDataListProps) => {
+const IndexDataList = ({
+  data,
+  postSaveOrDeleteResourceItemAction,
+}: IndexDataListProps) => {
   const [filteredData, setFilteredData] = useState(data);
   const [showXml, setShowXml] = useState<boolean | "indeterminate">(false);
   const [showXls, setShowXls] = useState<boolean | "indeterminate">(false);
@@ -84,6 +83,9 @@ const IndexDataList = ({ data }: IndexDataListProps) => {
         <DataItemsAccordion
           dataItems={filteredData}
           openAll={openAllAccordions}
+          postSaveOrDeleteResourceItemAction={
+            postSaveOrDeleteResourceItemAction
+          }
         />
       )}
     </div>

@@ -4,12 +4,10 @@ import { getXataClient } from "@/xata";
 
 export async function GET(req: NextRequest, res: NextResponse) {
   const params = req.nextUrl.searchParams;
+
   const userId = params.get("userId");
-  // const resourceId = params.get("resourceId");
   const tempUser = params.get("temporary");
   const getFullResourceItem = params.get("getFullResourceItem");
-
-  // const { resourceId, userId, tempUser } = req.query;
 
   if (!userId) {
     return NextResponse.json({
@@ -91,5 +89,4 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
     .catch((e) => undefined);
 
   return NextResponse.json(deletedRecord?.toSerializable());
-  // const deletedUserResource = await xata.db.user_resources.deleteOne
 }
