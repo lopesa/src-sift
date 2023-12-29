@@ -24,9 +24,9 @@ const Workspace = ({ dataItems }: WorkspaceProps) => {
     const varUrl =
       status === "authenticated" && (session as SessionWithUserId)?.user?.id
         ? `userId=${(session as SessionWithUserId)?.user?.id}`
-        : `?userId=${temporaryUser?.id}&temporary=true`;
+        : `userId=${temporaryUser?.id}&temporary=true`;
 
-    const url = `/api/user-resource${varUrl}&getFullResourceItem=true`;
+    const url = `/api/user-resource?${varUrl}&getFullResourceItem=true`;
 
     const userData = await fetch(url).catch((e) => {
       // console.log(e);
@@ -44,24 +44,18 @@ const Workspace = ({ dataItems }: WorkspaceProps) => {
   }, [session, status, temporaryUser]);
 
   useEffect(() => {
-    // if user is authenticated data initially comes down with the page
-    if (status === "authenticated") {
-      if (dataItems?.length) {
-        setFinalDataItems(dataItems);
-      }
+    if (!(session as SessionWithUserId)?.user?.id && !temporaryUser?.id) {
       return;
     }
-
     // if the temp user's items have already been fetched, don't fetch again
     if (dataItems?.length) {
       return;
     }
 
-    temporaryUser?.id &&
-      getUserData().catch((e) => {
-        // console.log(e);
-      });
-  }, [getUserData, status, session, temporaryUser, dataItems]);
+    getUserData().catch((e) => {
+      // console.log(e);
+    });
+  }, [getUserData, status, temporaryUser, dataItems, setFinalDataItems]);
 
   return (
     <div>

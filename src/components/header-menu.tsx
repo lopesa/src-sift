@@ -35,7 +35,8 @@ const HeaderMenu = () => {
             <NavigationMenuLink
               className={cn(
                 "px-2 py-3 outline-none font-medium rounded text-sky-600 hover:text-sky-800",
-                status === UserStatus.AUTHENTICATED && "emerald-900 text-white"
+                status === UserStatus.AUTHENTICATED &&
+                  "bg-emerald-600 text-white"
               )}
             >
               Workspace

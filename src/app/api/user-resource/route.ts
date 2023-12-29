@@ -15,9 +15,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
     });
   }
 
-  const filter = !!tempUser
-    ? { "temp_user.id": userId }
-    : { "user.id": userId };
+  const filter =
+    tempUser === "true" ? { "temp_user.id": userId } : { "user.id": userId };
 
   const xata = getXataClient();
   const data = await xata.db.user_resources
