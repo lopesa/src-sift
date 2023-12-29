@@ -84,7 +84,7 @@ export const getDataTypesByFileExtension = (distribution: any) => {
   return Object.keys(dataTypesByFileExtension);
 };
 
-const getFileExtension = (filename: string) => {
+export const getFileExtension = (filename: string) => {
   // some bitshifting magic to get the file extension (stack overflow)
   // return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
   if (!filename.includes(".")) {

@@ -26,6 +26,8 @@ import DOMPurify from "dompurify";
 import { useState } from "react";
 import { DistributionItem } from "@/lib/types";
 import { Separator } from "./ui/separator";
+import PreviewData from "./PreviewData";
+import { getFileExtension } from "@/lib/utils/data";
 
 interface DataItemDialogProps {
   resourceId: string;
@@ -61,39 +63,40 @@ const DataItemDialog = ({ resourceId }: DataItemDialogProps) => {
     setResourceData(serializedData.data);
   };
 
-  // const getPreviewDataLink = (distributionItem: DistributionItems) => {
-  //   const url = distributionItem?.downloadURL || distributionItem?.accessURL;
-  //   if (!url) {
-  //     return;
-  //   }
-  //   const extension = getFileExtension(url);
-  //   const shouldOfferPreviewData =
-  //     typeof extension === "string" &&
-  //     (extension.includes("csv") || extension.includes("xls"));
+  const getPreviewDataLink = (distributionItem: DistributionItem) => {
+    const url = distributionItem?.downloadURL || distributionItem?.accessURL;
+    if (!url) {
+      return;
+    }
+    const extension = getFileExtension(url);
+    const shouldOfferPreviewData =
+      typeof extension === "string" &&
+      (extension.includes("csv") || extension.includes("xls"));
 
-  //   // return shouldOfferPreviewData && <ChartDialog chartItemUrl={url} />;
-  //   // return shouldOfferPreviewData && <PreviewData url={url} />;
-  //   return (
-  //     shouldOfferPreviewData && (
-  //       <div className={styles.PreviewDataContainer}>
-  //         <PreviewData url={url} />
-  //       </div>
-  //     )
-  //   );
+    // return shouldOfferPreviewData && <ChartDialog chartItemUrl={url} />;
+    // return shouldOfferPreviewData && <PreviewData url={url} />;
+    return (
+      shouldOfferPreviewData && (
+        // <div className={styles.PreviewDataContainer}>
+        <div>
+          <PreviewData url={url} />
+        </div>
+      )
+    );
 
-  //   // {distribution.downloadURL &&
-  //   //   getFileExtension(distribution.downloadURL) === "xls" && (
-  //   //     <div>
-  //   //       <button
-  //   //         onClick={(e) => {
-  //   //           onClickDownloadXls(e);
-  //   //         }}
-  //   //       >
-  //   //         Download xls
-  //   //       </button>
-  //   //     </div>
-  //   //   )}
-  // };
+    // {distribution.downloadURL &&
+    //   getFileExtension(distribution.downloadURL) === "xls" && (
+    //     <div>
+    //       <button
+    //         onClick={(e) => {
+    //           onClickDownloadXls(e);
+    //         }}
+    //       >
+    //         Download xls
+    //       </button>
+    //     </div>
+    //   )}
+  };
 
   const getResourceDataOriginalDataHTML = (
     resourceData: JSONData<ResourceItemRecord>
@@ -138,7 +141,7 @@ const DataItemDialog = ({ resourceId }: DataItemDialogProps) => {
       >
         <Button>Details</Button>
       </DialogTrigger>
-      <DialogContent className="w-[90vw] max-w-[90vw] h-[90vh] flex flex-col">
+      <DialogContent className="w-[90vw] max-w-[90vw] h-[90vh] flex flex-col overflow-scroll">
         {!resourceData && <div>Loading...</div>}
         {resourceData && (
           <>
@@ -191,7 +194,7 @@ const DataItemDialog = ({ resourceId }: DataItemDialogProps) => {
                           </a>
                         </div>
                       </DialogDescription>
-                      {/* {getPreviewDataLink(distribution)} */}
+                      {getPreviewDataLink(distribution)}
                     </div>
                   );
                 }
