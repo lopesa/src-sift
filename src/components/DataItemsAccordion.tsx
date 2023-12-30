@@ -186,7 +186,7 @@ const DataItemsAccordion = ({
                 <div className="flex-1 pl-4">{dataItem.title}</div>
               </AccordionTrigger>
 
-              <AccordionContent className="text-xs [&*]:m-0 [&p]:mb-2.5 mb-6 pl-8">
+              <AccordionContent className="text-xs [&*>]:m-0 mb-2.5 mb-6 pl-14 pr-6">
                 {dataItem.description ? (
                   <div
                     dangerouslySetInnerHTML={{

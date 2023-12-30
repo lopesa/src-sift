@@ -7,7 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog";
 
 import {
@@ -17,7 +16,7 @@ import {
   AccordionTrigger,
 } from "./ui/accordion";
 
-import { ResourceItemRecord, ResourceSource, getXataClient } from "@/xata";
+import { ResourceItemRecord } from "@/xata";
 
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { JSONData } from "@xata.io/client";
@@ -31,6 +30,7 @@ import { getFileExtension } from "@/lib/utils/data";
 
 interface DataItemDialogProps {
   resourceId: string;
+  className?: string;
 }
 
 const onClickDownloadXls = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -38,7 +38,7 @@ const onClickDownloadXls = (e: React.MouseEvent<HTMLButtonElement>) => {
   debugger;
 };
 
-const DataItemDialog = ({ resourceId }: DataItemDialogProps) => {
+const DataItemDialog = ({ resourceId, className }: DataItemDialogProps) => {
   const [resourceData, setResourceData] =
     useState<JSONData<ResourceItemRecord> | null>();
 
@@ -73,11 +73,8 @@ const DataItemDialog = ({ resourceId }: DataItemDialogProps) => {
       typeof extension === "string" &&
       (extension.includes("csv") || extension.includes("xls"));
 
-    // return shouldOfferPreviewData && <ChartDialog chartItemUrl={url} />;
-    // return shouldOfferPreviewData && <PreviewData url={url} />;
     return (
       shouldOfferPreviewData && (
-        // <div className={styles.PreviewDataContainer}>
         <div>
           <PreviewData url={url} />
         </div>
@@ -132,14 +129,10 @@ const DataItemDialog = ({ resourceId }: DataItemDialogProps) => {
 
   return (
     <Dialog onOpenChange={onOpenChange}>
-      <DialogTrigger
-        asChild
-        // onClick={() => {
-        //   console.log(dataItem);
-        // }}
-        // className={styles.DialogTrigger}
-      >
-        <Button>Details</Button>
+      <DialogTrigger asChild>
+        <Button size="xs" className="mt-4 bg-stone-600 hover:bg-stone-800">
+          Details
+        </Button>
       </DialogTrigger>
       <DialogContent className="w-[90vw] max-w-[90vw] h-[90vh] flex flex-col overflow-scroll">
         {!resourceData && <div>Loading...</div>}

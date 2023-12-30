@@ -7,6 +7,7 @@ export type DatasourceMetadata = {
   originalJsonDataUrl: string;
   originalInitialUrl: string;
   route: string;
+  displayName: string;
 };
 
 export type IntakeTypeForResourceItem = {

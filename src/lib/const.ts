@@ -18,17 +18,20 @@ export const DataSourceMetadataRecord: Record<
       "https://www.usda.gov/sites/default/files/documents/data.json",
     originalInitialUrl: "https://data.gov/metrics.html",
     route: "us-department-of-agriculture",
+    displayName: "US Department of Agriculture",
   },
   [DataSources.DEPARTMENT_OF_ENERGY]: {
     originalJsonDataUrl:
       "https://www.energy.gov/sites/default/files/2023-01/pdl010123.json",
     originalInitialUrl: "https://data.gov/metrics.html",
     route: "us-department-of-energy",
+    displayName: "US Department of Energy",
   },
   [DataSources.DEPARTMENT_OF_TREASURY]: {
     originalJsonDataUrl: "http://www.treasury.gov/data.json",
     originalInitialUrl: "https://catalog.data.gov/harvest/about/treasury-json",
     route: "us-department-of-treasury",
+    displayName: "US Department of Treasury",
   },
   // [DataSources.INTERNATIONAL_COFFEE_ORGANIZATION]: {
   //   originalJsonData: icoDataJson,

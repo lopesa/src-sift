@@ -1,5 +1,9 @@
 import IndexDataList from "@/components/IndexDataList";
-import { DataSources, getDataSourceFromRoute } from "@/lib/const";
+import {
+  DataSourceMetadataRecord,
+  DataSources,
+  getDataSourceFromRoute,
+} from "@/lib/const";
 import { getXataClient } from "@/xata";
 
 const ResourcePage = async ({ params }: { params: { id: string } }) => {
@@ -42,7 +46,14 @@ const ResourcePage = async ({ params }: { params: { id: string } }) => {
   // const serializedData = data.toSerializable();
   const serializedData = JSON.parse(JSON.stringify(data));
 
-  return <div>{serializedData && <IndexDataList data={serializedData} />}</div>;
+  const title = DataSourceMetadataRecord[DataSources[dataSource]].displayName;
+
+  return (
+    <>
+      {serializedData && <IndexDataList data={serializedData} title={title} />}
+      {!serializedData && <div>error</div>}
+    </>
+  );
 };
 
 export default ResourcePage;

@@ -3,7 +3,7 @@ import HeaderMenu from "./header-menu";
 
 const Nav = () => {
   return (
-    <header className="sticky inline-block w-full h-14 shadow-xl top-0 z-10 bg-white text-zinc-500">
+    <header className="relative inline-block w-full h-14 shadow-xl bg-white text-zinc-500">
       <AppLogo />
       <h2 className="hidden md:block absolute leading-[3.4rem] text-sm m-0 ml-[50%] translate-x-[-50%]">
         A central place to explore different sources of Public Data
