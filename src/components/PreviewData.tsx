@@ -53,22 +53,21 @@ const PreviewData = ({ url }: PreviewDataProps) => {
         </Button>
       )}
       {showDataPreview && (
-        <div className="w-full">
-          <div>Data Preview</div>
-          <div>
+        <div className="w-full mt-4">
+          <div className="text-sm font-bold mb-1">Data Preview</div>
+          <div className="text-sm mb-2">
             Total preview rows: {dataSubset.length} / {totalRowsAvailable} total
             rows
           </div>
           {(dataSubset.length && (
-            <div className="w-full max-h-[500px] overflow-auto">
-              <table className="w-full border-collapse border-spacing-0 [&>*:nth-child(odd)]:bg-sky-200 [&>*:nth-child(even)]:bg-sky-300">
+            <div className="w-full max-h-[400px] overflow-auto">
+              <table className="w-full border-collapse border-spacing-0 [&>*:nth-child(odd)]:bg-stone-100 [&>*:nth-child(even)]:bg-stone-200 text-stone-800 pt-1">
                 {dataKeys && (
-                  <tr>
-                    {/* <tr className={styles.DataTableHeader}> */}
+                  <tr className="sticky top-0">
                     {dataKeys.map((key) => (
                       <th
                         key={key}
-                        className="p-2.5 text-lg text-left border-b border-solid"
+                        className="p-2.5 text-sm text-left border-b border-solid"
                       >
                         {key}
                       </th>
@@ -81,7 +80,7 @@ const PreviewData = ({ url }: PreviewDataProps) => {
                       {row.map((cell, index) => (
                         <td
                           key={index}
-                          className="p-2.5 text-sm text-left border-b border-solid"
+                          className="p-2.5 text-xs text-left border-b border-solid"
                         >
                           {cell}
                         </td>
