@@ -71,7 +71,7 @@ const IndexDataList = ({
               <span> Current Num Items: {filteredData.length}</span>
             )}
           </p>
-          <form className="flex mt-2 mb-6 [&>*]:mr-2.5">
+          <form className="flex mt-2 mb-6 [&>label]:mr-2.5 [&>button]:mr-1">
             <Checkbox onCheckedChange={setShowXml} />
             <label className="text-xs">Xml</label>
             <Checkbox onCheckedChange={setShowXls} />

@@ -44,7 +44,11 @@ const PreviewData = ({ url }: PreviewDataProps) => {
   return (
     <>
       {!showDataPreview && (
-        <Button onClick={() => setShowDataPreview(true)}>
+        <Button
+          size="xs"
+          className="mt-2 bg-stone-600 hover:bg-stone-800"
+          onClick={() => setShowDataPreview(true)}
+        >
           Show Data Preview
         </Button>
       )}

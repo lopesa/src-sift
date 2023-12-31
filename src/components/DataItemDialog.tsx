@@ -18,7 +18,6 @@ import {
 
 import { ResourceItemRecord } from "@/xata";
 
-import { Cross2Icon } from "@radix-ui/react-icons";
 import { JSONData } from "@xata.io/client";
 import { Button } from "@/components/ui/button";
 import DOMPurify from "dompurify";
@@ -27,6 +26,8 @@ import { DistributionItem } from "@/lib/types";
 import { Separator } from "./ui/separator";
 import PreviewData from "./PreviewData";
 import { getFileExtension } from "@/lib/utils/data";
+import SkewLoader from "react-spinners/SkewLoader";
+import { cn } from "@/lib/utils";
 
 interface DataItemDialogProps {
   resourceId: string;
@@ -70,8 +71,10 @@ const DataItemDialog = ({ resourceId, className }: DataItemDialogProps) => {
     }
     const extension = getFileExtension(url);
     const shouldOfferPreviewData =
-      typeof extension === "string" &&
-      (extension.includes("csv") || extension.includes("xls"));
+      typeof extension === "string" && extension.includes("csv");
+    // const shouldOfferPreviewData =
+    //   typeof extension === "string" &&
+    //   (extension.includes("csv") || extension.includes("xls"));
 
     return (
       shouldOfferPreviewData && (
@@ -80,19 +83,6 @@ const DataItemDialog = ({ resourceId, className }: DataItemDialogProps) => {
         </div>
       )
     );
-
-    // {distribution.downloadURL &&
-    //   getFileExtension(distribution.downloadURL) === "xls" && (
-    //     <div>
-    //       <button
-    //         onClick={(e) => {
-    //           onClickDownloadXls(e);
-    //         }}
-    //       >
-    //         Download xls
-    //       </button>
-    //     </div>
-    //   )}
   };
 
   const getResourceDataOriginalDataHTML = (
@@ -129,84 +119,98 @@ const DataItemDialog = ({ resourceId, className }: DataItemDialogProps) => {
 
   return (
     <Dialog onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
+      <DialogTrigger>
         <Button size="xs" className="mt-4 bg-stone-600 hover:bg-stone-800">
           Details
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[90vw] max-w-[90vw] h-[90vh] flex flex-col overflow-scroll">
-        {!resourceData && <div>Loading...</div>}
-        {resourceData && (
-          <>
-            <DialogHeader>
-              {resourceData.title && (
-                <DialogTitle>{resourceData.title as string}</DialogTitle>
+      <DialogContent className="w-[90vw] max-w-[90vw] h-[90vh] p-7 pt-10">
+        <div className="h-full overflow-scroll">
+          {!resourceData && (
+            <SkewLoader loading={true} size={10} color="#38bdf8" />
+          )}
+
+          {resourceData && (
+            <>
+              {resourceData?.title && (
+                <DialogHeader className="h-[50px]">
+                  <DialogTitle className="text-xl font-light pr-10">
+                    {resourceData.title as string}
+                  </DialogTitle>
+                </DialogHeader>
               )}
-            </DialogHeader>
-            {resourceData.keywords && (
-              <div className="flex flex-wrap">
-                <span style={{ fontWeight: "bold" }}>Keywords:</span>&nbsp;
-                {(resourceData.keywords as string[]).map((keyword) => {
-                  return <div key={keyword}>• {keyword}</div>;
-                })}
-              </div>
-            )}
 
-            {resourceData.description && (
-              <DialogDescription>
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(
-                      resourceData.description as string
-                    ),
-                  }}
-                ></div>
-              </DialogDescription>
-            )}
+              <div
+                className={cn(
+                  resourceData?.title ? "h-[calc(100%-50px)]" : "h-full",
+                  "overflow-scroll"
+                )}
+              >
+                {resourceData.keywords && (
+                  <DialogDescription className="flex flex-wrap pr-20">
+                    <span style={{ fontWeight: "bold" }}>Keywords:</span>&nbsp;
+                    {(resourceData.keywords as string[]).map((keyword) => {
+                      return <div key={keyword}>• {keyword}</div>;
+                    })}
+                  </DialogDescription>
+                )}
 
-            <h3>Distribution:</h3>
-            {resourceData.distribution &&
-              resourceData.distribution.map(
-                (distribution: DistributionItem, index: number) => {
-                  return (
-                    <div key={index}>
-                      <DialogDescription>
-                        {distribution.title && (
-                          <div style={{ fontWeight: "bold" }}>
-                            {distribution.title}
-                          </div>
-                        )}
-                        <div>
-                          <a
-                            href={getDistributionUrl(distribution)}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            {getDistributionUrl(distribution) &&
-                              getDistributionUrl(distribution)}
-                          </a>
+                {resourceData.description && (
+                  <DialogDescription className="pr-20">
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(
+                          resourceData.description as string
+                        ),
+                      }}
+                    ></div>
+                  </DialogDescription>
+                )}
+
+                <h3 className="mt-6 mb-2 font-bold">Distribution:</h3>
+                {resourceData.distribution &&
+                  resourceData.distribution.map(
+                    (distribution: DistributionItem, index: number) => {
+                      return (
+                        <div key={index} className="mb-6">
+                          <DialogDescription>
+                            {distribution.title && (
+                              <div style={{ fontWeight: "bold" }}>
+                                • {distribution.title}
+                              </div>
+                            )}
+                            <div>
+                              <a
+                                href={getDistributionUrl(distribution)}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="underline"
+                              >
+                                {getDistributionUrl(distribution) &&
+                                  getDistributionUrl(distribution)}
+                              </a>
+                            </div>
+                          </DialogDescription>
+                          {getPreviewDataLink(distribution)}
                         </div>
-                      </DialogDescription>
-                      {getPreviewDataLink(distribution)}
-                    </div>
-                  );
-                }
-              )}
+                      );
+                    }
+                  )}
 
-            <Separator className="h-px ml-7 my-0 mr-2.5 w-5/12 shrink" />
-
-            <Accordion type="single" collapsible>
-              <AccordionItem value="item-1">
-                <AccordionTrigger className="cursor-pointer underline ml-2.5 text-xs">
-                  All Data
-                </AccordionTrigger>
-                <AccordionContent className="">
-                  {getResourceDataOriginalDataHTML(resourceData)}
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </>
-        )}
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger className="cursor-pointer underline ml-2.5 text-xs">
+                      All Data
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      {getResourceDataOriginalDataHTML(resourceData)}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+            </>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );
