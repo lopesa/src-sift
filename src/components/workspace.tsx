@@ -55,7 +55,14 @@ const Workspace = ({ dataItems }: WorkspaceProps) => {
     getUserData().catch((e) => {
       // console.log(e);
     });
-  }, [getUserData, status, temporaryUser, dataItems, setFinalDataItems]);
+  }, [
+    getUserData,
+    status,
+    temporaryUser,
+    dataItems,
+    setFinalDataItems,
+    session,
+  ]);
 
   return (
     <div>

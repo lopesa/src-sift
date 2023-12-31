@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useCallback } from "react";
 // import LoginSignupDialog from "components/LoginSignupDialog";
 
 import { sanitize } from "isomorphic-dompurify";
@@ -35,12 +35,12 @@ const DataItemsAccordion = ({
   // const [savedItems, setSavedItems] = useState<Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[]>([]);
   const temporaryUser = useContext(TemporaryUserContext);
 
-  const getUserId = () => {
+  const getUserId = useCallback(() => {
     if (status === "authenticated") {
       return (session as SessionWithUserId)?.user?.id;
     }
     return temporaryUser?.id;
-  };
+  }, [session, status, temporaryUser]);
 
   useEffect(() => {
     const userId = getUserId();
@@ -64,7 +64,7 @@ const DataItemsAccordion = ({
       // console.log(e);
     });
     return;
-  }, [setSavedItemIds, status, session, temporaryUser]);
+  }, [setSavedItemIds, status, session, temporaryUser, getUserId]);
 
   useEffect(() => {
     if (openAll) {
