@@ -20,7 +20,7 @@ export default function TemporaryUserIdProvider({
     JSONData<TemporaryUsersRecord> | undefined
   >("temporaryUser", undefined);
 
-  // this doesn't work because it is reflected in React cycles
+  // the following doesn't work because it is executed in React cycles
   // changing it to directly use the localstorage api keeps it synchronous
   // const [gettingTemporaryUser, setGettingTemporaryUser] = useLocalStorage(
   //   "gettingTemporaryUser",
@@ -36,7 +36,7 @@ export default function TemporaryUserIdProvider({
 
     window.localStorage.setItem("gettingTemporaryUser", "true");
 
-    const creatAndSetTempUserId = async () => {
+    const createAndSetTempUserId = async () => {
       const tempUser = await fetch("/api/temporary-user", {
         method: "POST",
         headers: {
@@ -51,23 +51,29 @@ export default function TemporaryUserIdProvider({
       if (tempUserJson) {
         setTemporaryUser(tempUserJson);
 
-        // window.onbeforeunload = () => {
-        //   debugger;
-        //   fetch("/api/temporary-user", {
-        //     method: "DELETE",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify({
-        //       temporaryUserId: tempUserJson.id,
-        //     }),
-        //   });
-        // };
+        /**
+         * one thought on how to deal with deleting temp users occasionally.
+         * this obviously is pretty abrupt so probably will do something with
+         * vercel timed functions (cron jobs)
+         
+        window.onbeforeunload = () => {
+          debugger;
+          fetch("/api/temporary-user", {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              temporaryUserId: tempUserJson.id,
+            }),
+          });
+        };
+        */
       }
-      window.localStorage.setItem("gettingTemporaryUser", "false");
+      window.localStorage.removeItem("gettingTemporaryUser");
     };
 
-    creatAndSetTempUserId().catch((e) => {
+    createAndSetTempUserId().catch((e) => {
       // console.log(e);
     });
   }, [temporaryUser, setTemporaryUser]);

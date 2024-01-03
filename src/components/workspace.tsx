@@ -71,7 +71,7 @@ const Workspace = ({ dataItems }: WorkspaceProps) => {
         {!!finalDataItems.length && (
           <IndexDataList
             data={finalDataItems}
-            postSaveOrDeleteResourceItemAction={getUserData}
+            postUpdateResourceItemAction={getUserData}
           />
         )}
       </div>

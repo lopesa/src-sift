@@ -28,6 +28,7 @@ import PreviewData from "./PreviewData";
 import { getFileExtension } from "@/lib/utils/data";
 import SkewLoader from "react-spinners/SkewLoader";
 import { cn } from "@/lib/utils";
+import SaveIconComponent from "./saveIcon";
 
 interface DataItemDialogProps {
   resourceId: string;
@@ -134,7 +135,11 @@ const DataItemDialog = ({ resourceId, className }: DataItemDialogProps) => {
             <>
               {resourceData?.title && (
                 <DialogHeader className="h-[50px]">
-                  <DialogTitle className="text-xl font-light pr-10">
+                  <DialogTitle className="text-xl font-light pr-10 flex items-center">
+                    <SaveIconComponent
+                      resourceId={resourceData.id}
+                      className="mr-2"
+                    />
                     {resourceData.title as string}
                   </DialogTitle>
                 </DialogHeader>

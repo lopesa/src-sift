@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getXataClient } from "@/xata";
+import { UserResourcesRecord, getXataClient } from "@/xata";
+import { JSONData } from "@xata.io/client";
+
+export type UserResourceAPIRequestBody = Promise<
+  | NextResponse<{
+      error: string;
+    }>
+  | NextResponse<JSONData<UserResourcesRecord> | undefined>
+>;
 
 export async function GET(req: NextRequest, res: NextResponse) {
   const params = req.nextUrl.searchParams;

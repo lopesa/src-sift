@@ -4,6 +4,7 @@ import "./globals.css";
 import Nav from "@/components/nav";
 import NextAuthProvider from "@/context/nextAuthProvider";
 import TemporaryUserProvider from "@/context/temporaryUserProvider";
+import SavedUserItemsProvider from "@/context/savedUserItemsProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,8 +25,10 @@ export default async function RootLayout({
       >
         <NextAuthProvider>
           <TemporaryUserProvider>
-            <Nav />
-            {children}
+            <SavedUserItemsProvider>
+              <Nav />
+              {children}
+            </SavedUserItemsProvider>
           </TemporaryUserProvider>
         </NextAuthProvider>
       </body>
