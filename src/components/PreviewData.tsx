@@ -4,6 +4,12 @@
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import SkewLoader from "react-spinners/SkewLoader";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./ui/accordion";
 
 interface PreviewDataProps {
   url: string;
@@ -53,45 +59,51 @@ const PreviewData = ({ url }: PreviewDataProps) => {
         </Button>
       )}
       {showDataPreview && (
-        <div className="w-full mt-4">
-          <div className="text-sm font-bold mb-1">Data Preview</div>
-          <div className="text-sm mb-2">
-            Total preview rows: {dataSubset.length} / {totalRowsAvailable} total
-            rows
-          </div>
-          {(dataSubset.length && (
-            <div className="w-full max-h-[400px] overflow-auto">
-              <table className="w-full border-collapse border-spacing-0 [&>*:nth-child(odd)]:bg-stone-100 [&>*:nth-child(even)]:bg-stone-200 text-stone-800 pt-1">
-                {dataKeys && (
-                  <tr className="sticky top-0">
-                    {dataKeys.map((key) => (
-                      <th
-                        key={key}
-                        className="p-2.5 text-sm text-left border-b border-solid"
-                      >
-                        {key}
-                      </th>
-                    ))}
-                  </tr>
-                )}
-                {dataSubset.map((row, index) => {
-                  return (
-                    <tr key={index}>
-                      {row.map((cell, index) => (
-                        <td
-                          key={index}
-                          className="p-2.5 text-xs text-left border-b border-solid"
-                        >
-                          {cell}
-                        </td>
-                      ))}
-                    </tr>
-                  );
-                })}
-              </table>
-            </div>
-          )) || <SkewLoader />}
-        </div>
+        <Accordion type="single" collapsible defaultValue="item-1">
+          <AccordionItem value="item-1">
+            <AccordionTrigger className="[&>svg]:left-0"></AccordionTrigger>
+            <AccordionContent className="w-full mt-4">
+              <div className="text-sm font-bold mb-1">Data Preview</div>
+              <div className="text-sm mb-2">
+                Total preview rows: {dataSubset.length} / {totalRowsAvailable}{" "}
+                total rows
+              </div>
+
+              {(dataSubset.length && (
+                <div className="w-full max-h-[400px] overflow-auto">
+                  <table className="w-full border-collapse border-spacing-0 [&>*:nth-child(odd)]:bg-stone-100 [&>*:nth-child(even)]:bg-stone-200 text-stone-800 pt-1">
+                    {dataKeys && (
+                      <tr className="sticky top-0">
+                        {dataKeys.map((key) => (
+                          <th
+                            key={key}
+                            className="p-2.5 text-sm text-left border-b border-solid"
+                          >
+                            {key}
+                          </th>
+                        ))}
+                      </tr>
+                    )}
+                    {dataSubset.map((row, index) => {
+                      return (
+                        <tr key={index}>
+                          {row.map((cell, index) => (
+                            <td
+                              key={index}
+                              className="p-2.5 text-xs text-left border-b border-solid"
+                            >
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      );
+                    })}
+                  </table>
+                </div>
+              )) || <SkewLoader />}
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       )}
     </>
   );
