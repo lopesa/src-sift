@@ -13,8 +13,6 @@ export default function Home() {
     null
   );
   const onSearchSuccess = (data: SearchResults) => {
-    console.log(data);
-    debugger;
     setSearchResults(data);
   };
   return (

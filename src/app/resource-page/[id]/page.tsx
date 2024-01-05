@@ -6,6 +6,10 @@ import {
 } from "@/lib/const";
 import { getXataClient } from "@/xata";
 
+export function generateStaticParams() {
+  return [{ id: "us-department-of-agriculture" }];
+}
+
 const ResourcePage = async ({ params }: { params: { id: string } }) => {
   const dataSource = getDataSourceFromRoute(params.id);
 
