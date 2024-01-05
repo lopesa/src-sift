@@ -1,10 +1,10 @@
 "use client";
 
 import IndexDataList from "@/components/IndexDataList";
+import AiChat from "@/components/ai-chat";
 import Search from "@/components/search";
 import { Button } from "@/components/ui/button";
 import { SearchResults } from "@/lib/types";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -17,6 +17,7 @@ export default function Home() {
   };
   return (
     <main className="flex w-full min-h-screen flex-col items-center p-24">
+      {/* SEARCH */}
       <div className="w-60">
         <Search
           label="Search all resources"
@@ -24,25 +25,29 @@ export default function Home() {
           onSearchSuccess={onSearchSuccess}
         />
       </div>
+
+      {/* AI CHAT */}
+      <div className="w-60">
+        <AiChat label="Chat with Ai Over All Resources" className="mb-8" />
+      </div>
+
+      {/* SEARCH RESULTS */}
       {searchResults?.results?.records && (
         <IndexDataList
           data={searchResults?.results?.records}
           title="Search Results"
         />
       )}
-      {!searchResults?.results?.records && (
-        <>
-          <div>or</div>
-          <div className="mx-auto my-0">
-            <h1 className="text-xl mb-1">Browse a Resource:</h1>
-            <Link href="/resource-page/us-department-of-agriculture">
-              <Button variant="link" className="text-base">
-                US Department of Agriculture
-              </Button>
-            </Link>
-          </div>
-        </>
-      )}
+
+      {/* BROWSE RESOURCES */}
+      <div className="mx-auto my-0">
+        <h1 className="text-xl mb-1">Browse a Resource:</h1>
+        <Link href="/resource-page/us-department-of-agriculture">
+          <Button variant="link" className="text-base">
+            US Department of Agriculture
+          </Button>
+        </Link>
+      </div>
     </main>
   );
 }
