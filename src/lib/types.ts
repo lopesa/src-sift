@@ -1,5 +1,5 @@
 import { ResourceItemRecord } from "@/xata";
-import { SelectedPick } from "@xata.io/client";
+import { SearchXataRecord, SelectedPick, TotalCount } from "@xata.io/client";
 import { Session } from "next-auth";
 
 export type DatasourceMetadata = {
@@ -48,3 +48,9 @@ export type DataItemsAccordionItem = Readonly<
 
 type SessionUserWithId = Session["user"] & { id?: string };
 export type SessionWithUserId = Session & { user?: SessionUserWithId };
+
+export type SearchResults = {
+  results: {
+    records: SearchXataRecord<SelectedPick<ResourceItemRecord, ["*"]>>[];
+  } & TotalCount;
+};
