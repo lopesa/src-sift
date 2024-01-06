@@ -25,6 +25,8 @@ export type SearchProps = {
   label?: string;
   description?: string;
   className?: string;
+  onSearchLoading?: () => void;
+  onSearchFail?: () => void;
   onSearchSuccess?: (data: SearchResults) => void;
 };
 
@@ -32,6 +34,8 @@ const Search = ({
   label,
   description,
   className,
+  onSearchLoading,
+  onSearchFail,
   onSearchSuccess,
 }: SearchProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,22 +47,28 @@ const Search = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!values.searchText) {
+      onSearchFail?.();
       return;
     }
+
+    onSearchLoading?.();
 
     const searchResponse = await fetch(
       `/api/search?searchText=${values.searchText}`
     ).catch((e) => {
+      onSearchFail?.();
       return e;
     });
 
     if (!searchResponse?.ok) {
+      onSearchFail?.();
       return;
     }
 
     const data: SearchResults = await searchResponse.json();
 
     if (!data?.results?.records) {
+      onSearchFail?.();
       return;
     }
 

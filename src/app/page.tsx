@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button";
 import { SearchResults } from "@/lib/types";
 import Link from "next/link";
 import { useState } from "react";
+import SkewLoader from "react-spinners/SkewLoader";
 
 export default function Home() {
   const [searchResults, setSearchResults] = useState<SearchResults | null>(
     null
   );
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState<Error | null>(null);
   const onSearchSuccess = (data: SearchResults) => {
     setSearchResults(data);
   };
@@ -22,22 +25,52 @@ export default function Home() {
         <Search
           label="Search all resources"
           className="mb-8"
-          onSearchSuccess={onSearchSuccess}
+          onSearchLoading={() => {
+            setSearchLoading(true);
+          }}
+          onSearchFail={() => {
+            setSearchLoading(false);
+            setSearchError(new Error("Search failed"));
+          }}
+          onSearchSuccess={(data) => {
+            setSearchLoading(false);
+            onSearchSuccess(data);
+          }}
         />
       </div>
+
+      {/* SEARCH RESULTS */}
+      {searchLoading && (
+        <SkewLoader
+          loading={true}
+          className="mt-1 mb-4"
+          color="#38bdf8"
+          size={14}
+        />
+      )}
+      {searchError && <p>Error: {searchError.message}</p>}
+      {searchResults?.results?.records && (
+        <>
+          <Button
+            variant="link"
+            className="text-xs underline mb-2"
+            onClick={() => {
+              setSearchResults(null);
+            }}
+          >
+            Clear Search
+          </Button>
+          <IndexDataList
+            data={searchResults?.results?.records}
+            title="Search Results"
+          />
+        </>
+      )}
 
       {/* AI CHAT */}
       <div className="w-60">
         <AiChat label="Chat with Ai Over All Resources" className="mb-8" />
       </div>
-
-      {/* SEARCH RESULTS */}
-      {searchResults?.results?.records && (
-        <IndexDataList
-          data={searchResults?.results?.records}
-          title="Search Results"
-        />
-      )}
 
       {/* BROWSE RESOURCES */}
       <div className="mx-auto my-0">

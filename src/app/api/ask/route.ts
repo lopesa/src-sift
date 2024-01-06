@@ -5,9 +5,7 @@ import { getXataClient } from "@/xata";
 
 const xata = getXataClient();
 
-export const config = {
-  runtime: "edge",
-};
+export const runtime = "edge";
 
 const bodySchema = z.object({
   question: z.string(),
