@@ -15,7 +15,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import useXataAiChat from "@/hooks/use-xata-ai-chat";
+import SkewLoader from "react-spinners/SkewLoader";
 
 const formSchema = z.object({
   chatText: z.string().min(2).max(150),
@@ -43,7 +45,10 @@ const AiChat = ({ label, description, className }: AiChatProps) => {
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className={`${className}`}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className={`${className} w-72`}
+        >
           <FormField
             control={form.control}
             name="chatText"
@@ -51,7 +56,7 @@ const AiChat = ({ label, description, className }: AiChatProps) => {
               <FormItem>
                 {label && <FormLabel>{label}</FormLabel>}
                 <FormControl>
-                  <Input
+                  <Textarea
                     placeholder="Enter Chat Text (or Question)"
                     {...field}
                   />
@@ -69,8 +74,19 @@ const AiChat = ({ label, description, className }: AiChatProps) => {
         </form>
       </Form>
       <div>
-        {answer && <div>{answer}</div>}
-        {isLoading && <div>Loading</div>}
+        {answer && (
+          <div className="w-1/2 h-96 overflow-scroll mx-auto mt-4">
+            {answer}
+          </div>
+        )}
+        {isLoading && (
+          <SkewLoader
+            loading={true}
+            className="mt-1 mb-4"
+            color="#38bdf8"
+            size={14}
+          />
+        )}
       </div>
     </>
   );

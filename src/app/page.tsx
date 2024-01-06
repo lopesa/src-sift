@@ -19,25 +19,38 @@ export default function Home() {
     setSearchResults(data);
   };
   return (
-    <main className="flex w-full min-h-screen flex-col items-center p-24">
+    <main className="flex w-full min-h-screen flex-col items-center p-14">
+      {/* BROWSE RESOURCES */}
+      {/* <div className="mx-auto my-0"> */}
+      <h1 className="text-xl mb-1 mt-10">Browse a Resource:</h1>
+      <Button asChild variant="link">
+        <Link href="/resource-page/us-department-of-agriculture">
+          US Department of Agriculture
+        </Link>
+      </Button>
+
+      {/* </Button>
+        <Button variant="link" className="text-base">
+          US Department of Agriculture
+        </Button>
+      </Link> */}
+
       {/* SEARCH */}
-      <div className="w-60">
-        <Search
-          label="Search all resources"
-          className="mb-8"
-          onSearchLoading={() => {
-            setSearchLoading(true);
-          }}
-          onSearchFail={() => {
-            setSearchLoading(false);
-            setSearchError(new Error("Search failed"));
-          }}
-          onSearchSuccess={(data) => {
-            setSearchLoading(false);
-            onSearchSuccess(data);
-          }}
-        />
-      </div>
+      <h1 className="mb-1 mt-10">Search All Resources</h1>
+      <Search
+        className="w-72"
+        onSearchLoading={() => {
+          setSearchLoading(true);
+        }}
+        onSearchFail={() => {
+          setSearchLoading(false);
+          setSearchError(new Error("Search failed"));
+        }}
+        onSearchSuccess={(data) => {
+          setSearchLoading(false);
+          onSearchSuccess(data);
+        }}
+      />
 
       {/* SEARCH RESULTS */}
       {searchLoading && (
@@ -68,19 +81,9 @@ export default function Home() {
       )}
 
       {/* AI CHAT */}
-      <div className="w-60">
-        <AiChat label="Chat with Ai Over All Resources" className="mb-8" />
-      </div>
-
-      {/* BROWSE RESOURCES */}
-      <div className="mx-auto my-0">
-        <h1 className="text-xl mb-1">Browse a Resource:</h1>
-        <Link href="/resource-page/us-department-of-agriculture">
-          <Button variant="link" className="text-base">
-            US Department of Agriculture
-          </Button>
-        </Link>
-      </div>
+      {/* <AiChat label="Chat with Ai Over All Resources" className="mt-10" /> */}
+      <h1 className="mb-1 mt-10">Ask AI, Considering All Resources</h1>
+      <AiChat />
     </main>
   );
 }
