@@ -179,6 +179,11 @@ const DataItemDialog = ({ resourceId, className }: DataItemDialogProps) => {
                       return (
                         <div key={index} className="mb-6">
                           <DialogDescription>
+                            <SaveIconComponent
+                              resourceId={resourceData.id}
+                              className="mr-2"
+                              distributionItem={distribution}
+                            />
                             {distribution.title && (
                               <div style={{ fontWeight: "bold" }}>
                                 • {distribution.title}

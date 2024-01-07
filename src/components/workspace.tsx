@@ -1,6 +1,6 @@
 "use client";
 
-import { ResourceItemRecord, UserResourcesRecord } from "@/xata";
+import { ResourceItemRecord, UserResourceRecord } from "@/xata";
 import { SelectedPick } from "@xata.io/client";
 import { useSession } from "next-auth/react";
 import { useCallback, useContext, useEffect, useState } from "react";
@@ -32,7 +32,7 @@ const Workspace = ({ dataItems }: WorkspaceProps) => {
       // console.log(e);
     });
     const userDataJson: SelectedPick<
-      UserResourcesRecord,
+      UserResourceRecord,
       ("*" | "resource.*")[]
     >[] = await userData?.json();
 

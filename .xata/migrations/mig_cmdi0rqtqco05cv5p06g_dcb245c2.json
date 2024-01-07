@@ -1,0 +1,13 @@
+{
+  "id": "mig_cmdi0rqtqco05cv5p06g",
+  "parentID": "mig_cmdi0mfbfsbuprjcafg0",
+  "checksum": "1:dcb245c2d3f66a9be8c067f6ae9945b3e4afe8ff5233c2b1af8522f8cf54bec3",
+  "operations": [
+    {
+      "renameTable": {
+        "newName": "user_resource",
+        "oldName": "user_resources"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "mig_cmdhgkrr4o6tfr2n43j0",
+  "parentID": "mig_cmdhgfrr4o6tfr2n43i0",
+  "checksum": "1:8d9f8ee6d3c978827c8bd9ebb4053900b87c57a1fed352a3b5f6c3bf628987fa",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "url",
+          "type": "string"
+        },
+        "table": "distribution_item"
+      }
+    }
+  ]
+}

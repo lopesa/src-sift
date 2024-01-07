@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { UserResourcesRecord, getXataClient } from "@/xata";
+import { UserResourceRecord, getXataClient } from "@/xata";
 import { JSONData } from "@xata.io/client";
 
 export type UserResourceAPIRequestBody = Promise<
   | NextResponse<{
       error: string;
     }>
-  | NextResponse<JSONData<UserResourcesRecord> | undefined>
+  | NextResponse<JSONData<UserResourceRecord> | undefined>
 >;
 
 export async function GET(req: NextRequest, res: NextResponse) {
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     tempUser === "true" ? { "temp_user.id": userId } : { "user.id": userId };
 
   const xata = getXataClient();
-  const data = await xata.db.user_resources
+  const data = await xata.db.user_resource
     .select(getFullResourceItem ? ["*", "resource.*"] : ["*"])
     .filter(filter)
     .getAll()
@@ -43,7 +43,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
     });
   });
 
-  const { resourceId, userId, tempUser } = requestBody;
+  const { resourceId, distributionItem, userId, tempUser } = requestBody;
+
+  if (distributionItem) {
+    return NextResponse.json({
+      message: "TO DO: special treatment for a distribution item",
+    });
+  }
 
   const recordData: {
     resource: string;
@@ -59,13 +65,20 @@ export async function POST(req: NextRequest, res: NextResponse) {
   }
 
   const xata = getXataClient();
-  const record = await xata.db.user_resources.create(recordData).catch((e) => {
+  const record = await xata.db.user_resource.create(recordData).catch((e) => {
     return undefined;
   });
 
   return NextResponse.json(record?.toSerializable());
 }
 
+/**
+ * DELETE a resource_item or a distribution_item
+ *
+ * @param req
+ * @param res
+ * @returns the deleted record
+ */
 export async function DELETE(req: NextRequest, res: NextResponse) {
   const requestBody = await req.json().catch((error) => {
     return NextResponse.json({
@@ -80,7 +93,7 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
     : { "user.id": userId, "resource.id": resourceId };
 
   const xata = getXataClient();
-  const recordToDelete = await xata.db.user_resources
+  const recordToDelete = await xata.db.user_resource
     .filter(filter)
     .getFirst()
     .catch((e) => undefined);
@@ -91,7 +104,7 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
     });
   }
 
-  const deletedRecord = await xata.db.user_resources
+  const deletedRecord = await xata.db.user_resource
     .delete(recordToDelete.id)
     .catch((e) => undefined);
 

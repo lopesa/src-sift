@@ -26,7 +26,10 @@ const tables = [
       { name: "full_data", type: "json" },
       { name: "data_types_by_file_extension", type: "multiple" },
     ],
-    revLinks: [{ column: "resource", table: "user_resources" }],
+    revLinks: [
+      { column: "resource", table: "user_resource" },
+      { column: "resource_item", table: "distribution_item" },
+    ],
   },
   {
     name: "resource_source_updates",
@@ -51,7 +54,7 @@ const tables = [
       { column: "user", table: "nextauth_users_accounts" },
       { column: "user", table: "nextauth_users_sessions" },
       { column: "user", table: "nextauth_sessions" },
-      { column: "user", table: "user_resources" },
+      { column: "user", table: "user_resource" },
     ],
   },
   {
@@ -104,17 +107,32 @@ const tables = [
     revLinks: [{ column: "session", table: "nextauth_users_sessions" }],
   },
   {
-    name: "user_resources",
+    name: "user_resource",
     columns: [
       { name: "resource", type: "link", link: { table: "resource_item" } },
       { name: "user", type: "link", link: { table: "nextauth_users" } },
       { name: "temp_user", type: "link", link: { table: "temporary_users" } },
+      {
+        name: "distribution_item",
+        type: "link",
+        link: { table: "distribution_item" },
+      },
     ],
   },
   {
     name: "temporary_users",
     columns: [],
-    revLinks: [{ column: "temp_user", table: "user_resources" }],
+    revLinks: [{ column: "temp_user", table: "user_resource" }],
+  },
+  {
+    name: "distribution_item",
+    columns: [
+      { name: "resource_item", type: "link", link: { table: "resource_item" } },
+      { name: "file", type: "file[]" },
+      { name: "url", type: "string" },
+      { name: "data_type", type: "multiple" },
+    ],
+    revLinks: [{ column: "distribution_item", table: "user_resource" }],
   },
 ] as const;
 
@@ -150,11 +168,14 @@ export type NextauthUsersSessionsRecord = NextauthUsersSessions & XataRecord;
 export type NextauthSessions = InferredTypes["nextauth_sessions"];
 export type NextauthSessionsRecord = NextauthSessions & XataRecord;
 
-export type UserResources = InferredTypes["user_resources"];
-export type UserResourcesRecord = UserResources & XataRecord;
+export type UserResource = InferredTypes["user_resource"];
+export type UserResourceRecord = UserResource & XataRecord;
 
 export type TemporaryUsers = InferredTypes["temporary_users"];
 export type TemporaryUsersRecord = TemporaryUsers & XataRecord;
+
+export type DistributionItem = InferredTypes["distribution_item"];
+export type DistributionItemRecord = DistributionItem & XataRecord;
 
 export type DatabaseSchema = {
   resource_source: ResourceSourceRecord;
@@ -166,8 +187,9 @@ export type DatabaseSchema = {
   nextauth_users_accounts: NextauthUsersAccountsRecord;
   nextauth_users_sessions: NextauthUsersSessionsRecord;
   nextauth_sessions: NextauthSessionsRecord;
-  user_resources: UserResourcesRecord;
+  user_resource: UserResourceRecord;
   temporary_users: TemporaryUsersRecord;
+  distribution_item: DistributionItemRecord;
 };
 
 const DatabaseClient = buildClient();

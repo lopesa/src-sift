@@ -1,0 +1,16 @@
+{
+  "id": "mig_cmao729t8llnsos1i38g",
+  "parentID": "mig_cmao6rpt8llnsos1i37g",
+  "checksum": "1:b40a545fbd90bbccb7aba9882670c27f13f812344ed0a84074753ebbca689faa",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "data_file",
+          "type": "file"
+        },
+        "table": "data_item"
+      }
+    }
+  ]
+}

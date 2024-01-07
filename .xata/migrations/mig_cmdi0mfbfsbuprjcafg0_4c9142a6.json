@@ -1,0 +1,19 @@
+{
+  "id": "mig_cmdi0mfbfsbuprjcafg0",
+  "parentID": "mig_cmdi04vbfsbuprjcaff0",
+  "checksum": "1:4c9142a60f6c75c6b110a656b73960f6c0ccf6af0562c8469ab86858db5db952",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "distribution_item",
+          "type": "link",
+          "link": {
+            "table": "distribution_item"
+          }
+        },
+        "table": "user_resources"
+      }
+    }
+  ]
+}
