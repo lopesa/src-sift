@@ -66,6 +66,12 @@ export async function GET(
   return NextResponse.json(data.toSerializable());
 }
 
+/**
+ * create a new distribution item
+ * @param req
+ * @param res
+ * @returns
+ */
 export async function POST(
   req: NextRequest,
   res: NextResponse
@@ -110,6 +116,34 @@ export async function POST(
       error: "Error creating record",
     });
   }
+
+  return NextResponse.json(record?.toSerializable());
+}
+
+/**
+ * delete a distribution item by id
+ * @param req
+ * @param res
+ */
+export async function DELETE(req: NextRequest, res: NextResponse) {
+  const requestBody = await req.json().catch((error) => {
+    return NextResponse.json({
+      error: "Invalid request body",
+    });
+  });
+
+  const { id } = requestBody;
+
+  if (!id) {
+    return NextResponse.json({
+      error: "Invalid request body",
+    });
+  }
+
+  const xata = getXataClient();
+  const record = await xata.db.distribution_item
+    .delete({ id })
+    .catch((e) => undefined);
 
   return NextResponse.json(record?.toSerializable());
 }

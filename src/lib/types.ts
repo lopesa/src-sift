@@ -1,4 +1,8 @@
-import { DistributionItemRecord, ResourceItemRecord } from "@/xata";
+import {
+  DistributionItemRecord,
+  ResourceItemRecord,
+  UserResourceRecord,
+} from "@/xata";
 import { SearchXataRecord, SelectedPick, TotalCount } from "@xata.io/client";
 import { Session } from "next-auth";
 
@@ -58,5 +62,11 @@ export type SearchResults = {
 export function isValidDistributionItemRecord(
   item: any
 ): item is DistributionItemRecord {
+  return item && item.id;
+}
+
+export function isValidUserResourceRecord(
+  item: any
+): item is UserResourceRecord {
   return item && item.id;
 }

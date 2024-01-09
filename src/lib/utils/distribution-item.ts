@@ -38,3 +38,19 @@ export const createDistributionItem = async (
   const createdDistributionItem = await createdDistributionItemRes?.json();
   return createdDistributionItem;
 };
+
+export const deleteDistributionItem = async (
+  distributionItemId: string
+): Promise<JSONData<DistributionItemRecord> | { error: string }> => {
+  const deletedDistributionItemRes = await fetch(`/api/distribution-item`, {
+    method: "DELETE",
+    body: JSON.stringify({
+      id: distributionItemId,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).catch((e) => e);
+  const deletedDistributionItem = await deletedDistributionItemRes?.json();
+  return deletedDistributionItem;
+};

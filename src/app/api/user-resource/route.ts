@@ -11,7 +11,7 @@ export type UserResourceAPIRequestBody = Promise<
 >;
 
 /**
- * GET all user_resource records
+ * GET all user_resource records for a user
  * @TODO: if passed parameter, get one user_resource record
  *
  * @param req
@@ -112,11 +112,26 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
     });
   });
 
-  const { resourceId, userId, tempUser } = requestBody;
+  const { resourceId, distributionItemId, userId, tempUser } = requestBody;
 
-  const filter = !!tempUser
-    ? { "temp_user.id": userId, "resource.id": resourceId }
-    : { "user.id": userId, "resource.id": resourceId };
+  if (!userId || (!distributionItemId && !resourceId)) {
+    return NextResponse.json({
+      error: "Invalid request body",
+    });
+  }
+
+  const filter: {
+    "user.id"?: string;
+    "temp_user.id"?: string;
+    "resource.id"?: string;
+    "distribution_item.id"?: string;
+  } = !!tempUser ? { "temp_user.id": userId } : { "user.id": userId };
+
+  if (distributionItemId) {
+    filter["distribution_item.id"] = distributionItemId;
+  } else if (resourceId) {
+    filter["resource.id"] = resourceId;
+  }
 
   const xata = getXataClient();
   const recordToDelete = await xata.db.user_resource

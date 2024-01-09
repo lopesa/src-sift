@@ -21,6 +21,7 @@ export const getUserDataItem = async ({
   distributionItemId,
 }: GetUserDataItemArgs) => {
   const params = new URLSearchParams();
+
   if (userId) {
     params.append("userId", userId);
   }
@@ -34,6 +35,7 @@ export const getUserDataItem = async ({
     params.append("getFullDataItem", getFullDataItem.toString());
   }
   params.append("tempUser", (!!tempUser).toString());
+
   const userDataItemRes = await fetch(
     `/api/user-resource?${params.toString()}`
   ).catch((e) => undefined);
@@ -41,23 +43,34 @@ export const getUserDataItem = async ({
   return userDataItem;
 };
 
-export const deleteUserDataItem = async (
-  userId: string,
-  resourceId: string,
-  tempUser: boolean
-) => {
+type DeleteUserDataItemArgs = {
+  userId: string;
+  resourceId: string;
+  distributionItemId?: string;
+  tempUser: boolean;
+};
+
+export const deleteUserDataItem = async ({
+  userId,
+  resourceId,
+  distributionItemId,
+  tempUser,
+}: DeleteUserDataItemArgs) => {
   const deleted = await fetch(`/api/user-resource`, {
     method: "DELETE",
     body: JSON.stringify({
       userId,
       resourceId,
+      distributionItemId,
       tempUser,
     }),
     headers: {
       "Content-Type": "application/json",
     },
   }).catch((e) => {
-    undefined;
+    return {
+      error: e.message,
+    };
   });
   return deleted;
 };
@@ -89,4 +102,15 @@ export const createUserDataItem = async ({
   }).catch((e) => undefined);
 
   return await userDataItem?.json();
+};
+
+export const getUserResourcesWithDistributionItem = async (
+  distributionItemId: string
+) => {
+  const params = new URLSearchParams();
+  params.append("distributionItemId", distributionItemId);
+  const userResources = await fetch(
+    `/api/user-resource/by-distribution-item?${params.toString()}`
+  );
+  return await userResources?.json();
 };

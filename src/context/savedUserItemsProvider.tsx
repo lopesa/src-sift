@@ -1,11 +1,21 @@
 "use client";
 
-import { SessionWithUserId, isValidDistributionItemRecord } from "@/lib/types";
+import {
+  SessionWithUserId,
+  isValidDistributionItemRecord,
+  isValidUserResourceRecord,
+} from "@/lib/types";
 import {
   createDistributionItem,
+  deleteDistributionItem,
   getDistributionItem,
 } from "@/lib/utils/distribution-item";
-import { createUserDataItem, getUserDataItem } from "@/lib/utils/user-data";
+import {
+  createUserDataItem,
+  deleteUserDataItem,
+  getUserDataItem,
+  getUserResourcesWithDistributionItem,
+} from "@/lib/utils/user-data";
 import {
   DistributionItem,
   DistributionItemRecord,
@@ -157,14 +167,40 @@ export default function SavedUserItemsProvider({
       distributionItem
     );
 
-    const itemIsSaved = isValidDistributionItemRecord(existingDistributionItem)
-      ? distributionItemIsSavedForUser(existingDistributionItem.id)
-      : false;
+    // item is currently saved
+    if (isValidDistributionItemRecord(existingDistributionItem)) {
+      // delete the user_resource
+      const deletedUserResource = await deleteUserDataItem({
+        userId,
+        resourceId,
+        distributionItemId: existingDistributionItem?.id,
+        tempUser: status !== "authenticated",
+      });
 
-    if (itemIsSaved) {
-      // delete the user_resources
+      if (!isValidUserResourceRecord(deletedUserResource)) {
+        return false;
+      }
+
+      removeSavedDistributionItem(existingDistributionItem.id);
+
+      const remainingUserResources = await getUserResourcesWithDistributionItem(
+        existingDistributionItem.id
+      ).catch((e) => {
+        return {
+          error: e.message,
+        };
+      });
+
+      if (!remainingUserResources?.error && !remainingUserResources?.length) {
+        // delete the distribution_item
+        const deletedUserResource = await deleteDistributionItem(
+          existingDistributionItem.id
+        );
+      }
+
       // if its a distribution item and if no other users have it saved, delete it from distribution_items
       return true;
+      // item is not currently saved
     } else {
       // create a distribution_item if it doesn't exist
       let createdDistributionItem;
