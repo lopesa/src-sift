@@ -1,0 +1,13 @@
+{
+  "id": "mig_cmeo8fnl7vhfemrogpg0",
+  "parentID": "mig_cmeo8enl7vhfemrogpf0",
+  "checksum": "1:c402831833a96891089530f64156538cf33fae5034f09d47703b27a12bec84c8",
+  "operations": [
+    {
+      "removeColumn": {
+        "column": "mediaType",
+        "table": "distribution_item"
+      }
+    }
+  ]
+}

@@ -10,11 +10,21 @@ export type UserResourceAPIRequestBody = Promise<
   | NextResponse<JSONData<UserResourceRecord> | undefined>
 >;
 
+/**
+ * GET all user_resource records
+ * @TODO: if passed parameter, get one user_resource record
+ *
+ * @param req
+ * @param res
+ * @returns the user_resource records
+ */
 export async function GET(req: NextRequest, res: NextResponse) {
   const params = req.nextUrl.searchParams;
 
   const userId = params.get("userId");
-  const tempUser = params.get("temporary");
+  const tempUser = params.get("tempUser");
+  const resourceId = params.get("resourceId");
+  const distributionItemId = params.get("distributionItemId");
   const getFullResourceItem = params.get("getFullResourceItem");
 
   if (!userId) {
@@ -28,14 +38,22 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
   const xata = getXataClient();
   const data = await xata.db.user_resource
-    .select(getFullResourceItem ? ["*", "resource.*"] : ["*"])
+    .select(
+      getFullResourceItem ? ["*", "resource.*", "distribution_item.*"] : ["*"]
+    )
     .filter(filter)
-    .getAll()
+    .getAll({ consistency: "eventual" })
     .catch((e) => undefined);
 
   return NextResponse.json(JSON.parse(JSON.stringify(data)));
 }
 
+/**
+ * create a user resource record
+ * @param req
+ * @param res
+ * @returns the created record
+ */
 export async function POST(req: NextRequest, res: NextResponse) {
   const requestBody = await req.json().catch((error) => {
     return NextResponse.json({
@@ -43,21 +61,29 @@ export async function POST(req: NextRequest, res: NextResponse) {
     });
   });
 
-  const { resourceId, distributionItem, userId, tempUser } = requestBody;
+  const { resourceId, distributionItemId, userId, tempUser } = requestBody;
 
-  if (distributionItem) {
+  if ((!distributionItemId && !resourceId) || !userId) {
     return NextResponse.json({
-      message: "TO DO: special treatment for a distribution item",
+      error: "Invalid request body",
     });
   }
 
   const recordData: {
-    resource: string;
+    resource?: string;
+    distribution_item?: string;
     user?: string;
     temp_user?: string;
-  } = {
-    resource: resourceId,
-  };
+  } = {};
+
+  if (distributionItemId) {
+    recordData.distribution_item = distributionItemId;
+  }
+
+  if (!distributionItemId && resourceId) {
+    recordData.resource = resourceId;
+  }
+
   if (tempUser) {
     recordData.temp_user = userId;
   } else {
@@ -73,7 +99,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 }
 
 /**
- * DELETE a resource_item or a distribution_item
+ * DELETE a user_resource record
  *
  * @param req
  * @param res
@@ -95,7 +121,7 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
   const xata = getXataClient();
   const recordToDelete = await xata.db.user_resource
     .filter(filter)
-    .getFirst()
+    .getFirst({ consistency: "eventual" })
     .catch((e) => undefined);
 
   if (!recordToDelete) {

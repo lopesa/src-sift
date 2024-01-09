@@ -1,0 +1,14 @@
+{
+  "id": "mig_cme6po1dunekp4db1p9g",
+  "parentID": "mig_cme6e3suphs364j0msa0",
+  "checksum": "1:039f082e8a44370cc27399c280152c51e07602b6d4342096d67d3b25a9a2449d",
+  "operations": [
+    {
+      "renameColumn": {
+        "newName": "downloadURL",
+        "oldName": "download_url",
+        "table": "distribution_item"
+      }
+    }
+  ]
+}

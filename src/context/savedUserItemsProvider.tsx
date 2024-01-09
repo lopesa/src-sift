@@ -1,7 +1,17 @@
 "use client";
 
-import { SessionWithUserId } from "@/lib/types";
-import { TemporaryUsersRecord, UserResourceRecord } from "@/xata";
+import { SessionWithUserId, isValidDistributionItemRecord } from "@/lib/types";
+import {
+  createDistributionItem,
+  getDistributionItem,
+} from "@/lib/utils/distribution-item";
+import { createUserDataItem, getUserDataItem } from "@/lib/utils/user-data";
+import {
+  DistributionItem,
+  DistributionItemRecord,
+  TemporaryUsersRecord,
+  UserResourceRecord,
+} from "@/xata";
 import { JSONData } from "@xata.io/client";
 import { useSession } from "next-auth/react";
 import {
@@ -22,18 +32,20 @@ type SavedUserItems = {
 type SavedUserItemsContextT = {
   savedUserItems: SavedUserItems;
   setSavedUserItems?: Dispatch<SetStateAction<SavedUserItems>>;
-  addLocalStorageDistributionItem: (id: string) => void;
-  removeLocalStorageDistributionItem: (id: string) => void;
-  addLocalStorageResourceItem: (id: string) => void;
-  removeLocalStorageResourceItem: (id: string) => void;
+  toggleItemIsSaved: (
+    resourceId: string,
+    distributionItem?: DistributionItem
+  ) => Promise<boolean>;
+  getItemIsSaved: (
+    resourceId: string,
+    distributionItem?: DistributionItem
+  ) => Promise<boolean>;
 };
 
 export const SavedUserItemsContext = createContext<SavedUserItemsContextT>({
   savedUserItems: { resourceItemIds: [], distributionItemIds: [] },
-  addLocalStorageDistributionItem: () => {},
-  removeLocalStorageDistributionItem: () => {},
-  addLocalStorageResourceItem: () => {},
-  removeLocalStorageResourceItem: () => {},
+  toggleItemIsSaved: () => Promise.resolve(false),
+  getItemIsSaved: () => Promise.resolve(false),
 });
 
 type SavedUserItemsProviderProps = {
@@ -54,13 +66,13 @@ export default function SavedUserItemsProvider({
     { resourceItemIds: [], distributionItemIds: [] }
   );
 
-  const addLocalStorageDistributionItem = (id: string) => {
+  const addSavedDistributionItem = (id: string) => {
     setSavedUserItems({
       resourceItemIds: [...savedUserItems.resourceItemIds],
       distributionItemIds: [...savedUserItems.distributionItemIds, id],
     });
   };
-  const removeLocalStorageDistributionItem = (id: string) => {
+  const removeSavedDistributionItem = (id: string) => {
     setSavedUserItems({
       resourceItemIds: [...savedUserItems.resourceItemIds],
       distributionItemIds: savedUserItems.distributionItemIds.filter(
@@ -68,13 +80,13 @@ export default function SavedUserItemsProvider({
       ),
     });
   };
-  const addLocalStorageResourceItem = (id: string) => {
+  const addSavedResourceItem = (id: string) => {
     setSavedUserItems({
       resourceItemIds: [...savedUserItems.resourceItemIds, id],
       distributionItemIds: [...savedUserItems.distributionItemIds],
     });
   };
-  const removeLocalStorageResourceItem = (id: string) => {
+  const removeSavedResourceItem = (id: string) => {
     setSavedUserItems({
       resourceItemIds: savedUserItems.resourceItemIds.filter(
         (savedId) => savedId !== id
@@ -90,16 +102,120 @@ export default function SavedUserItemsProvider({
     return temporaryUser?.id;
   }, [session, status, temporaryUser]);
 
-  useEffect(() => {
-    const getUserData = async () => {
-      const userData = await fetch(
-        `/api/user-resource?userId=${getUserId()}&temporary=${
-          status !== "authenticated"
-        }`
-      ).catch((e) => {
-        // console.log(e);
+  const resourceItemIsSavedForUser = (resourceId: string) => {
+    return (
+      !!savedUserItems.resourceItemIds.length &&
+      savedUserItems.resourceItemIds.includes(resourceId)
+    );
+  };
+  const distributionItemIsSavedForUser = (distributionItemId: string) => {
+    // check it agains the savedUserItems.distributionItemIds)
+    return savedUserItems.distributionItemIds.includes(distributionItemId);
+  };
+
+  const getItemIsSaved = async (
+    resourceId: string,
+    distributionItem?: DistributionItem
+  ) => {
+    if (resourceId && !distributionItem) {
+      return resourceItemIsSavedForUser(resourceId);
+    } else if (resourceId && distributionItem) {
+      const existingDistributionItem = await getDistributionItem(
+        resourceId,
+        distributionItem
+      );
+      const existingDistributionItemId = isValidDistributionItemRecord(
+        existingDistributionItem
+      )
+        ? existingDistributionItem.id
+        : undefined;
+      return !!existingDistributionItemId
+        ? distributionItemIsSavedForUser(existingDistributionItemId)
+        : false;
+    }
+    return false;
+  };
+
+  const toggleItemIsSaved = async (
+    resourceId: string,
+    distributionItem?: DistributionItem
+  ) => {
+    const userId = getUserId();
+
+    if (!userId) {
+      return false;
+    }
+
+    if (!distributionItem) {
+      // do regular resource item stuff and return
+      return true;
+    }
+
+    // item is a distribution item below here
+    const existingDistributionItem = await getDistributionItem(
+      resourceId,
+      distributionItem
+    );
+
+    const itemIsSaved = isValidDistributionItemRecord(existingDistributionItem)
+      ? distributionItemIsSavedForUser(existingDistributionItem.id)
+      : false;
+
+    if (itemIsSaved) {
+      // delete the user_resources
+      // if its a distribution item and if no other users have it saved, delete it from distribution_items
+      return true;
+    } else {
+      // create a distribution_item if it doesn't exist
+      let createdDistributionItem;
+
+      if (!isValidDistributionItemRecord(existingDistributionItem)) {
+        createdDistributionItem = await createDistributionItem(
+          resourceId,
+          distributionItem
+        );
+      }
+
+      const distributionItemId = isValidDistributionItemRecord(
+        existingDistributionItem
+      )
+        ? existingDistributionItem.id
+        : isValidDistributionItemRecord(createdDistributionItem)
+        ? createdDistributionItem.id
+        : undefined;
+
+      if (!distributionItemId) {
+        return false;
+      }
+      // create a user_resource
+      const createdUserResource = await createUserDataItem({
+        userId,
+        resourceId,
+        distributionItemId,
+        tempUser: status !== "authenticated",
       });
-      const userDataJson = await userData?.json();
+
+      if (!createdUserResource) {
+        return false;
+      }
+
+      // add it to the local saved user resources
+      addSavedDistributionItem(distributionItemId);
+
+      return true;
+    }
+  };
+
+  useEffect(() => {
+    const userId = getUserId();
+    if (!userId) {
+      return;
+    }
+    const getUserData = async () => {
+      const userDataJson = await getUserDataItem({
+        userId,
+        tempUser: status !== "authenticated",
+      });
 
       let newSavedUserItems = savedUserItems;
 
@@ -107,6 +223,11 @@ export default function SavedUserItemsProvider({
         userDataJson.forEach((item: UserResourceRecord) => {
           if (item.resource) {
             newSavedUserItems.resourceItemIds.push(item.resource.id);
+          }
+          if (item.distribution_item) {
+            newSavedUserItems.distributionItemIds.push(
+              item.distribution_item.id
+            );
           }
         });
         setSavedUserItems(newSavedUserItems);
@@ -131,10 +252,8 @@ export default function SavedUserItemsProvider({
       value={{
         savedUserItems,
         setSavedUserItems,
-        addLocalStorageDistributionItem,
-        removeLocalStorageDistributionItem,
-        addLocalStorageResourceItem,
-        removeLocalStorageResourceItem,
+        toggleItemIsSaved,
+        getItemIsSaved,
       }}
     >
       {children}

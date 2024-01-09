@@ -25,7 +25,6 @@ export async function POST(req: NextRequest): Promise<Response> {
     async start(controller) {
       xata.db.resource_item.ask(body.data.question, {
         onMessage: (message: AskResult) => {
-          // debugger;
           controller.enqueue(encoder.encode(`event: message\n`));
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify(message)}\n\n`)

@@ -1,0 +1,16 @@
+{
+  "id": "mig_cmem2jq102i9el77ol6g",
+  "parentID": "mig_cme6q6pdunekp4db1pag",
+  "checksum": "1:a42b737c3dec4a89830fb680f275d8d96b3f02642605805cbd9739d87ec08b0e",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "description",
+          "type": "text"
+        },
+        "table": "distribution_item"
+      }
+    }
+  ]
+}

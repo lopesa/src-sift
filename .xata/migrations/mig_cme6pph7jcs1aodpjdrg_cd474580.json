@@ -1,0 +1,14 @@
+{
+  "id": "mig_cme6pph7jcs1aodpjdrg",
+  "parentID": "mig_cme6po1dunekp4db1p9g",
+  "checksum": "1:cd474580a2feaea6a50be756b70266240080c75625c264371efb588a786554b5",
+  "operations": [
+    {
+      "renameColumn": {
+        "newName": "accessURL",
+        "oldName": "access_url",
+        "table": "distribution_item"
+      }
+    }
+  ]
+}

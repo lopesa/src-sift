@@ -1,4 +1,4 @@
-import { ResourceItemRecord } from "@/xata";
+import { DistributionItemRecord, ResourceItemRecord } from "@/xata";
 import { SearchXataRecord, SelectedPick, TotalCount } from "@xata.io/client";
 import { Session } from "next-auth";
 
@@ -26,16 +26,16 @@ export type AppFinalResourceItem = Readonly<
   dataTypesByFileExtension?: string[];
 };
 
-export type DistributionItem = DataGovDistibutionItem;
+// export type DistributionItem = DataGovDistibutionItem;
 
-export type DataGovDistibutionItem = {
-  "@type"?: string;
-  downloadURL?: string;
-  accessURL?: string;
-  forma?: string;
-  mediaType?: string;
-  title?: string;
-};
+// export type DataGovDistibutionItem = {
+//   "@type"?: string;
+//   downloadURL?: string;
+//   accessURL?: string;
+//   forma?: string;
+//   mediaType?: string;
+//   title?: string;
+// };
 
 export interface Saved {
   isSaved?: boolean;
@@ -54,3 +54,9 @@ export type SearchResults = {
     records: SearchXataRecord<SelectedPick<ResourceItemRecord, ["*"]>>[];
   } & TotalCount;
 };
+
+export function isValidDistributionItemRecord(
+  item: any
+): item is DistributionItemRecord {
+  return item && item.id;
+}

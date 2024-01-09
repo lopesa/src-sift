@@ -1,4 +1,45 @@
-import { DistributionItem } from "../types";
+type GetUserDataItemArgs = {
+  userId: string;
+  tempUser: boolean;
+  resourceId?: string;
+  distributionItemId?: string;
+  getFullDataItem?: boolean;
+};
+
+/**
+ * get all user data items
+ * @TODO pass in an id and get a single item
+ * @param userId
+ * @param resourceId
+ * @param distributionItemId
+ */
+export const getUserDataItem = async ({
+  userId,
+  tempUser,
+  getFullDataItem,
+  resourceId,
+  distributionItemId,
+}: GetUserDataItemArgs) => {
+  const params = new URLSearchParams();
+  if (userId) {
+    params.append("userId", userId);
+  }
+  if (resourceId) {
+    params.append("resourceId", resourceId);
+  }
+  if (distributionItemId) {
+    params.append("distributionItemId", distributionItemId);
+  }
+  if (getFullDataItem) {
+    params.append("getFullDataItem", getFullDataItem.toString());
+  }
+  params.append("tempUser", (!!tempUser).toString());
+  const userDataItemRes = await fetch(
+    `/api/user-resource?${params.toString()}`
+  ).catch((e) => undefined);
+  const userDataItem = await userDataItemRes?.json();
+  return userDataItem;
+};
 
 export const deleteUserDataItem = async (
   userId: string,
@@ -16,37 +57,36 @@ export const deleteUserDataItem = async (
       "Content-Type": "application/json",
     },
   }).catch((e) => {
-    // console.log(e);
+    undefined;
   });
   return deleted;
 };
 
-export type SaveUserDataItemArgs = {
+export type CreateUserDataItemArgs = {
   userId: string;
-  resourceId: string;
-  tempUser: boolean;
-  distributionItem?: DistributionItem;
+  resourceId?: string;
+  tempUser?: boolean;
+  distributionItemId?: string;
 };
 
-export const saveUserDataItem = async ({
+export const createUserDataItem = async ({
   userId,
   resourceId,
   tempUser,
-  distributionItem,
-}: SaveUserDataItemArgs) => {
+  distributionItemId,
+}: CreateUserDataItemArgs) => {
   const userDataItem = await fetch(`/api/user-resource`, {
     method: "POST",
     body: JSON.stringify({
       userId,
       resourceId,
       tempUser,
-      distributionItem,
+      distributionItemId,
     }),
     headers: {
       "Content-Type": "application/json",
     },
-  }).catch((e) => {
-    // console.log(e);
-  });
-  return userDataItem;
+  }).catch((e) => undefined);
+
+  return await userDataItem?.json();
 };

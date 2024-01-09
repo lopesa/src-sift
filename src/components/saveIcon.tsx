@@ -3,11 +3,8 @@
 import { SaveIcon } from "lucide-react";
 import { SavedUserItemsContext } from "@/context/savedUserItemsProvider";
 import { cn } from "@/lib/utils";
-import { useCallback, useContext } from "react";
-import { useSession } from "next-auth/react";
-import { DistributionItem, SessionWithUserId } from "@/lib/types";
-import { TemporaryUserContext } from "@/context/temporaryUserProvider";
-import { deleteUserDataItem, saveUserDataItem } from "@/lib/utils/user-data";
+import { useContext, useEffect, useState } from "react";
+import { DistributionItem } from "@/xata";
 
 export type SaveIconProps = {
   resourceId: string;
@@ -22,90 +19,31 @@ const SaveIconComponent = ({
   postUpdateResourceItemAction,
   className,
 }: SaveIconProps) => {
-  const { data: session, status } = useSession();
-  const temporaryUser = useContext(TemporaryUserContext);
+  const [isSaved, setIsSaved] = useState<boolean>(false);
 
-  const {
-    savedUserItems,
-    setSavedUserItems,
-    addLocalStorageDistributionItem,
-    removeLocalStorageDistributionItem,
-    addLocalStorageResourceItem,
-    removeLocalStorageResourceItem,
-  } = useContext(SavedUserItemsContext);
+  const { toggleItemIsSaved, getItemIsSaved } = useContext(
+    SavedUserItemsContext
+  );
 
-  const resourceItemIsSaved = () => {
-    return (
-      savedUserItems.resourceItemIds.length &&
-      savedUserItems.resourceItemIds.includes(resourceId)
-    );
-  };
-
-  const distributionItemIsSaved = () => {
-    return false;
-  };
-
-  const isSaved = () => {
-    if (resourceId && !distributionItem) {
-      return resourceItemIsSaved();
-    } else if (resourceId && distributionItem) {
-      return distributionItemIsSaved();
-    }
-    return false;
-  };
-
-  const getUserId = useCallback(() => {
-    if (status === "authenticated") {
-      return (session as SessionWithUserId)?.user?.id;
-    }
-    return temporaryUser?.id;
-  }, [session, status, temporaryUser]);
+  useEffect(() => {
+    const getIsSaved = async () => {
+      const isSaved = await getItemIsSaved(resourceId, distributionItem);
+      setIsSaved(isSaved);
+    };
+    getIsSaved();
+  }, [setIsSaved, getItemIsSaved, resourceId, distributionItem]);
 
   const onClickSave = async (e: React.MouseEvent<SVGElement>) => {
     e.preventDefault();
 
-    const userId = getUserId();
+    const curState = isSaved;
 
-    if (!userId) {
-      return;
-    }
+    // preemptive
+    setIsSaved(!isSaved);
 
-    if (resourceId && !distributionItem) {
-      const itemIsSaved = resourceItemIsSaved();
-
-      // preemtively set the state
-      if (itemIsSaved) {
-        removeLocalStorageResourceItem(resourceId);
-      } else {
-        addLocalStorageResourceItem(resourceId);
-      }
-
-      if (itemIsSaved) {
-        const deleted = await deleteUserDataItem(
-          userId,
-          resourceId,
-          status === "unauthenticated"
-        );
-        if (!deleted) {
-          // failed remotely, undo preemtive state change
-          addLocalStorageResourceItem(resourceId);
-        }
-        postUpdateResourceItemAction?.();
-      } else {
-        const savedItem = await saveUserDataItem({
-          userId,
-          resourceId,
-          tempUser: status === "unauthenticated",
-          distributionItem,
-        });
-        if (!savedItem) {
-          // failed remotely, undo preemtive state change
-          removeLocalStorageResourceItem(resourceId);
-        }
-        postUpdateResourceItemAction?.();
-      }
-    } else if (resourceId && distributionItem) {
-    }
+    const saveSuccess = await toggleItemIsSaved(resourceId, distributionItem);
+    setIsSaved(await getItemIsSaved(resourceId, distributionItem));
+    postUpdateResourceItemAction?.();
   };
 
   return (
@@ -113,7 +51,7 @@ const SaveIconComponent = ({
       size={16}
       data-item-id={resourceId}
       className={cn(
-        isSaved() ? "text-emerald-700" : "text-gray-300",
+        isSaved ? "text-emerald-700" : "text-gray-300",
         "cursor-pointer",
         className
       )}

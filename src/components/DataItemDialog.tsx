@@ -16,13 +16,13 @@ import {
   AccordionTrigger,
 } from "./ui/accordion";
 
-import { ResourceItemRecord } from "@/xata";
+import { DistributionItem, ResourceItemRecord } from "@/xata";
 
 import { JSONData } from "@xata.io/client";
 import { Button } from "@/components/ui/button";
 import DOMPurify from "dompurify";
 import { useState } from "react";
-import { DistributionItem } from "@/lib/types";
+// import { DistributionItem } from "@/lib/types";
 import { Separator } from "./ui/separator";
 import PreviewData from "./PreviewData";
 import { getFileExtension } from "@/lib/utils/data";
@@ -112,9 +112,9 @@ const DataItemDialog = ({ resourceId, className }: DataItemDialogProps) => {
     });
   };
 
-  const getDistributionUrl = (distributionItem: DistributionItem) => {
-    return distributionItem?.downloadURL || distributionItem?.accessURL;
-  };
+  // const getDistributionUrl = (distributionItem: DistributionItem) => {
+  //   return distributionItem?.downloadURL || distributionItem?.accessURL;
+  // };
 
   const doNotPrintDataKeys = ["id", "xata"];
 
@@ -189,7 +189,7 @@ const DataItemDialog = ({ resourceId, className }: DataItemDialogProps) => {
                                 • {distribution.title}
                               </div>
                             )}
-                            <div>
+                            {/* <div>
                               <a
                                 href={getDistributionUrl(distribution)}
                                 target="_blank"
@@ -199,7 +199,7 @@ const DataItemDialog = ({ resourceId, className }: DataItemDialogProps) => {
                                 {getDistributionUrl(distribution) &&
                                   getDistributionUrl(distribution)}
                               </a>
-                            </div>
+                            </div> */}
                           </DialogDescription>
                           {getPreviewDataLink(distribution)}
                         </div>

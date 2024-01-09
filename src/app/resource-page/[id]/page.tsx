@@ -20,7 +20,7 @@ const ResourcePage = async ({ params }: { params: { id: string } }) => {
   const xata = getXataClient();
   let dataSourceEntry = await xata.db.resource_source
     .filter({ name: DataSources[dataSource] })
-    .getFirst()
+    .getFirst({ consistency: "eventual" })
     .catch((err) => {
       throw err;
     });
