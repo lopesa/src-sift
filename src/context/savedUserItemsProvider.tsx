@@ -35,16 +35,14 @@ import {
   useState,
 } from "react";
 import { useLocalStorage } from "usehooks-ts";
-import savedUserItemsReducer from "./savedUserItemsReducer";
-
-type SavedUserItems = {
-  resourceItemIds: string[];
-  distributionItemIds: string[];
-};
+import savedUserItemsReducer, {
+  SavedUserItems,
+  SavedUserItemsAction,
+} from "./savedUserItemsReducer";
 
 type SavedUserItemsContextT = {
   savedUserItems: SavedUserItems;
-  setSavedUserItems?: Dispatch<SetStateAction<SavedUserItems>>;
+  // setSavedUserItems?: Dispatch<SetStateAction<SavedUserItems>>;
   toggleItemIsSaved: (
     resourceId: string,
     distributionItem?: DistributionItem
@@ -56,7 +54,11 @@ type SavedUserItemsContextT = {
 };
 
 export const SavedUserItemsContext = createContext<SavedUserItemsContextT>({
-  savedUserItems: { resourceItemIds: [], distributionItemIds: [] },
+  savedUserItems: {
+    resourceItemIds: [] as string[],
+    distributionItemIds: [] as string[],
+    initComplete: false,
+  },
   toggleItemIsSaved: () => Promise.resolve(false),
   getItemIsSavedForUser: () => Promise.resolve(false),
 });
@@ -77,7 +79,14 @@ export default function SavedUserItemsProvider({
   const [savedUserItems, dispatch] = useReducer(savedUserItemsReducer, {
     resourceItemIds: [],
     distributionItemIds: [],
+    initComplete: false,
   });
+
+  const setInitComplete = () => {
+    dispatch({
+      type: "setInitComplete",
+    });
+  };
 
   const addDistributionItemToContext = (id: string) => {
     dispatch({
@@ -302,6 +311,7 @@ export default function SavedUserItemsProvider({
           }
         });
       }
+      setInitComplete();
     };
 
     getUserData().catch((e) => {

@@ -44,7 +44,7 @@ export async function GET(req: Request, res: NextResponse) {
     )
     .filter(filter)
     .getAll({ consistency: "eventual" })
-    .catch((e) => undefined);
+    .catch((e) => e);
 
   return NextResponse.json(JSON.parse(JSON.stringify(data)));
 }

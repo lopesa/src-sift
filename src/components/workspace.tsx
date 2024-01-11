@@ -7,6 +7,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { DataItemsAccordionItem, SessionWithUserId } from "@/lib/types";
 import { TemporaryUserContext } from "@/context/temporaryUserProvider";
 import IndexDataList from "./IndexDataList";
+import { SavedUserItemsContext } from "@/context/savedUserItemsProvider";
 
 export type WorkspaceProps = {
   dataItems?: Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[];
@@ -16,6 +17,9 @@ const Workspace = ({ dataItems }: WorkspaceProps) => {
   const { data: session, status } = useSession();
   const temporaryUser = useContext(TemporaryUserContext);
 
+  const { toggleItemIsSaved, getItemIsSavedForUser, savedUserItems } =
+    useContext(SavedUserItemsContext);
+
   const [finalDataItems, setFinalDataItems] = useState<
     DataItemsAccordionItem[]
   >([]);
@@ -24,7 +28,7 @@ const Workspace = ({ dataItems }: WorkspaceProps) => {
     const varUrl =
       status === "authenticated" && (session as SessionWithUserId)?.user?.id
         ? `userId=${(session as SessionWithUserId)?.user?.id}`
-        : `userId=${temporaryUser?.id}&temporary=true`;
+        : `userId=${temporaryUser?.id}&tempUser=true`;
 
     const url = `/api/user-resource?${varUrl}&getFullResourceItem=true`;
 
@@ -36,39 +40,33 @@ const Workspace = ({ dataItems }: WorkspaceProps) => {
       ("*" | "resource.*")[]
     >[] = await userData?.json();
 
-    let data = userDataJson.map(
-      (item) => item.resource as DataItemsAccordionItem
-    );
+    let data = userDataJson
+      .filter((item) => !!item.resource)
+      .map((item) => item.resource as DataItemsAccordionItem);
 
     setFinalDataItems(data);
   }, [session, status, temporaryUser]);
 
   useEffect(() => {
-    if (!(session as SessionWithUserId)?.user?.id && !temporaryUser?.id) {
+    if (
+      status === "loading" ||
+      (!(session as SessionWithUserId)?.user?.id && !temporaryUser?.id)
+    ) {
       return;
     }
     // if the temp user's items have already been fetched, don't fetch again
-    if (dataItems?.length) {
-      return;
-    }
+    // if (dataItems?.length) {
+    //   return;
+    // }
 
-    getUserData().catch((e) => {
-      // console.log(e);
-    });
-  }, [
-    getUserData,
-    status,
-    temporaryUser,
-    dataItems,
-    setFinalDataItems,
-    session,
-  ]);
+    getUserData().catch((e) => e);
+  }, [getUserData, temporaryUser, session]);
 
   return (
     <div>
       <h1>Workspace</h1>
       <div className="mx-auto my-0 max-w-[95vw] w-[760px]">
-        {!!finalDataItems.length && (
+        {savedUserItems?.initComplete && (
           <IndexDataList
             data={finalDataItems}
             postUpdateResourceItemAction={getUserData}
