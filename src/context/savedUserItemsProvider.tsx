@@ -79,25 +79,25 @@ export default function SavedUserItemsProvider({
     distributionItemIds: [],
   });
 
-  const addSavedDistributionItem = (id: string) => {
+  const addDistributionItemToContext = (id: string) => {
     dispatch({
       type: "addDistributionItem",
       id: id,
     });
   };
-  const removeSavedDistributionItem = (id: string) => {
+  const removeDistributionItemFromContext = (id: string) => {
     dispatch({
       type: "removeDistributionItem",
       id: id,
     });
   };
-  const addSavedResourceItem = (id: string) => {
+  const addResourceItemToContext = (id: string) => {
     dispatch({
       type: "addResourceItem",
       id: id,
     });
   };
-  const removeSavedResourceItem = (id: string) => {
+  const removeResourceItemFromContext = (id: string) => {
     dispatch({
       type: "removeResourceItem",
       id: id,
@@ -165,7 +165,35 @@ export default function SavedUserItemsProvider({
 
     if (!distributionItem) {
       // do regular resource item stuff and return
-      return true;
+      if (isSaved) {
+        const deletedUserResource = await deleteUserDataItem({
+          userId,
+          resourceId,
+          tempUser: status !== "authenticated",
+        });
+
+        if (!isValidUserResourceRecord(deletedUserResource)) {
+          return false;
+        }
+
+        removeResourceItemFromContext(resourceId);
+        return true;
+      } else {
+        const createdUserResource = await createUserDataItem({
+          userId,
+          resourceId,
+          tempUser: status !== "authenticated",
+        });
+
+        if (!createdUserResource) {
+          return false;
+        }
+
+        // add it to the local saved user resources
+        addResourceItemToContext(resourceId);
+
+        return true;
+      }
     }
 
     // item is a distribution item below here
@@ -190,13 +218,11 @@ export default function SavedUserItemsProvider({
         return false;
       }
 
-      // if its a distribution item and if no other users have it saved,
-      // delete it from distribution_items
+      // if its a distribution item (it is at this point)
+      // and if no other users have it saved, delete it from distribution_items
       const remainingUserResources = await getUserResourcesWithDistributionItem(
         existingDistributionItem.id
       ).catch((e) => e);
-
-      // debugger;
 
       if (!remainingUserResources?.length) {
         // delete the distribution_item
@@ -206,12 +232,12 @@ export default function SavedUserItemsProvider({
       }
 
       // WARNING! THIS HAS TO BE THE LAST THING TO HAPPEN BEFORE RETURNING OUT
-      // OF THIS FUNCTION!!!! (I assume in the add case below although
-      // I didn't test it)
+      // OF THIS FUNCTION!!!!
+      //(I assume in the add case below although I didn't test it)
       // I lost a lot of time to a weird bug where if I do this then make any
       // api call subsequently, the SavedUserItems context REVERTS! back to
       // having the item that I just deleted.
-      removeSavedDistributionItem(existingDistributionItem.id);
+      removeDistributionItemFromContext(existingDistributionItem.id);
 
       return true;
     } else {
@@ -249,7 +275,7 @@ export default function SavedUserItemsProvider({
       }
 
       // add it to the local saved user resources
-      addSavedDistributionItem(distributionItemId);
+      addDistributionItemToContext(distributionItemId);
 
       return true;
     }
@@ -269,10 +295,10 @@ export default function SavedUserItemsProvider({
       if (userDataJson?.length) {
         userDataJson.forEach((item: UserResourceRecord) => {
           if (item.resource) {
-            addSavedResourceItem(item.resource.id);
+            addResourceItemToContext(item.resource.id);
           }
           if (item.distribution_item) {
-            addSavedDistributionItem(item.distribution_item.id);
+            addDistributionItemToContext(item.distribution_item.id);
           }
         });
       }
