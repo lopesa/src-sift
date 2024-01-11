@@ -20,20 +20,23 @@ const SaveIconComponent = ({
   className,
 }: SaveIconProps) => {
   const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const { toggleItemIsSaved, getItemIsSaved } = useContext(
+  const { toggleItemIsSaved, getItemIsSavedForUser } = useContext(
     SavedUserItemsContext
   );
 
   useEffect(() => {
     const getIsSaved = async () => {
-      const isSaved = await getItemIsSaved(resourceId, distributionItem);
+      const isSaved = await getItemIsSavedForUser(resourceId, distributionItem);
       setIsSaved(isSaved);
     };
     getIsSaved();
-  }, [setIsSaved, getItemIsSaved, resourceId, distributionItem]);
+  }, [setIsSaved, getItemIsSavedForUser, resourceId, distributionItem]);
 
   const onClickSave = async (e: React.MouseEvent<SVGElement>) => {
+    if (isSaving) return;
+    setIsSaving(true);
     e.preventDefault();
 
     const curState = isSaved;
@@ -42,8 +45,17 @@ const SaveIconComponent = ({
     setIsSaved(!isSaved);
 
     const saveSuccess = await toggleItemIsSaved(resourceId, distributionItem);
-    setIsSaved(await getItemIsSaved(resourceId, distributionItem));
+
+    if (!saveSuccess) {
+      const isSavedRemotely = await getItemIsSavedForUser(
+        resourceId,
+        distributionItem
+      );
+      setIsSaved(isSavedRemotely);
+    }
+
     postUpdateResourceItemAction?.();
+    setIsSaving(false);
   };
 
   return (

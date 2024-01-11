@@ -11,14 +11,12 @@ export const getDistributionItem = async (
       : distributionItem.accessURL
       ? encodeURIComponent(distributionItem.accessURL)
       : ""
-    // distributionItem.downloadURL || distributionItem.accessURL
   }`;
   // get any distribution items with this resource_item id and resource_url
   const existingDistributionItemRes = await fetch(
     `/api/distribution-item${searchString}`
   ).catch((e) => undefined);
-  const existingDistributionItem = await existingDistributionItemRes?.json();
-  return existingDistributionItem;
+  return await existingDistributionItemRes?.json();
 };
 
 export const createDistributionItem = async (
@@ -51,6 +49,5 @@ export const deleteDistributionItem = async (
       "Content-Type": "application/json",
     },
   }).catch((e) => e);
-  const deletedDistributionItem = await deletedDistributionItemRes?.json();
-  return deletedDistributionItem;
+  return await deletedDistributionItemRes?.json();
 };

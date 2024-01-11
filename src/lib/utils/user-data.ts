@@ -67,12 +67,8 @@ export const deleteUserDataItem = async ({
     headers: {
       "Content-Type": "application/json",
     },
-  }).catch((e) => {
-    return {
-      error: e.message,
-    };
-  });
-  return deleted;
+  }).catch((e) => e);
+  return await deleted?.json();
 };
 
 export type CreateUserDataItemArgs = {
@@ -99,7 +95,7 @@ export const createUserDataItem = async ({
     headers: {
       "Content-Type": "application/json",
     },
-  }).catch((e) => undefined);
+  }).catch((e) => e);
 
   return await userDataItem?.json();
 };
@@ -109,8 +105,9 @@ export const getUserResourcesWithDistributionItem = async (
 ) => {
   const params = new URLSearchParams();
   params.append("distributionItemId", distributionItemId);
-  const userResources = await fetch(
+  const userResourcesResponse = await fetch(
     `/api/user-resource/by-distribution-item?${params.toString()}`
-  );
-  return await userResources?.json();
+  ).catch((e) => e);
+  const userResources = await userResourcesResponse?.json();
+  return userResources;
 };

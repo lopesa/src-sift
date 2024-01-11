@@ -20,7 +20,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
   const data = await xata.db.user_resource
     .filter({ distribution_item: distributionItemId })
     .getAll({ consistency: "eventual" })
-    .catch((e) => undefined);
+    .catch((e) => e);
 
   return NextResponse.json(JSON.parse(JSON.stringify(data)));
 }

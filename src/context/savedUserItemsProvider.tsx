@@ -31,8 +31,11 @@ import {
   createContext,
   useCallback,
   useEffect,
+  useReducer,
+  useState,
 } from "react";
 import { useLocalStorage } from "usehooks-ts";
+import savedUserItemsReducer from "./savedUserItemsReducer";
 
 type SavedUserItems = {
   resourceItemIds: string[];
@@ -46,7 +49,7 @@ type SavedUserItemsContextT = {
     resourceId: string,
     distributionItem?: DistributionItem
   ) => Promise<boolean>;
-  getItemIsSaved: (
+  getItemIsSavedForUser: (
     resourceId: string,
     distributionItem?: DistributionItem
   ) => Promise<boolean>;
@@ -55,7 +58,7 @@ type SavedUserItemsContextT = {
 export const SavedUserItemsContext = createContext<SavedUserItemsContextT>({
   savedUserItems: { resourceItemIds: [], distributionItemIds: [] },
   toggleItemIsSaved: () => Promise.resolve(false),
-  getItemIsSaved: () => Promise.resolve(false),
+  getItemIsSavedForUser: () => Promise.resolve(false),
 });
 
 type SavedUserItemsProviderProps = {
@@ -71,37 +74,33 @@ export default function SavedUserItemsProvider({
     JSONData<TemporaryUsersRecord> | undefined
   >("temporaryUser", undefined);
 
-  const [savedUserItems, setSavedUserItems] = useLocalStorage<SavedUserItems>(
-    "savedUserItems",
-    { resourceItemIds: [], distributionItemIds: [] }
-  );
+  const [savedUserItems, dispatch] = useReducer(savedUserItemsReducer, {
+    resourceItemIds: [],
+    distributionItemIds: [],
+  });
 
   const addSavedDistributionItem = (id: string) => {
-    setSavedUserItems({
-      resourceItemIds: [...savedUserItems.resourceItemIds],
-      distributionItemIds: [...savedUserItems.distributionItemIds, id],
+    dispatch({
+      type: "addDistributionItem",
+      id: id,
     });
   };
   const removeSavedDistributionItem = (id: string) => {
-    setSavedUserItems({
-      resourceItemIds: [...savedUserItems.resourceItemIds],
-      distributionItemIds: savedUserItems.distributionItemIds.filter(
-        (savedId) => savedId !== id
-      ),
+    dispatch({
+      type: "removeDistributionItem",
+      id: id,
     });
   };
   const addSavedResourceItem = (id: string) => {
-    setSavedUserItems({
-      resourceItemIds: [...savedUserItems.resourceItemIds, id],
-      distributionItemIds: [...savedUserItems.distributionItemIds],
+    dispatch({
+      type: "addResourceItem",
+      id: id,
     });
   };
   const removeSavedResourceItem = (id: string) => {
-    setSavedUserItems({
-      resourceItemIds: savedUserItems.resourceItemIds.filter(
-        (savedId) => savedId !== id
-      ),
-      distributionItemIds: [...savedUserItems.distributionItemIds],
+    dispatch({
+      type: "removeResourceItem",
+      id: id,
     });
   };
 
@@ -118,12 +117,15 @@ export default function SavedUserItemsProvider({
       savedUserItems.resourceItemIds.includes(resourceId)
     );
   };
-  const distributionItemIsSavedForUser = (distributionItemId: string) => {
+  const distributionItemIsSavedForUser = (
+    distributionItemId: string,
+    savedUserItems: SavedUserItems
+  ) => {
     // check it agains the savedUserItems.distributionItemIds)
     return savedUserItems.distributionItemIds.includes(distributionItemId);
   };
 
-  const getItemIsSaved = async (
+  const getItemIsSavedForUser = async (
     resourceId: string,
     distributionItem?: DistributionItem
   ) => {
@@ -139,8 +141,12 @@ export default function SavedUserItemsProvider({
       )
         ? existingDistributionItem.id
         : undefined;
+
       return !!existingDistributionItemId
-        ? distributionItemIsSavedForUser(existingDistributionItemId)
+        ? distributionItemIsSavedForUser(
+            existingDistributionItemId,
+            savedUserItems
+          )
         : false;
     }
     return false;
@@ -151,6 +157,7 @@ export default function SavedUserItemsProvider({
     distributionItem?: DistributionItem
   ) => {
     const userId = getUserId();
+    const isSaved = await getItemIsSavedForUser(resourceId, distributionItem);
 
     if (!userId) {
       return false;
@@ -167,8 +174,10 @@ export default function SavedUserItemsProvider({
       distributionItem
     );
 
-    // item is currently saved
-    if (isValidDistributionItemRecord(existingDistributionItem)) {
+    if (isSaved) {
+      if (!isValidDistributionItemRecord(existingDistributionItem)) {
+        return false;
+      }
       // delete the user_resource
       const deletedUserResource = await deleteUserDataItem({
         userId,
@@ -181,26 +190,30 @@ export default function SavedUserItemsProvider({
         return false;
       }
 
-      removeSavedDistributionItem(existingDistributionItem.id);
-
+      // if its a distribution item and if no other users have it saved,
+      // delete it from distribution_items
       const remainingUserResources = await getUserResourcesWithDistributionItem(
         existingDistributionItem.id
-      ).catch((e) => {
-        return {
-          error: e.message,
-        };
-      });
+      ).catch((e) => e);
 
-      if (!remainingUserResources?.error && !remainingUserResources?.length) {
+      // debugger;
+
+      if (!remainingUserResources?.length) {
         // delete the distribution_item
-        const deletedUserResource = await deleteDistributionItem(
+        const deletedDistributionItem = await deleteDistributionItem(
           existingDistributionItem.id
-        );
+        ).catch((e) => e);
       }
 
-      // if its a distribution item and if no other users have it saved, delete it from distribution_items
+      // WARNING! THIS HAS TO BE THE LAST THING TO HAPPEN BEFORE RETURNING OUT
+      // OF THIS FUNCTION!!!! (I assume in the add case below although
+      // I didn't test it)
+      // I lost a lot of time to a weird bug where if I do this then make any
+      // api call subsequently, the SavedUserItems context REVERTS! back to
+      // having the item that I just deleted.
+      removeSavedDistributionItem(existingDistributionItem.id);
+
       return true;
-      // item is not currently saved
     } else {
       // create a distribution_item if it doesn't exist
       let createdDistributionItem;
@@ -253,20 +266,15 @@ export default function SavedUserItemsProvider({
         tempUser: status !== "authenticated",
       });
 
-      let newSavedUserItems = savedUserItems;
-
-      if (userDataJson?.savedUserItems) {
+      if (userDataJson?.length) {
         userDataJson.forEach((item: UserResourceRecord) => {
           if (item.resource) {
-            newSavedUserItems.resourceItemIds.push(item.resource.id);
+            addSavedResourceItem(item.resource.id);
           }
           if (item.distribution_item) {
-            newSavedUserItems.distributionItemIds.push(
-              item.distribution_item.id
-            );
+            addSavedDistributionItem(item.distribution_item.id);
           }
         });
-        setSavedUserItems(newSavedUserItems);
       }
     };
 
@@ -274,22 +282,14 @@ export default function SavedUserItemsProvider({
       // console.log(e);
     });
     return;
-  }, [
-    status,
-    session,
-    temporaryUser,
-    getUserId,
-    savedUserItems,
-    setSavedUserItems,
-  ]);
+  }, [status, getUserId]);
 
   return (
     <SavedUserItemsContext.Provider
       value={{
         savedUserItems,
-        setSavedUserItems,
         toggleItemIsSaved,
-        getItemIsSaved,
+        getItemIsSavedForUser,
       }}
     >
       {children}

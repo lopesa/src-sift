@@ -141,9 +141,7 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
   }
 
   const xata = getXataClient();
-  const record = await xata.db.distribution_item
-    .delete({ id })
-    .catch((e) => undefined);
+  const record = await xata.db.distribution_item.delete({ id }).catch((e) => e);
 
   return NextResponse.json(record?.toSerializable());
 }

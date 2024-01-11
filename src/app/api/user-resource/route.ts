@@ -18,14 +18,15 @@ export type UserResourceAPIRequestBody = Promise<
  * @param res
  * @returns the user_resource records
  */
-export async function GET(req: NextRequest, res: NextResponse) {
-  const params = req.nextUrl.searchParams;
+export async function GET(req: Request, res: NextResponse) {
+  // const params = req.nextUrl.searchParams;
+  const { searchParams } = new URL(req.url);
 
-  const userId = params.get("userId");
-  const tempUser = params.get("tempUser");
-  const resourceId = params.get("resourceId");
-  const distributionItemId = params.get("distributionItemId");
-  const getFullResourceItem = params.get("getFullResourceItem");
+  const userId = searchParams.get("userId");
+  const tempUser = searchParams.get("tempUser");
+  const resourceId = searchParams.get("resourceId");
+  const distributionItemId = searchParams.get("distributionItemId");
+  const getFullResourceItem = searchParams.get("getFullResourceItem");
 
   if (!userId) {
     return NextResponse.json({
