@@ -24,8 +24,9 @@ export async function GET(req: Request, res: NextResponse) {
 
   const userId = searchParams.get("userId");
   const tempUser = searchParams.get("tempUser");
-  const resourceId = searchParams.get("resourceId");
-  const distributionItemId = searchParams.get("distributionItemId");
+  // will need these for the TODO above
+  // const resourceId = searchParams.get("resourceId");
+  // const distributionItemId = searchParams.get("distributionItemId");
   const getFullResourceItem = searchParams.get("getFullResourceItem");
 
   if (!userId) {
@@ -43,10 +44,12 @@ export async function GET(req: Request, res: NextResponse) {
       getFullResourceItem ? ["*", "resource.*", "distribution_item.*"] : ["*"]
     )
     .filter(filter)
-    .getAll({ consistency: "eventual" })
-    .catch((e) => e);
+    .getAll({ consistency: "eventual" });
+  // .catch((e) => e);
 
-  return NextResponse.json(JSON.parse(JSON.stringify(data)));
+  return NextResponse.json({
+    data: JSON.parse(JSON.stringify(data)),
+  });
 }
 
 /**
@@ -75,14 +78,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
     distribution_item?: string;
     user?: string;
     temp_user?: string;
-  } = {};
+  } = { resource: resourceId };
 
   if (distributionItemId) {
     recordData.distribution_item = distributionItemId;
-  }
-
-  if (!distributionItemId && resourceId) {
-    recordData.resource = resourceId;
   }
 
   if (tempUser) {

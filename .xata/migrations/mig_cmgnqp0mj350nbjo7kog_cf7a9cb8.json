@@ -1,0 +1,19 @@
+{
+  "id": "mig_cmgnqp0mj350nbjo7kog",
+  "parentID": "mig_cmgnqj8mj350nbjo7kng",
+  "checksum": "1:cf7a9cb8a8df6db5e249d2a2d7a7316cb592653906664e09b361a6726a6ca3d2",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "resource",
+          "type": "link",
+          "link": {
+            "table": "resource_item"
+          }
+        },
+        "table": "user_resource"
+      }
+    }
+  ]
+}

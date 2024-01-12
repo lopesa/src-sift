@@ -1,3 +1,6 @@
+import { UserResourceRecord } from "@/xata";
+import { isSuccessfulInternalApiResponse } from "../types";
+
 type GetUserDataItemArgs = {
   userId: string;
   tempUser: boolean;
@@ -17,20 +20,23 @@ export const getUserDataItem = async ({
   userId,
   tempUser,
   getFullDataItem,
-  resourceId,
-  distributionItemId,
-}: GetUserDataItemArgs) => {
+}: // resourceId,
+// distributionItemId,
+GetUserDataItemArgs) => {
   const params = new URLSearchParams();
 
   if (userId) {
     params.append("userId", userId);
   }
-  if (resourceId) {
-    params.append("resourceId", resourceId);
-  }
-  if (distributionItemId) {
-    params.append("distributionItemId", distributionItemId);
-  }
+
+  // see note in route handler
+  // will need these to implement get one record
+  // if (resourceId) {
+  //   params.append("resourceId", resourceId);
+  // }
+  // if (distributionItemId) {
+  //   params.append("distributionItemId", distributionItemId);
+  // }
   if (getFullDataItem) {
     params.append("getFullDataItem", getFullDataItem.toString());
   }
@@ -38,9 +44,14 @@ export const getUserDataItem = async ({
 
   const userDataItemRes = await fetch(
     `/api/user-resource?${params.toString()}`
-  ).catch((e) => undefined);
+  );
+
   const userDataItem = await userDataItemRes?.json();
-  return userDataItem;
+
+  if (!isSuccessfulInternalApiResponse(userDataItem)) {
+    return [] as UserResourceRecord[];
+  }
+  return userDataItem.data as UserResourceRecord[];
 };
 
 type DeleteUserDataItemArgs = {

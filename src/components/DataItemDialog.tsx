@@ -22,7 +22,6 @@ import { JSONData } from "@xata.io/client";
 import { Button } from "@/components/ui/button";
 import DOMPurify from "dompurify";
 import { useState } from "react";
-// import { DistributionItem } from "@/lib/types";
 import { Separator } from "./ui/separator";
 import PreviewData from "./PreviewData";
 import { getFileExtension } from "@/lib/utils/data";
@@ -31,6 +30,7 @@ import { cn } from "@/lib/utils";
 import SaveIconComponent from "./saveIcon";
 
 interface DataItemDialogProps {
+  triggerCopy?: string;
   resourceId: string;
   className?: string;
 }
@@ -40,7 +40,11 @@ const onClickDownloadXls = (e: React.MouseEvent<HTMLButtonElement>) => {
   debugger;
 };
 
-const DataItemDialog = ({ resourceId, className }: DataItemDialogProps) => {
+const DataItemDialog = ({
+  resourceId,
+  className,
+  triggerCopy,
+}: DataItemDialogProps) => {
   const [resourceData, setResourceData] =
     useState<JSONData<ResourceItemRecord> | null>();
 
@@ -122,7 +126,7 @@ const DataItemDialog = ({ resourceId, className }: DataItemDialogProps) => {
     <Dialog onOpenChange={onOpenChange}>
       <DialogTrigger>
         <Button size="xs" className="mt-4 bg-stone-600 hover:bg-stone-800">
-          Details
+          {triggerCopy || "Details"}
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[90vw] max-w-[90vw] h-[90vh] p-7 pt-10">
@@ -184,11 +188,10 @@ const DataItemDialog = ({ resourceId, className }: DataItemDialogProps) => {
                               className="mr-2"
                               distributionItem={distribution}
                             />
-                            {distribution.title && (
-                              <div style={{ fontWeight: "bold" }}>
-                                • {distribution.title}
-                              </div>
-                            )}
+                            <div className="text-bold">
+                              • {distribution.title || "no title available"}
+                            </div>
+
                             {/* <div>
                               <a
                                 href={getDistributionUrl(distribution)}

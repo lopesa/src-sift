@@ -70,3 +70,10 @@ export function isValidUserResourceRecord(
 ): item is UserResourceRecord {
   return item && item.id;
 }
+
+export function isSuccessfulInternalApiResponse(item: {
+  data?: any;
+  error?: any;
+}): item is { data: any } {
+  return item && item.data && !item.error;
+}

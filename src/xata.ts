@@ -27,8 +27,8 @@ const tables = [
       { name: "data_types_by_file_extension", type: "multiple" },
     ],
     revLinks: [
-      { column: "resource", table: "user_resource" },
       { column: "resource_item", table: "distribution_item" },
+      { column: "resource", table: "user_resource" },
     ],
   },
   {
@@ -109,7 +109,6 @@ const tables = [
   {
     name: "user_resource",
     columns: [
-      { name: "resource", type: "link", link: { table: "resource_item" } },
       { name: "user", type: "link", link: { table: "nextauth_users" } },
       { name: "temp_user", type: "link", link: { table: "temporary_users" } },
       {
@@ -117,6 +116,7 @@ const tables = [
         type: "link",
         link: { table: "distribution_item" },
       },
+      { name: "resource", type: "link", link: { table: "resource_item" } },
     ],
   },
   {

@@ -22,7 +22,7 @@ const Workspace = async () => {
 
   return (
     <main className="flex w-6/12 flex-col items-center p-4">
-      <WorkspaceComponent dataItems={[]} />
+      <WorkspaceComponent />
       {!session && (
         <Button>
           <Link href="/api/auth/signin">Sign In</Link>

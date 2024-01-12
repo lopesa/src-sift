@@ -2,6 +2,7 @@
 
 import {
   SessionWithUserId,
+  isSuccessfulInternalApiResponse,
   isValidDistributionItemRecord,
   isValidUserResourceRecord,
 } from "@/lib/types";
@@ -18,31 +19,23 @@ import {
 } from "@/lib/utils/user-data";
 import {
   DistributionItem,
-  DistributionItemRecord,
   TemporaryUsersRecord,
   UserResourceRecord,
 } from "@/xata";
 import { JSONData } from "@xata.io/client";
 import { useSession } from "next-auth/react";
 import {
-  Dispatch,
   ReactNode,
-  SetStateAction,
   createContext,
   useCallback,
   useEffect,
   useReducer,
-  useState,
 } from "react";
 import { useLocalStorage } from "usehooks-ts";
-import savedUserItemsReducer, {
-  SavedUserItems,
-  SavedUserItemsAction,
-} from "./savedUserItemsReducer";
+import savedUserItemsReducer, { SavedUserItems } from "./savedUserItemsReducer";
 
 type SavedUserItemsContextT = {
   savedUserItems: SavedUserItems;
-  // setSavedUserItems?: Dispatch<SetStateAction<SavedUserItems>>;
   toggleItemIsSaved: (
     resourceId: string,
     distributionItem?: DistributionItem
@@ -51,6 +44,7 @@ type SavedUserItemsContextT = {
     resourceId: string,
     distributionItem?: DistributionItem
   ) => Promise<boolean>;
+  getUserData: () => Promise<UserResourceRecord[]>;
 };
 
 export const SavedUserItemsContext = createContext<SavedUserItemsContextT>({
@@ -61,15 +55,14 @@ export const SavedUserItemsContext = createContext<SavedUserItemsContextT>({
   },
   toggleItemIsSaved: () => Promise.resolve(false),
   getItemIsSavedForUser: () => Promise.resolve(false),
+  getUserData: () => Promise.resolve([] as UserResourceRecord[]),
 });
-
-type SavedUserItemsProviderProps = {
-  children: ReactNode;
-};
 
 export default function SavedUserItemsProvider({
   children,
-}: SavedUserItemsProviderProps) {
+}: {
+  children: ReactNode;
+}) {
   const { data: session, status } = useSession();
 
   const [temporaryUser, setTemporaryUser] = useLocalStorage<
@@ -130,8 +123,27 @@ export default function SavedUserItemsProvider({
     distributionItemId: string,
     savedUserItems: SavedUserItems
   ) => {
-    // check it agains the savedUserItems.distributionItemIds)
+    // check it against the savedUserItems.distributionItemIds)
     return savedUserItems.distributionItemIds.includes(distributionItemId);
+  };
+
+  const getUserData = async () => {
+    const varUrl =
+      status === "authenticated" && (session as SessionWithUserId)?.user?.id
+        ? `userId=${(session as SessionWithUserId)?.user?.id}`
+        : `userId=${temporaryUser?.id}&tempUser=true`;
+
+    const url = `/api/user-resource?${varUrl}&getFullResourceItem=true`;
+
+    const userData = await fetch(url);
+
+    const userDataJson = await userData?.json();
+
+    if (!isSuccessfulInternalApiResponse(userDataJson)) {
+      return [] as UserResourceRecord[];
+    }
+
+    return userDataJson.data as UserResourceRecord[];
   };
 
   const getItemIsSavedForUser = async (
@@ -302,8 +314,8 @@ export default function SavedUserItemsProvider({
       });
 
       if (userDataJson?.length) {
-        userDataJson.forEach((item: UserResourceRecord) => {
-          if (item.resource) {
+        userDataJson.forEach((item) => {
+          if (item.resource && !item.distribution_item) {
             addResourceItemToContext(item.resource.id);
           }
           if (item.distribution_item) {
@@ -326,6 +338,7 @@ export default function SavedUserItemsProvider({
         savedUserItems,
         toggleItemIsSaved,
         getItemIsSavedForUser,
+        getUserData,
       }}
     >
       {children}

@@ -1,50 +1,44 @@
 "use client";
 
-import { ResourceItemRecord, UserResourceRecord } from "@/xata";
-import { SelectedPick } from "@xata.io/client";
+import { UserResourceRecord } from "@/xata";
 import { useSession } from "next-auth/react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { DataItemsAccordionItem, SessionWithUserId } from "@/lib/types";
 import { TemporaryUserContext } from "@/context/temporaryUserProvider";
 import IndexDataList from "./IndexDataList";
 import { SavedUserItemsContext } from "@/context/savedUserItemsProvider";
+import DistributionItemsAccordion from "./DistributionItemsAccordion";
 
-export type WorkspaceProps = {
-  dataItems?: Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[];
-};
-
-const Workspace = ({ dataItems }: WorkspaceProps) => {
+const Workspace = () => {
   const { data: session, status } = useSession();
   const temporaryUser = useContext(TemporaryUserContext);
 
-  const { toggleItemIsSaved, getItemIsSavedForUser, savedUserItems } =
-    useContext(SavedUserItemsContext);
+  const { savedUserItems, getUserData } = useContext(SavedUserItemsContext);
 
-  const [finalDataItems, setFinalDataItems] = useState<
+  const [finalResourceDataItems, setFinalResourceDataItems] = useState<
     DataItemsAccordionItem[]
   >([]);
 
-  const getUserData = useCallback(async () => {
-    const varUrl =
-      status === "authenticated" && (session as SessionWithUserId)?.user?.id
-        ? `userId=${(session as SessionWithUserId)?.user?.id}`
-        : `userId=${temporaryUser?.id}&tempUser=true`;
+  const [finalDistributionDataItems, setFinalDistributionDataItems] = useState<
+    UserResourceRecord[]
+  >([]);
 
-    const url = `/api/user-resource?${varUrl}&getFullResourceItem=true`;
+  const getAndSetUserData = useCallback(async () => {
+    const userDataJson = await getUserData();
 
-    const userData = await fetch(url).catch((e) => {
-      // console.log(e);
-    });
-    const userDataJson: SelectedPick<
-      UserResourceRecord,
-      ("*" | "resource.*")[]
-    >[] = await userData?.json();
+    if (!userDataJson?.length) {
+      return;
+    }
 
-    let data = userDataJson
-      .filter((item) => !!item.resource)
+    let resourceData = userDataJson
+      .filter((item) => !!item.resource && !item.distribution_item)
       .map((item) => item.resource as DataItemsAccordionItem);
 
-    setFinalDataItems(data);
+    let distributionData = userDataJson.filter(
+      (item) => !!item.distribution_item
+    );
+    setFinalResourceDataItems(resourceData);
+    setFinalDistributionDataItems(distributionData);
   }, [session, status, temporaryUser]);
 
   useEffect(() => {
@@ -54,25 +48,27 @@ const Workspace = ({ dataItems }: WorkspaceProps) => {
     ) {
       return;
     }
-    // if the temp user's items have already been fetched, don't fetch again
-    // if (dataItems?.length) {
-    //   return;
-    // }
-
-    getUserData().catch((e) => e);
-  }, [getUserData, temporaryUser, session]);
+    getAndSetUserData().catch((e) => e);
+  }, [getAndSetUserData, temporaryUser, session]);
 
   return (
     <div>
       <h1>Workspace</h1>
       <div className="mx-auto my-0 max-w-[95vw] w-[760px]">
-        {savedUserItems?.initComplete && (
+        {savedUserItems?.initComplete && finalResourceDataItems.length && (
           <IndexDataList
-            data={finalDataItems}
-            postUpdateResourceItemAction={getUserData}
+            data={finalResourceDataItems}
+            postUpdateResourceItemAction={getAndSetUserData}
           />
         )}
       </div>
+      {savedUserItems?.initComplete && finalDistributionDataItems.length && (
+        <DistributionItemsAccordion
+          dataItems={finalDistributionDataItems}
+          openAll={true}
+          postUpdateResourceItemAction={getAndSetUserData}
+        />
+      )}
     </div>
   );
 };
