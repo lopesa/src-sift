@@ -17,13 +17,11 @@ import Link from "next/link";
 interface DistributionItemsAccordionProps {
   dataItems: UserResourceRecord[];
   openAll?: boolean | "indeterminate";
-  postUpdateResourceItemAction?: () => void;
 }
 
 const DistributionItemsAccordion = ({
   dataItems,
   openAll,
-  postUpdateResourceItemAction,
 }: DistributionItemsAccordionProps) => {
   const [value, setValue] = useState<string[]>([]);
 
@@ -54,9 +52,6 @@ const DistributionItemsAccordion = ({
                     <SaveIconComponent
                       resourceId={resource.id}
                       distributionItem={distribution_item}
-                      postUpdateResourceItemAction={
-                        postUpdateResourceItemAction
-                      }
                     />
                     <div>{distribution_item.title || "no title available"}</div>
                   </div>
@@ -95,7 +90,6 @@ const DistributionItemsAccordion = ({
                   </div>
                 )}
                 <div className="flex-1 pl-2">
-                  <div>{distribution_item.title || "no title available"}</div>
                   {resource && (
                     <DataItemDialog
                       key={index}

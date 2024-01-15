@@ -9,14 +9,12 @@ import { DistributionItem } from "@/xata";
 export type SaveIconProps = {
   resourceId: string;
   distributionItem?: DistributionItem;
-  postUpdateResourceItemAction?: () => void;
   className?: string;
 };
 
 const SaveIconComponent = ({
   resourceId,
   distributionItem,
-  postUpdateResourceItemAction,
   className,
 }: SaveIconProps) => {
   const [isSaved, setIsSaved] = useState<boolean>(false);
@@ -54,7 +52,6 @@ const SaveIconComponent = ({
       setIsSaved(isSavedRemotely);
     }
 
-    postUpdateResourceItemAction?.();
     setIsSaving(false);
   };
 

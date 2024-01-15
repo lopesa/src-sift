@@ -1,18 +1,14 @@
 import { AskResult } from "@xata.io/client";
 import { NextRequest } from "next/server";
-import { z } from "zod";
 import { getXataClient } from "@/xata";
+import { aiQuestionFormat } from "@/lib/types";
 
 const xata = getXataClient();
 
 export const runtime = "edge";
 
-const bodySchema = z.object({
-  question: z.string(),
-});
-
 export async function POST(req: NextRequest): Promise<Response> {
-  const body = bodySchema.safeParse(await req.json());
+  const body = aiQuestionFormat.safeParse(await req.json());
   if (!body.success) {
     return new Response(JSON.stringify({ message: "Invalid body" }), {
       status: 400,

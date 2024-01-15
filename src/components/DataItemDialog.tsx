@@ -28,6 +28,7 @@ import { getFileExtension } from "@/lib/utils/data";
 import SkewLoader from "react-spinners/SkewLoader";
 import { cn } from "@/lib/utils";
 import SaveIconComponent from "./saveIcon";
+import Link from "next/link";
 
 interface DataItemDialogProps {
   triggerCopy?: string;
@@ -60,8 +61,6 @@ const DataItemDialog = ({
     const response = await fetch(`/api/resource-item?id=${resourceId}`).catch(
       (error) => {
         return error;
-        // debugger;
-        // throw new Error(error);
       }
     );
 
@@ -116,9 +115,9 @@ const DataItemDialog = ({
     });
   };
 
-  // const getDistributionUrl = (distributionItem: DistributionItem) => {
-  //   return distributionItem?.downloadURL || distributionItem?.accessURL;
-  // };
+  const getDistributionUrl = (distributionItem: DistributionItem) => {
+    return distributionItem?.downloadURL || distributionItem?.accessURL;
+  };
 
   const doNotPrintDataKeys = ["id", "xata"];
 
@@ -192,17 +191,18 @@ const DataItemDialog = ({
                               • {distribution.title || "no title available"}
                             </div>
 
-                            {/* <div>
-                              <a
-                                href={getDistributionUrl(distribution)}
+                            {!!getDistributionUrl(distribution) && (
+                              <Link
+                                href={
+                                  getDistributionUrl(distribution) as string
+                                }
                                 target="_blank"
                                 rel="noreferrer"
                                 className="underline"
                               >
-                                {getDistributionUrl(distribution) &&
-                                  getDistributionUrl(distribution)}
-                              </a>
-                            </div> */}
+                                {getDistributionUrl(distribution)}
+                              </Link>
+                            )}
                           </DialogDescription>
                           {getPreviewDataLink(distribution)}
                         </div>

@@ -5,6 +5,7 @@ import {
 } from "@/xata";
 import { SearchXataRecord, SelectedPick, TotalCount } from "@xata.io/client";
 import { Session } from "next-auth";
+import { z } from "zod";
 
 export type DatasourceMetadata = {
   originalJsonData?: Array<object>;
@@ -58,6 +59,15 @@ export type SearchResults = {
     records: SearchXataRecord<SelectedPick<ResourceItemRecord, ["*"]>>[];
   } & TotalCount;
 };
+
+// const scope = z.object({
+//   resources: z.array(z.string()),
+//   distributionItems: z.array(z.string()),
+// });
+export const aiQuestionFormat = z.object({
+  question: z.string(),
+  // scope: z.array(z.string()), // not really panning out, probably remove
+});
 
 export function isValidDistributionItemRecord(
   item: any

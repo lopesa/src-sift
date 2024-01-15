@@ -21,19 +21,12 @@ export default function Home() {
   return (
     <main className="flex w-full min-h-screen flex-col items-center p-14">
       {/* BROWSE RESOURCES */}
-      {/* <div className="mx-auto my-0"> */}
       <h1 className="text-xl mb-1 mt-10">Browse a Resource:</h1>
       <Button asChild variant="link">
         <Link href="/resource-page/us-department-of-agriculture">
           US Department of Agriculture
         </Link>
       </Button>
-
-      {/* </Button>
-        <Button variant="link" className="text-base">
-          US Department of Agriculture
-        </Button>
-      </Link> */}
 
       {/* SEARCH */}
       <h1 className="mb-1 mt-10">Search All Resources</h1>
@@ -81,9 +74,9 @@ export default function Home() {
       )}
 
       {/* AI CHAT */}
-      {/* <AiChat label="Chat with Ai Over All Resources" className="mt-10" /> */}
-      <h1 className="mb-1 mt-10">Ask AI, Considering All Resources</h1>
-      <AiChat />
+      {/* not seeming terribly feasable even over one resource meta-source (USDA - 2k+ entries) */}
+      {/* <h1 className="mb-1 mt-10">Ask AI, Considering All Resources</h1> */}
+      {/* <AiChat /> */}
     </main>
   );
 }

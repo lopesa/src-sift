@@ -8,12 +8,17 @@ import { TemporaryUserContext } from "@/context/temporaryUserProvider";
 import IndexDataList from "./IndexDataList";
 import { SavedUserItemsContext } from "@/context/savedUserItemsProvider";
 import DistributionItemsAccordion from "./DistributionItemsAccordion";
+import AiChat from "./ai-chat";
 
 const Workspace = () => {
   const { data: session, status } = useSession();
   const temporaryUser = useContext(TemporaryUserContext);
 
   const { savedUserItems, getUserData } = useContext(SavedUserItemsContext);
+
+  const [userResourceRecordIds, setUserResourceRecordIds] = useState<string[]>(
+    []
+  );
 
   const [finalResourceDataItems, setFinalResourceDataItems] = useState<
     DataItemsAccordionItem[]
@@ -26,9 +31,9 @@ const Workspace = () => {
   const getAndSetUserData = useCallback(async () => {
     const userDataJson = await getUserData();
 
-    if (!userDataJson?.length) {
-      return;
-    }
+    // if (!userDataJson?.length) {
+    //   return;
+    // }
 
     let resourceData = userDataJson
       .filter((item) => !!item.resource && !item.distribution_item)
@@ -37,6 +42,8 @@ const Workspace = () => {
     let distributionData = userDataJson.filter(
       (item) => !!item.distribution_item
     );
+    // should move this up into the provider
+    setUserResourceRecordIds(userDataJson.map((item) => item.id));
     setFinalResourceDataItems(resourceData);
     setFinalDistributionDataItems(distributionData);
   }, [session, status, temporaryUser]);
@@ -51,24 +58,28 @@ const Workspace = () => {
     getAndSetUserData().catch((e) => e);
   }, [getAndSetUserData, temporaryUser, session]);
 
+  useEffect(() => {
+    if (!savedUserItems?.initComplete) {
+      return;
+    }
+    getAndSetUserData().catch((e) => e);
+  }, [savedUserItems]);
+
   return (
     <div>
       <h1>Workspace</h1>
       <div className="mx-auto my-0 max-w-[95vw] w-[760px]">
-        {savedUserItems?.initComplete && finalResourceDataItems.length && (
-          <IndexDataList
-            data={finalResourceDataItems}
-            postUpdateResourceItemAction={getAndSetUserData}
-          />
+        {savedUserItems?.initComplete && !!finalResourceDataItems.length && (
+          <IndexDataList data={finalResourceDataItems} />
         )}
       </div>
-      {savedUserItems?.initComplete && finalDistributionDataItems.length && (
+      {savedUserItems?.initComplete && !!finalDistributionDataItems.length && (
         <DistributionItemsAccordion
           dataItems={finalDistributionDataItems}
           openAll={true}
-          postUpdateResourceItemAction={getAndSetUserData}
         />
       )}
+      {!!userResourceRecordIds.length && <AiChat />}
     </div>
   );
 };

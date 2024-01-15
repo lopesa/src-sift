@@ -18,6 +18,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import useXataAiChat from "@/hooks/use-xata-ai-chat";
 import SkewLoader from "react-spinners/SkewLoader";
+import { useContext } from "react";
+import { SavedUserItemsContext } from "@/context/savedUserItemsProvider";
+import DataItemDialog from "./DataItemDialog";
+import { ResourceItemRecord } from "@/xata";
+import { DataItemsAccordionItem } from "@/lib/types";
 
 const formSchema = z.object({
   chatText: z.string().min(2).max(150),
@@ -30,6 +35,7 @@ export type AiChatProps = {
 };
 
 const AiChat = ({ label, description, className }: AiChatProps) => {
+  const { savedUserItems, getUserData } = useContext(SavedUserItemsContext);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,8 +44,10 @@ const AiChat = ({ label, description, className }: AiChatProps) => {
   });
 
   const { answer, records, isLoading, askQuestion } = useXataAiChat();
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    askQuestion(values.chatText);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    askQuestion({
+      question: values.chatText,
+    });
   };
 
   return (
@@ -73,12 +81,8 @@ const AiChat = ({ label, description, className }: AiChatProps) => {
           </Button>
         </form>
       </Form>
-      <div>
-        {answer && (
-          <div className="w-1/2 h-96 overflow-scroll mx-auto mt-4">
-            {answer}
-          </div>
-        )}
+      <div className="w-1/2">
+        {answer && <div className="w-1/2 h-96 mx-auto mt-4">{answer}</div>}
         {isLoading && (
           <SkewLoader
             loading={true}
@@ -87,6 +91,19 @@ const AiChat = ({ label, description, className }: AiChatProps) => {
             size={14}
           />
         )}
+        {/* {records && (
+          <div>
+            scope:{" "}
+            {scope?.map((s) => (
+              <div>{s}</div>
+            ))}
+            records:{" "}
+            {records?.map((r) => (
+              <DataItemDialog key={r} resourceId={r} triggerCopy={r} />
+              // <div>{r}</div>
+            ))}
+          </div>
+        )} */}
       </div>
     </>
   );

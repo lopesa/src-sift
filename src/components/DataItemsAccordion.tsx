@@ -17,13 +17,11 @@ import SaveIconComponent from "./saveIcon";
 interface DataItemsAccordionProps {
   dataItems: DataItemsAccordionItem[];
   openAll?: boolean | "indeterminate";
-  postUpdateResourceItemAction?: () => void;
 }
 
 const DataItemsAccordion = ({
   dataItems,
   openAll,
-  postUpdateResourceItemAction,
 }: DataItemsAccordionProps) => {
   const [value, setValue] = useState<string[]>([]);
 
@@ -48,10 +46,7 @@ const DataItemsAccordion = ({
           dataItems.map((dataItem, index) => (
             <AccordionItem key={index} value={dataItem.id}>
               <AccordionTrigger className="text-sm text-left py-2 [&>svg]:ml-6">
-                <SaveIconComponent
-                  resourceId={dataItem.id}
-                  postUpdateResourceItemAction={postUpdateResourceItemAction}
-                />
+                <SaveIconComponent resourceId={dataItem.id} />
                 <div className="flex-1 pl-4">{dataItem.title}</div>
               </AccordionTrigger>
 

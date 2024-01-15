@@ -9,16 +9,11 @@ import DataItemsAccordion from "./DataItemsAccordion";
 interface IndexDataListProps {
   data: Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[];
   title?: string;
-  postUpdateResourceItemAction?: () => void;
 }
 
 type DataType = "xml" | "csv" | "xls" | "xlsx";
 
-const IndexDataList = ({
-  data,
-  title,
-  postUpdateResourceItemAction,
-}: IndexDataListProps) => {
+const IndexDataList = ({ data, title }: IndexDataListProps) => {
   const [filteredData, setFilteredData] = useState(data);
   const [showXml, setShowXml] = useState<boolean | "indeterminate">(false);
   const [showXls, setShowXls] = useState<boolean | "indeterminate">(false);
@@ -89,7 +84,6 @@ const IndexDataList = ({
           <DataItemsAccordion
             dataItems={filteredData}
             openAll={openAllAccordions}
-            postUpdateResourceItemAction={postUpdateResourceItemAction}
           />
         </div>
       )}
