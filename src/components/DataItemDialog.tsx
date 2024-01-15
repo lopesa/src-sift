@@ -123,8 +123,12 @@ const DataItemDialog = ({
 
   return (
     <Dialog onOpenChange={onOpenChange}>
-      <DialogTrigger>
-        <Button size="xs" className="mt-4 bg-stone-600 hover:bg-stone-800">
+      <DialogTrigger asChild>
+        <Button
+          // asChild
+          size="xs"
+          className="bg-stone-600 hover:bg-stone-800"
+        >
           {triggerCopy || "Details"}
         </Button>
       </DialogTrigger>

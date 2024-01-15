@@ -9,7 +9,7 @@ const useXataAiChat = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const askQuestion = useCallback(
-    ({ question }: z.infer<typeof aiQuestionFormat>) => {
+    ({ question, rules, searchType }: z.infer<typeof aiQuestionFormat>) => {
       // @TODO or not to do: choosing scope
       // for now just use all
       if (!question) return;
@@ -19,7 +19,7 @@ const useXataAiChat = () => {
 
       void fetchEventSource(`/api/ask`, {
         method: "POST",
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, rules, searchType }),
         headers: { "Content-Type": "application/json" },
         onmessage(ev) {
           try {

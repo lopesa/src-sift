@@ -79,7 +79,7 @@ const Workspace = () => {
           openAll={true}
         />
       )}
-      {!!userResourceRecordIds.length && <AiChat />}
+      {/* {!!userResourceRecordIds.length && <AiChat />} */}
     </div>
   );
 };

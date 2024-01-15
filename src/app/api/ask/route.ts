@@ -19,7 +19,9 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   const stream = new ReadableStream({
     async start(controller) {
-      xata.db.resource_item.ask(body.data.question, {
+      const args = xata.db.resource_item.ask(body.data.question, {
+        rules: body.data.rules,
+        // searchType: body.data.searchType || "keyword",
         onMessage: (message: AskResult) => {
           controller.enqueue(encoder.encode(`event: message\n`));
           controller.enqueue(

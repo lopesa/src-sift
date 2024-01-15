@@ -13,6 +13,7 @@ import {
 import DataItemDialog from "./DataItemDialog";
 import { DataItemsAccordionItem } from "@/lib/types";
 import SaveIconComponent from "./saveIcon";
+import FindSimilar from "./find-similar";
 
 interface DataItemsAccordionProps {
   dataItems: DataItemsAccordionItem[];
@@ -24,6 +25,7 @@ const DataItemsAccordion = ({
   openAll,
 }: DataItemsAccordionProps) => {
   const [value, setValue] = useState<string[]>([]);
+  const [shouldFindSimilar, setShouldFindSimilar] = useState(false);
 
   useEffect(() => {
     if (openAll) {
@@ -60,8 +62,17 @@ const DataItemsAccordion = ({
                 ) : (
                   <div>No description available</div>
                 )}
-
-                <DataItemDialog key={index} resourceId={dataItem?.id} />
+                <DataItemDialog
+                  key={index}
+                  resourceId={dataItem?.id}
+                  className="mt-4"
+                />
+                {/* {dataItem.description && (
+                  <FindSimilar
+                    className="mt-4"
+                    description={dataItem.description}
+                  />
+                )} */}
               </AccordionContent>
             </AccordionItem>
           ))}

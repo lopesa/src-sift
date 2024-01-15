@@ -66,6 +66,8 @@ export type SearchResults = {
 // });
 export const aiQuestionFormat = z.object({
   question: z.string(),
+  rules: z.array(z.string()).optional(),
+  searchType: z.enum(["keyword", "vector"]).optional(),
   // scope: z.array(z.string()), // not really panning out, probably remove
 });
 

@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <main className="flex w-full min-h-screen flex-col items-center p-14">
       {/* BROWSE RESOURCES */}
-      <h1 className="text-xl mb-1 mt-10">Browse a Resource:</h1>
+      <h1 className="text-xl mb-1 mt-10">Browse a Source Provider:</h1>
       <Button asChild variant="link">
         <Link href="/resource-page/us-department-of-agriculture">
           US Department of Agriculture
@@ -29,7 +29,7 @@ export default function Home() {
       </Button>
 
       {/* SEARCH */}
-      <h1 className="mb-1 mt-10">Search All Resources</h1>
+      <h1 className="mb-1 mt-10">Search All Source Providers</h1>
       <Search
         className="w-72"
         onSearchLoading={() => {
