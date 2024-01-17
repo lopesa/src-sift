@@ -11,13 +11,14 @@ interface IndexDataListProps {
   title?: string;
 }
 
-type DataType = "xml" | "csv" | "xls" | "xlsx";
+type DataType = "xml" | "csv" | "xls" | "xlsx" | "json";
 
 const IndexDataList = ({ data, title }: IndexDataListProps) => {
   const [filteredData, setFilteredData] = useState(data);
   const [showXml, setShowXml] = useState<boolean | "indeterminate">(false);
   const [showXls, setShowXls] = useState<boolean | "indeterminate">(false);
   const [showCsv, setShowCsv] = useState<boolean | "indeterminate">(false);
+  const [showJson, setShowJson] = useState<boolean | "indeterminate">(false);
   const [openAllAccordions, setOpenAllAccordions] = useState<
     boolean | "indeterminate"
   >(false);
@@ -31,8 +32,12 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
       includesArray.push("csv");
     }
     if (showXls) {
+      debugger;
       includesArray.push("xls");
       includesArray.push("xlsx");
+    }
+    if (showJson) {
+      includesArray.push("json");
     }
 
     // if no filters are set, show everything
@@ -53,7 +58,7 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
       return false;
     });
     setFilteredData(filtered);
-  }, [showXml, showCsv, showXls, data]);
+  }, [showXml, showCsv, showXls, showJson, data]);
 
   return (
     <div className="flex flex-col h-full bg-stone-100 pl-6 pr-8">
@@ -67,6 +72,8 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
             )}
           </p>
           <form className="flex mt-2 mb-6 [&>label]:mr-2.5 [&>button]:mr-1">
+            <Checkbox onCheckedChange={setShowJson} />
+            <label className="text-xs">JSON</label>
             <Checkbox onCheckedChange={setShowXml} />
             <label className="text-xs">Xml</label>
             <Checkbox onCheckedChange={setShowXls} />

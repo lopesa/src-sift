@@ -2,6 +2,11 @@ import { getFileExtension } from "@/lib/utils/data";
 import { NextRequest, NextResponse } from "next/server";
 import validator from "validator";
 import PapaParse from "papaparse";
+import http from "http";
+import https from "https";
+import fs, { WriteStream, promises } from "fs";
+// const http = require("http");
+// const fs = require("fs");
 
 export async function GET(req: NextRequest, res: NextResponse) {
   const returnErrorResponse = (message: string) => {
@@ -25,11 +30,107 @@ export async function GET(req: NextRequest, res: NextResponse) {
   }
   if (
     fileExtension === -1 ||
-    (!fileExtension.includes("csv") && !fileExtension.includes("xls"))
+    (!fileExtension.includes("csv") &&
+      !fileExtension.includes("xls") &&
+      !fileExtension.includes("json"))
   ) {
     return returnErrorResponse(`Invalid file type, got: ${fileExtension}`);
   }
 
+  // function streamToString(stream: http.IncomingMessage) {
+  //   const chunks: any[] = [];
+  //   return new Promise((resolve, reject) => {
+  //     debugger;
+  //     stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+  //     stream.on("error", (err) => reject(err));
+  //     stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+  //   });
+  // }
+
+  if (true) {
+    // const request = https.get(url, function (response) {
+    //   response.pipe(file);
+    // });
+    // const requestedFileStream: fs.WriteStream = await new Promise((resolve) => {
+    const response = await fetch(url).catch((e) => {
+      // debugger;
+    });
+
+    if (!response?.ok) {
+      return returnErrorResponse("Error fetching data");
+      // debugger;
+    }
+
+    const jsonData = await response?.json().catch((e) => {
+      // debugger;
+    });
+    // debugger;
+    // const requestedFileStream = await new Promise((resolve) => {
+    //   const file = fs.createWriteStream("/tmp/data.csv");
+    //   https
+    //     .get(url, async (response) => {
+    //       debugger;
+    //       // const string = await streamToString(response);
+    //       // debugger;
+    //       // return string;
+
+    //       response.pipe(file);
+    //       file.on("finish", async () => {
+    //         file.close();
+    //         // debugger;
+
+    //         resolve(file);
+    //       });
+    //     })
+    //     .on("error", (err) => {
+    //       debugger;
+    //       fs.unlink(url, () => {}); // Delete the file on error
+    //       console.error(`Error downloading file: ${err.message}`);
+    //     });
+    // });
+
+    // debugger;
+
+    // let fileContent = await fs.promises.readFile("/tmp/data.csv").catch((e) => {
+    //   debugger;
+    // });
+
+    // // const test = fileContent ? new Uint8Array(fileContent) : [];
+
+    // debugger;
+
+    // const test = await streamToString(requestedFileStream as WriteStream).catch(
+    //   (e) => {
+    //     debugger;
+    //   }
+    // );
+
+    // debugger;
+
+    // let fileContentArray = fileContent ? fileContent : [];
+    // let fileContentArray = fileContent ? fileContent.toJSON() : [];
+    // let fileContentArray = fileContent ? new Uint8Array(fileContent) : [];
+
+    // debugger;
+    // let requestedFileStreamString;
+    // if (requestedFileStream) {
+    //   debugger;
+    //   // requestedFileStreamString = await streamToString(requestedFileStream);
+    // }
+    // debugger;
+    return NextResponse.json({
+      data: jsonData,
+      // fileContent
+      //   ? {
+      //       data: fileContent.toJSON().data,
+      //     }
+      //   : {
+      //       error: "Error fetching data",
+      //     }
+    });
+  }
+
+  /**
   // @TODO: check how large the file is before starting to download
   // implement a max size to try to download
 
@@ -53,6 +154,14 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
   if (!response?.ok) {
     return returnErrorResponse("Error fetching data");
+  }
+
+  if (fileExtension === "json") {
+    const data = await response.json();
+    return NextResponse.json({
+      data,
+      totalRows: data.length,
+    });
   }
 
   let data;
@@ -116,4 +225,5 @@ export async function GET(req: NextRequest, res: NextResponse) {
     //     console.log("Error: ", err.message);
     //   });
   }
+  */
 }

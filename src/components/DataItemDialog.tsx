@@ -75,7 +75,8 @@ const DataItemDialog = ({
     }
     const extension = getFileExtension(url);
     const shouldOfferPreviewData =
-      typeof extension === "string" && extension.includes("csv");
+      typeof extension === "string" &&
+      (extension.includes("csv") || extension.includes("json"));
     // const shouldOfferPreviewData =
     //   typeof extension === "string" &&
     //   (extension.includes("csv") || extension.includes("xls"));

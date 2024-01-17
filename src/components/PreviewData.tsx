@@ -10,15 +10,21 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "./ui/accordion";
+import { getFileExtension } from "@/lib/utils/data";
+import ReactJson from "@microlink/react-json-view";
 
 interface PreviewDataProps {
   url: string;
 }
 const PreviewData = ({ url }: PreviewDataProps) => {
+  const [jsonData, setJsonData] = useState<JSON | null>(null);
   const [dataSubset, setDataSubset] = useState<string[][]>([]);
   const [dataKeys, setDataKeys] = useState<string[]>();
   const [totalRowsAvailable, setTotalRowsAvailable] = useState<number>(0);
   const [showDataPreview, setShowDataPreview] = useState<boolean>(false);
+  const [fileExtension, setFileExtension] = useState<string | -1>(
+    getFileExtension(url)
+  );
 
   useEffect(() => {
     if (!showDataPreview || dataSubset.length) {
@@ -33,13 +39,16 @@ const PreviewData = ({ url }: PreviewDataProps) => {
       });
 
       const data = await response?.json();
+      // debugger;
 
-      if (!data?.data?.length) {
-        return;
-      }
-      setDataKeys(data?.data[0]);
-      setDataSubset(data?.data.slice(1) || []);
-      setTotalRowsAvailable(data?.totalRows || 0);
+      // if (!data?.data?.length) {
+      //   return;
+      // }
+      setJsonData(data?.data);
+
+      // setDataKeys(data?.data[0]);
+      // setDataSubset(data?.data.slice(1) || []);
+      // setTotalRowsAvailable(data?.totalRows || 0);
     };
 
     getData().catch((e) => {
@@ -64,43 +73,51 @@ const PreviewData = ({ url }: PreviewDataProps) => {
             <AccordionTrigger className="[&>svg]:left-0"></AccordionTrigger>
             <AccordionContent className="w-full mt-4">
               <div className="text-sm font-bold mb-1">Data Preview</div>
-              <div className="text-sm mb-2">
-                Total preview rows: {dataSubset.length} / {totalRowsAvailable}{" "}
-                total rows
-              </div>
+              {fileExtension === "json" && jsonData && (
+                <ReactJson src={jsonData} />
+              )}
 
-              {(dataSubset.length && (
-                <div className="w-full max-h-[400px] overflow-auto">
-                  <table className="w-full border-collapse border-spacing-0 [&>*:nth-child(odd)]:bg-stone-100 [&>*:nth-child(even)]:bg-stone-200 text-stone-800 pt-1">
-                    {dataKeys && (
-                      <tr className="sticky top-0">
-                        {dataKeys.map((key) => (
-                          <th
-                            key={key}
-                            className="p-2.5 text-sm text-left border-b border-solid"
-                          >
-                            {key}
-                          </th>
-                        ))}
-                      </tr>
-                    )}
-                    {dataSubset.map((row, index) => {
-                      return (
-                        <tr key={index}>
-                          {row.map((cell, index) => (
-                            <td
-                              key={index}
-                              className="p-2.5 text-xs text-left border-b border-solid"
-                            >
-                              {cell}
-                            </td>
-                          ))}
-                        </tr>
-                      );
-                    })}
-                  </table>
-                </div>
-              )) || <SkewLoader />}
+              {fileExtension === "csv" && (
+                <>
+                  <div className="text-sm mb-2">
+                    Total preview rows: {dataSubset.length} /{" "}
+                    {totalRowsAvailable} total rows
+                  </div>
+
+                  {(dataSubset.length && (
+                    <div className="w-full max-h-[400px] overflow-auto">
+                      <table className="w-full border-collapse border-spacing-0 [&>*:nth-child(odd)]:bg-stone-100 [&>*:nth-child(even)]:bg-stone-200 text-stone-800 pt-1">
+                        {dataKeys && (
+                          <tr className="sticky top-0">
+                            {dataKeys.map((key) => (
+                              <th
+                                key={key}
+                                className="p-2.5 text-sm text-left border-b border-solid"
+                              >
+                                {key}
+                              </th>
+                            ))}
+                          </tr>
+                        )}
+                        {dataSubset.map((row, index) => {
+                          return (
+                            <tr key={index}>
+                              {row.map((cell, index) => (
+                                <td
+                                  key={index}
+                                  className="p-2.5 text-xs text-left border-b border-solid"
+                                >
+                                  {cell}
+                                </td>
+                              ))}
+                            </tr>
+                          );
+                        })}
+                      </table>
+                    </div>
+                  )) || <SkewLoader />}
+                </>
+              )}
             </AccordionContent>
           </AccordionItem>
         </Accordion>

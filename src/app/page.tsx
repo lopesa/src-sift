@@ -28,6 +28,12 @@ export default function Home() {
         </Link>
       </Button>
 
+      <Button asChild variant="link">
+        <Link href="/resource-page/us-department-of-energy">
+          US Department of Energy
+        </Link>
+      </Button>
+
       {/* SEARCH */}
       <h1 className="mb-1 mt-10">Search All Source Providers</h1>
       <Search
