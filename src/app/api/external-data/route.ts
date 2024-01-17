@@ -28,12 +28,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
   if (!validator.isURL(url)) {
     return returnErrorResponse("Invalid url");
   }
-  if (
-    fileExtension === -1 ||
-    (!fileExtension.includes("csv") &&
-      !fileExtension.includes("xls") &&
-      !fileExtension.includes("json"))
-  ) {
+  const usableFileTypes = ["csv", "xls", "json", "xml"];
+  if (fileExtension === -1 || !usableFileTypes.includes(fileExtension)) {
     return returnErrorResponse(`Invalid file type, got: ${fileExtension}`);
   }
 
@@ -46,8 +42,41 @@ export async function GET(req: NextRequest, res: NextResponse) {
   //     stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
   //   });
   // }
+  if (fileExtension === "xml") {
+    const optionsResponse = await fetch(url, {
+      method: "OPTIONS",
+    }).catch((e) => {
+      // debugger;
+    });
 
-  if (true) {
+    const options =
+      optionsResponse?.ok &&
+      (await optionsResponse?.json().catch((e) => {
+        // debugger;
+      }));
+
+    // debugger;
+
+    const response = await fetch(url).catch((e) => {
+      // debugger;
+    });
+
+    if (!response?.ok) {
+      // debugger;
+      return returnErrorResponse("Error fetching data");
+    }
+
+    const xmlData = await response?.text().catch((e) => {
+      // debugger;
+    });
+
+    // debugger;
+    return NextResponse.json({
+      data: xmlData,
+    });
+  }
+
+  if (fileExtension === "json") {
     // const request = https.get(url, function (response) {
     //   response.pipe(file);
     // });

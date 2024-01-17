@@ -12,12 +12,14 @@ import {
 } from "./ui/accordion";
 import { getFileExtension } from "@/lib/utils/data";
 import ReactJson from "@microlink/react-json-view";
+import XMLViewer from "react-xml-viewer";
 
 interface PreviewDataProps {
   url: string;
 }
 const PreviewData = ({ url }: PreviewDataProps) => {
   const [jsonData, setJsonData] = useState<JSON | null>(null);
+  const [XMLData, setXMLData] = useState<JSON | null>(null);
   const [dataSubset, setDataSubset] = useState<string[][]>([]);
   const [dataKeys, setDataKeys] = useState<string[]>();
   const [totalRowsAvailable, setTotalRowsAvailable] = useState<number>(0);
@@ -44,7 +46,9 @@ const PreviewData = ({ url }: PreviewDataProps) => {
       // if (!data?.data?.length) {
       //   return;
       // }
-      setJsonData(data?.data);
+      setXMLData(data?.data);
+
+      // setJsonData(data?.data);
 
       // setDataKeys(data?.data[0]);
       // setDataSubset(data?.data.slice(1) || []);
@@ -73,6 +77,13 @@ const PreviewData = ({ url }: PreviewDataProps) => {
             <AccordionTrigger className="[&>svg]:left-0"></AccordionTrigger>
             <AccordionContent className="w-full mt-4">
               <div className="text-sm font-bold mb-1">Data Preview</div>
+
+              {fileExtension === "xml" && XMLData && (
+                <div className="text-[10px]">
+                  <XMLViewer xml={XMLData} collapsible={true} />
+                </div>
+              )}
+
               {fileExtension === "json" && jsonData && (
                 <ReactJson src={jsonData} />
               )}
