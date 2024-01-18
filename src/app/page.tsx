@@ -3,7 +3,9 @@
 import IndexDataList from "@/components/IndexDataList";
 import AiChat from "@/components/ai-chat";
 import Search from "@/components/search";
+import SiftIcon from "@/components/siftIcon";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { DataSourceMetadataRecord } from "@/lib/const";
 import { SearchResults } from "@/lib/types";
 import Link from "next/link";
@@ -33,8 +35,10 @@ export default function Home() {
         );
       })}
 
+      <Separator className="my-10" />
+
       {/* SEARCH */}
-      <h1 className="mb-1 mt-10">Search All Source Providers</h1>
+      <h1 className="text-xl mb-1 mt-10">Search All Source Providers:</h1>
       <Search
         className="w-72"
         onSearchLoading={() => {
@@ -77,6 +81,8 @@ export default function Home() {
           />
         </>
       )}
+
+      <SiftIcon className="mt-10 mb-4 mx-auto" />
 
       {/* AI CHAT */}
       {/* not seeming terribly feasable even over one resource meta-source (USDA - 2k+ entries) */}
