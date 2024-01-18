@@ -9,7 +9,7 @@ import { z } from "zod";
 
 export type DatasourceMetadata = {
   originalJsonData?: Array<object>;
-  originalJsonDataUrl: string;
+  originalJsonDataUrl: { name: string; url: string }[];
   originalInitialUrl: string;
   route: string;
   displayName: string;

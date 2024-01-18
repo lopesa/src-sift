@@ -9,20 +9,34 @@ import { cleanString } from ".";
 import { IntakeTypeForResourceItem } from "../types";
 
 export const fetchNewData = async (dataSource: DataSourcesKeys) => {
-  const fetchedData = await fetch(
-    DataSourceMetadataRecord[dataSource].originalJsonDataUrl
-  ).catch((e) => {
-    throw e;
-  });
-  if (!fetchedData?.ok) {
+  const urls = DataSourceMetadataRecord[dataSource].originalJsonDataUrl.map(
+    (src) => src.url
+  );
+
+  let responses = await Promise.all(
+    urls.map((url) => fetch(url).catch((e) => e))
+  );
+
+  if (responses.map((r) => r.ok).includes(false)) {
     throw new Error("Error fetching data from source");
   }
 
-  const fetchedDataJson = await fetchedData.json().catch((e) => {
-    throw e;
-  });
+  let fetchedDataJson = await Promise.all(
+    responses.map((r) => r.json().catch((e: Error) => e))
+  );
 
-  return fetchedDataJson;
+  fetchedDataJson = fetchedDataJson.filter((d: any) => !(d instanceof Error));
+
+  const returnVal = fetchedDataJson.reduce(
+    (acc: any, curr: any) => {
+      return {
+        dataset: [...acc.dataset, ...curr.dataset],
+      };
+    },
+    { dataset: [] }
+  );
+
+  return returnVal;
 };
 
 export const mapFetchedDataToSchema = (

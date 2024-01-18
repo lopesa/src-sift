@@ -4,6 +4,7 @@ import IndexDataList from "@/components/IndexDataList";
 import AiChat from "@/components/ai-chat";
 import Search from "@/components/search";
 import { Button } from "@/components/ui/button";
+import { DataSourceMetadataRecord } from "@/lib/const";
 import { SearchResults } from "@/lib/types";
 import Link from "next/link";
 import { useState } from "react";
@@ -22,17 +23,15 @@ export default function Home() {
     <main className="flex w-full min-h-screen flex-col items-center p-14">
       {/* BROWSE RESOURCES */}
       <h1 className="text-xl mb-1 mt-10">Browse a Source Provider:</h1>
-      <Button asChild variant="link">
-        <Link href="/resource-page/us-department-of-agriculture">
-          US Department of Agriculture
-        </Link>
-      </Button>
-
-      <Button asChild variant="link">
-        <Link href="/resource-page/us-department-of-energy">
-          US Department of Energy
-        </Link>
-      </Button>
+      {Object.values(DataSourceMetadataRecord).map((record) => {
+        return (
+          <Button asChild variant="link" key={record.displayName}>
+            <Link href={`/resource-page/${record.route}`}>
+              {record.displayName}
+            </Link>
+          </Button>
+        );
+      })}
 
       {/* SEARCH */}
       <h1 className="mb-1 mt-10">Search All Source Providers</h1>

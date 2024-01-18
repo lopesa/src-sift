@@ -6,17 +6,26 @@ import {
 import { NextRequest, NextResponse } from "next/server";
 
 import { getXataClient } from "@/xata";
+import { z } from "zod";
+import { DataSources, DataSourcesKeys } from "@/lib/const";
+import { zodEnumFromObjKeys } from "@/lib/utils/zod";
 
 const xata = getXataClient();
 
-export async function POST(req: NextRequest, res: NextResponse) {
-  const requestBody = await req.json().catch((error) => {
-    return NextResponse.json({
-      error: "Invalid request body",
-    });
-  });
+export const addResourceBody = z.object({
+  // @TODO make optional and if no source, add all
+  source: zodEnumFromObjKeys(DataSources),
+});
 
-  const { source } = requestBody;
+export async function POST(req: NextRequest, res: NextResponse) {
+  const body = addResourceBody.safeParse(await req.json());
+  if (!body.success) {
+    return new Response(JSON.stringify({ message: "Invalid body" }), {
+      status: 400,
+    });
+  }
+
+  const source = body.data.source;
 
   const dataSourceEntry = await getOrCreateDataSourceEntry(source);
 
