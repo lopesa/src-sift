@@ -13,6 +13,9 @@ import { getFileExtension } from "@/lib/utils/data";
 import ReactJson from "@microlink/react-json-view";
 import XMLViewer from "react-xml-viewer";
 import SiftLoader from "./sift-loader";
+// import dynamic from "next/dynamic";
+
+// const DynamicReactJson = (await import('@microlink/react-json-view')).default
 
 interface PreviewDataProps {
   url: string;

@@ -11,9 +11,9 @@ const NavLink = ({ href, className, ...props }: NavLinkProps) => {
   // const isActive = router.asPath === href;
 
   return (
-    <Link href={href} className={className}>
+    <Link href={href} passHref legacyBehavior>
       <NavigationMenuLink
-        // className="NavigationMenuLink"
+        className={className}
         // active={isActive}
         {...props}
       />
