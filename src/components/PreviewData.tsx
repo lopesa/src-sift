@@ -3,7 +3,6 @@
 // import { DSVParsedArray, DSVRowString } from "d3";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import SkewLoader from "react-spinners/SkewLoader";
 import {
   Accordion,
   AccordionContent,
@@ -13,6 +12,7 @@ import {
 import { getFileExtension } from "@/lib/utils/data";
 import ReactJson from "@microlink/react-json-view";
 import XMLViewer from "react-xml-viewer";
+import SiftLoader from "./sift-loader";
 
 interface PreviewDataProps {
   url: string;
@@ -126,7 +126,7 @@ const PreviewData = ({ url }: PreviewDataProps) => {
                         })}
                       </table>
                     </div>
-                  )) || <SkewLoader />}
+                  )) || <SiftLoader className="mt-10 mb-4 mx-auto" />}
                 </>
               )}
             </AccordionContent>

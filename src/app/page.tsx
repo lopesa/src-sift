@@ -3,14 +3,13 @@
 import IndexDataList from "@/components/IndexDataList";
 import AiChat from "@/components/ai-chat";
 import Search from "@/components/search";
-import SiftIcon from "@/components/siftIcon";
+import SiftLoader from "@/components/sift-loader";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { DataSourceMetadataRecord } from "@/lib/const";
 import { SearchResults } from "@/lib/types";
 import Link from "next/link";
 import { useState } from "react";
-import SkewLoader from "react-spinners/SkewLoader";
 
 export default function Home() {
   const [searchResults, setSearchResults] = useState<SearchResults | null>(
@@ -55,14 +54,7 @@ export default function Home() {
       />
 
       {/* SEARCH RESULTS */}
-      {searchLoading && (
-        <SkewLoader
-          loading={true}
-          className="mt-1 mb-4"
-          color="#38bdf8"
-          size={14}
-        />
-      )}
+      {searchLoading && <SiftLoader className="mt-10 mb-4 mx-auto" />}
       {searchError && <p>Error: {searchError.message}</p>}
       {searchResults?.results?.records && (
         <>
@@ -82,7 +74,8 @@ export default function Home() {
         </>
       )}
 
-      <SiftIcon className="mt-10 mb-4 mx-auto" />
+      {/* for debugging the SiftLoader */}
+      {/* <SiftLoader className="mt-10 mb-4 mx-auto" /> */}
 
       {/* AI CHAT */}
       {/* not seeming terribly feasable even over one resource meta-source (USDA - 2k+ entries) */}

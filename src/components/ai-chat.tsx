@@ -17,12 +17,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import useXataAiChat from "@/hooks/use-xata-ai-chat";
-import SkewLoader from "react-spinners/SkewLoader";
 import { useContext } from "react";
 import { SavedUserItemsContext } from "@/context/savedUserItemsProvider";
 import DataItemDialog from "./DataItemDialog";
 import { ResourceItemRecord } from "@/xata";
 import { DataItemsAccordionItem } from "@/lib/types";
+import SiftLoader from "./sift-loader";
 
 const formSchema = z.object({
   chatText: z.string().min(2).max(150),
@@ -83,14 +83,7 @@ const AiChat = ({ label, description, className }: AiChatProps) => {
       </Form>
       <div className="w-1/2">
         {answer && <div className="w-1/2 h-96 mx-auto mt-4">{answer}</div>}
-        {isLoading && (
-          <SkewLoader
-            loading={true}
-            className="mt-1 mb-4"
-            color="#38bdf8"
-            size={14}
-          />
-        )}
+        {isLoading && <SiftLoader className="mt-10 mb-4 mx-auto" />}
         {/* {records && (
           <div>
             scope:{" "}

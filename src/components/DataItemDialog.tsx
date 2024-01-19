@@ -25,10 +25,10 @@ import { useState } from "react";
 import { Separator } from "./ui/separator";
 import PreviewData from "./PreviewData";
 import { getFileExtension } from "@/lib/utils/data";
-import SkewLoader from "react-spinners/SkewLoader";
 import { cn } from "@/lib/utils";
 import SaveIconComponent from "./saveIcon";
 import Link from "next/link";
+import SiftLoader from "./sift-loader";
 
 interface DataItemDialogProps {
   triggerCopy?: string;
@@ -137,9 +137,7 @@ const DataItemDialog = ({
       </DialogTrigger>
       <DialogContent className="w-[90vw] max-w-[90vw] h-[90vh] p-7 pt-10">
         <div className="h-full overflow-scroll">
-          {!resourceData && (
-            <SkewLoader loading={true} size={10} color="#38bdf8" />
-          )}
+          {!resourceData && <SiftLoader className="mt-10 mb-4 mx-auto" />}
 
           {resourceData && (
             <>

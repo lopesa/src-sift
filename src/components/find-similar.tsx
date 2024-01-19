@@ -2,9 +2,9 @@
 
 import useXataAiChat from "@/hooks/use-xata-ai-chat";
 import { Button } from "./ui/button";
-import SkewLoader from "react-spinners/SkewLoader";
 import { useState } from "react";
 import DataItemDialog from "./DataItemDialog";
+import SiftLoader from "./sift-loader";
 
 type FindSimilarProps = {
   description: string;
@@ -43,14 +43,7 @@ const FindSimilar = ({ description, className }: FindSimilarProps) => {
       >
         Find Similar
       </Button>
-      {isLoading && (
-        <SkewLoader
-          loading={true}
-          className="mt-1 mb-4"
-          color="#38bdf8"
-          size={14}
-        />
-      )}
+      {isLoading && <SiftLoader className="mt-10 mb-4 mx-auto" />}
       {answer && <div>{answer}</div>}
       {records &&
         records?.map((r) => (
