@@ -20,6 +20,7 @@ export const authOptions: AuthOptions = {
     {
       id: "sendgrid",
       type: "email",
+      name: "Email (Magic Link)",
       async sendVerificationRequest({
         identifier: email,
         url,
