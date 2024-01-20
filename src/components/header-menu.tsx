@@ -13,6 +13,8 @@ import { UserStatus } from "@/lib/const";
 import NavLink from "./ui/nav-link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signOut } from "next-auth/react";
+import CreateAccountAlert from "./create-account-alert";
+import { useState } from "react";
 
 const HeaderMenu = () => {
   const { data: session, status } = useSession();
@@ -34,21 +36,32 @@ const HeaderMenu = () => {
 
         <NavigationMenuItem>
           <Avatar className="w-8 h-8 cursor-pointer">
-            {session?.user?.image && (
-              <AvatarImage
-                src={session.user.image}
+            {status === UserStatus.AUTHENTICATED ? (
+              session?.user?.image ? (
+                <AvatarImage
+                  src={session.user.image}
+                  onClick={() => {
+                    signOut();
+                  }}
+                />
+              ) : (
+                <AvatarFallback
+                  onClick={() => {
+                    signOut();
+                  }}
+                >
+                  tmp
+                </AvatarFallback>
+              )
+            ) : (
+              <AvatarFallback
                 onClick={() => {
-                  signOut();
+                  signIn();
                 }}
-              />
+              >
+                tmp
+              </AvatarFallback>
             )}
-            <AvatarFallback
-              onClick={() => {
-                signIn();
-              }}
-            >
-              ?
-            </AvatarFallback>
           </Avatar>
         </NavigationMenuItem>
       </NavigationMenuList>

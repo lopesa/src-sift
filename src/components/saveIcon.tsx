@@ -5,6 +5,9 @@ import { SavedUserItemsContext } from "@/context/savedUserItemsProvider";
 import { cn } from "@/lib/utils";
 import { useContext, useEffect, useState } from "react";
 import { DistributionItem } from "@/xata";
+import CreateAccountAlert from "./create-account-alert";
+import { useSession } from "next-auth/react";
+import { useLocalStorage } from "usehooks-ts";
 
 export type SaveIconProps = {
   resourceId: string;
@@ -19,26 +22,18 @@ const SaveIconComponent = ({
 }: SaveIconProps) => {
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [accountAlertOpen, setAccountAlertOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const [hasSeenAccountAlert, setHasSeenAccountAlert] = useLocalStorage(
+    "hasSeenAccountAlert",
+    false
+  );
 
   const { toggleItemIsSaved, getItemIsSavedForUser } = useContext(
     SavedUserItemsContext
   );
 
-  useEffect(() => {
-    const getIsSaved = async () => {
-      const isSaved = await getItemIsSavedForUser(resourceId, distributionItem);
-      setIsSaved(isSaved);
-    };
-    getIsSaved();
-  }, [setIsSaved, getItemIsSavedForUser, resourceId, distributionItem]);
-
-  const onClickSave = async (e: React.MouseEvent<SVGElement>) => {
-    if (isSaving) return;
-    setIsSaving(true);
-    e.preventDefault();
-
-    const curState = isSaved;
-
+  const doToggleSave = async () => {
     // preemptive
     setIsSaved(!isSaved);
 
@@ -51,23 +46,50 @@ const SaveIconComponent = ({
       );
       setIsSaved(isSavedRemotely);
     }
+  };
 
+  useEffect(() => {
+    const getIsSaved = async () => {
+      const isSaved = await getItemIsSavedForUser(resourceId, distributionItem);
+      setIsSaved(isSaved);
+    };
+    getIsSaved();
+  }, [setIsSaved, getItemIsSavedForUser, resourceId, distributionItem]);
+
+  const onClickSave = async (e: React.MouseEvent<SVGElement>) => {
+    if (isSaving) return;
+    setIsSaving(true);
+
+    e.preventDefault();
+
+    if (status === "unauthenticated" && !hasSeenAccountAlert) {
+      setHasSeenAccountAlert(true);
+      setAccountAlertOpen(true);
+    }
+
+    doToggleSave();
     setIsSaving(false);
   };
 
   return (
-    <SaveIcon
-      size={16}
-      data-item-id={resourceId}
-      className={cn(
-        isSaved ? "text-emerald-700" : "text-gray-300",
-        "cursor-pointer",
-        className
-      )}
-      onClick={(e) => {
-        onClickSave(e);
-      }}
-    />
+    <>
+      <CreateAccountAlert
+        open={accountAlertOpen}
+        controller={setAccountAlertOpen}
+      />
+      <SaveIcon
+        size={16}
+        data-item-id={resourceId}
+        className={cn(
+          isSaved ? "text-emerald-700" : "text-gray-300",
+          "cursor-pointer",
+          className
+        )}
+        onClick={(e) => {
+          onClickSave(e);
+        }}
+      />
+    </>
   );
 };
 
