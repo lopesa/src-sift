@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { UserResourceRecord, getXataClient } from "@/xata";
 import { JSONData } from "@xata.io/client";
+import { z } from "zod";
 
 export type UserResourceAPIRequestBody = Promise<
   | NextResponse<{
@@ -58,44 +59,73 @@ export async function GET(req: Request, res: NextResponse) {
  * @param res
  * @returns the created record
  */
+export const createUserResourceParams = z.object({
+  resourceId: z.string(),
+  userId: z.string(),
+  distributionItemId: z.string().optional(),
+  tempUser: z.boolean().optional(),
+});
+const POSTBodySchema = z.union([
+  createUserResourceParams,
+  z.array(createUserResourceParams),
+]);
+
 export async function POST(req: NextRequest, res: NextResponse) {
-  const requestBody = await req.json().catch((error) => {
-    return NextResponse.json({
-      error: "Invalid request body",
-    });
-  });
+  const body = POSTBodySchema.safeParse(await req.json());
 
-  const { resourceId, distributionItemId, userId, tempUser } = requestBody;
-
-  if ((!distributionItemId && !resourceId) || !userId) {
-    return NextResponse.json({
-      error: "Invalid request body",
-    });
+  if (!body.success) {
+    return NextResponse.json(
+      { error: "Invalid body" },
+      {
+        status: 400,
+      }
+    );
   }
 
-  const recordData: {
-    resource?: string;
-    distribution_item?: string;
-    user?: string;
-    temp_user?: string;
-  } = { resource: resourceId };
+  // single
+  const single = createUserResourceParams.safeParse(body.data);
 
-  if (distributionItemId) {
-    recordData.distribution_item = distributionItemId;
-  }
+  if (single.success) {
+    const { resourceId, distributionItemId, userId, tempUser } = single.data;
 
-  if (tempUser) {
-    recordData.temp_user = userId;
+    // @TODO: better type to require user or temp_user, but not both
+    const recordData: {
+      resource: string;
+      distribution_item?: string;
+      user?: string;
+      temp_user?: string;
+    } = { resource: resourceId };
+
+    if (distributionItemId) {
+      recordData.distribution_item = distributionItemId;
+    }
+
+    if (tempUser) {
+      recordData.temp_user = userId;
+    } else {
+      recordData.user = userId;
+    }
+
+    const xata = getXataClient();
+    // const record = await xata.db.user_resource.create(recordData).catch((e) => e);
+    const record = await xata.db.user_resource.create(recordData).catch((e) => {
+      console.error(e);
+    });
+
+    if (!record) {
+      return NextResponse.json({
+        error: "Error creating record",
+      });
+    }
+
+    return NextResponse.json({
+      data: record.toSerializable(),
+    });
   } else {
-    recordData.user = userId;
+    return NextResponse.json({
+      error: "Only enabled for single right now",
+    });
   }
-
-  const xata = getXataClient();
-  const record = await xata.db.user_resource.create(recordData).catch((e) => {
-    return undefined;
-  });
-
-  return NextResponse.json(record?.toSerializable());
 }
 
 /**

@@ -3,9 +3,19 @@ import {
   ResourceItemRecord,
   UserResourceRecord,
 } from "@/xata";
-import { SearchXataRecord, SelectedPick, TotalCount } from "@xata.io/client";
+import {
+  JSONData,
+  SearchXataRecord,
+  SelectedPick,
+  TotalCount,
+} from "@xata.io/client";
 import { Session } from "next-auth";
 import { z } from "zod";
+
+export type InternalApiResponse<T> = {
+  data?: T;
+  error?: string;
+};
 
 export type DatasourceMetadata = {
   originalJsonData?: Array<object>;
@@ -70,6 +80,8 @@ export const aiQuestionFormat = z.object({
   searchType: z.enum(["keyword", "vector"]).optional(),
   // scope: z.array(z.string()), // not really panning out, probably remove
 });
+
+// export const ZodUserResourceRecord = z.object(<UserResourceRecord>);
 
 export function isValidDistributionItemRecord(
   item: any

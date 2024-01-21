@@ -1,7 +1,10 @@
 "use client";
 
+import { SessionWithUserId } from "@/lib/types";
+import { doUserAuthTempUserCleanup } from "@/lib/utils/user-data";
 import { TemporaryUsersRecord } from "@/xata";
 import { JSONData } from "@xata.io/client";
+import { useSession } from "next-auth/react";
 import { ReactNode, createContext, useEffect } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -19,6 +22,27 @@ export default function TemporaryUserIdProvider({
   const [temporaryUser, setTemporaryUser] = useLocalStorage<
     JSONData<TemporaryUsersRecord> | undefined
   >("temporaryUser", undefined);
+  const { data: session, status } = useSession();
+
+  // status changing to authenticated
+  useEffect(() => {
+    if (status === "unauthenticated" || status === "loading") {
+      return;
+    }
+
+    // we've already done the update to the authed user
+    if (!temporaryUser) {
+      return;
+    }
+
+    const sessionUserId = (session as SessionWithUserId)?.user?.id;
+
+    if (!sessionUserId) {
+      return;
+    }
+
+    // doUserAuthTempUserCleanup(sessionUserId, temporaryUser.id).catch((e) => e);
+  }, [status, session]);
 
   // the following doesn't work because it is executed in React cycles
   // changing it to directly use the localstorage api keeps it synchronous
@@ -30,7 +54,7 @@ export default function TemporaryUserIdProvider({
   useEffect(() => {
     const inProgress = window.localStorage.getItem("gettingTemporaryUser");
 
-    if (temporaryUser || inProgress) {
+    if (temporaryUser || inProgress || status === "authenticated") {
       return;
     }
 

@@ -1,5 +1,7 @@
 import { UserResourceRecord } from "@/xata";
-import { isSuccessfulInternalApiResponse } from "../types";
+import { InternalApiResponse, isSuccessfulInternalApiResponse } from "../types";
+import { createUserResourceParams } from "@/app/api/user-resource/route";
+import { z } from "zod";
 
 type GetUserDataItemArgs = {
   userId: string;
@@ -44,7 +46,7 @@ GetUserDataItemArgs) => {
 
   const userDataItemRes = await fetch(
     `/api/user-resource?${params.toString()}`
-  );
+  ).catch((e) => e);
 
   const userDataItem = await userDataItemRes?.json();
 
@@ -82,33 +84,42 @@ export const deleteUserDataItem = async ({
   return await deleted?.json();
 };
 
-export type CreateUserDataItemArgs = {
-  userId: string;
-  resourceId?: string;
-  tempUser?: boolean;
-  distributionItemId?: string;
-};
+/**
+ * create a single user data item
+ * @param param
+ * @returns
+ */
 
-export const createUserDataItem = async ({
-  userId,
-  resourceId,
-  tempUser,
-  distributionItemId,
-}: CreateUserDataItemArgs) => {
-  const userDataItem = await fetch(`/api/user-resource`, {
+export const createUserDataItem = async (
+  args: z.infer<typeof createUserResourceParams>
+) => {
+  const postBody = createUserResourceParams.safeParse(args);
+
+  if (!postBody.success) {
+    return undefined;
+  }
+  const userDataItemRes = await fetch(`/api/user-resource`, {
     method: "POST",
-    body: JSON.stringify({
-      userId,
-      resourceId,
-      tempUser,
-      distributionItemId,
-    }),
+    body: JSON.stringify(postBody.data),
     headers: {
       "Content-Type": "application/json",
     },
-  }).catch((e) => e);
+  }).catch((e) => {
+    console.error(e);
+  });
 
-  return await userDataItem?.json();
+  if (!userDataItemRes?.ok) {
+    return undefined;
+  }
+
+  const userDataItem: InternalApiResponse<UserResourceRecord> =
+    await userDataItemRes?.json();
+
+  // if (!isSuccessfulInternalApiResponse(userDataItem)) {
+  //   return undefined;
+  // }
+
+  return userDataItem.data ? userDataItem.data : undefined;
 };
 
 export const getUserResourcesWithDistributionItem = async (
@@ -121,4 +132,46 @@ export const getUserResourcesWithDistributionItem = async (
   ).catch((e) => e);
   const userResources = await userResourcesResponse?.json();
   return userResources;
+};
+
+export const doUserAuthTempUserCleanup = async (
+  authUserId: string,
+  tempUserId: string
+) => {
+  debugger;
+  // get all user resources for each user
+  const [authUserResources, tempUserResources] = await Promise.all([
+    getUserDataItem({ userId: authUserId, tempUser: false }),
+    getUserDataItem({ userId: tempUserId, tempUser: true }),
+  ]);
+
+  // add non-repeated resources to auth user from temp user
+  const tempUserResourcesToAdd = tempUserResources.filter(
+    (tempUserResource) => {
+      return !authUserResources.includes(tempUserResource);
+    }
+  );
+
+  const additionPromises = tempUserResourcesToAdd.map((tempUserResource) => {
+    return () => {
+      let args: z.infer<typeof createUserResourceParams> = {
+        // TODO, proper typing should prevent this || ''
+        resourceId: tempUserResource?.resource?.id || "",
+        userId: authUserId,
+        tempUser: false,
+      };
+      if (tempUserResource.resource) {
+        args.resourceId = tempUserResource.resource.id;
+      }
+      if (tempUserResource.distribution_item) {
+        args.distributionItemId = tempUserResource.distribution_item.id;
+      }
+      return createUserDataItem(args);
+    };
+  });
+
+  const additions = await Promise.all(additionPromises);
+  debugger;
+  // delete temp user user resources
+  // delete temp user
 };
