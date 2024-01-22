@@ -1,6 +1,7 @@
 export type SavedUserItems = {
   initComplete: boolean;
-  resourceItemIds: string[];
+  // resourceItemIds: string[];
+  resourceItemIds: [string, string][];
   distributionItemIds: string[];
 };
 
@@ -12,6 +13,8 @@ export type SavedUserItemsAction = {
     | "addResourceItem"
     | "removeResourceItem";
   id?: string;
+  resourceAndUserResourceIds?: [string, string];
+  initComplete?: boolean;
 };
 
 const SavedUserItemsReducer = (
@@ -21,7 +24,7 @@ const SavedUserItemsReducer = (
   switch (action.type) {
     case "setInitComplete":
       return {
-        initComplete: true,
+        initComplete: action.initComplete as boolean,
         resourceItemIds: [...savedUserItems.resourceItemIds],
         distributionItemIds: [...savedUserItems.distributionItemIds],
       };
@@ -47,7 +50,7 @@ const SavedUserItemsReducer = (
         initComplete: savedUserItems.initComplete,
         resourceItemIds: [
           ...savedUserItems.resourceItemIds,
-          action.id as string,
+          action.resourceAndUserResourceIds as [string, string],
         ],
         distributionItemIds: [...savedUserItems.distributionItemIds],
       };
@@ -55,7 +58,7 @@ const SavedUserItemsReducer = (
       return {
         initComplete: savedUserItems.initComplete,
         resourceItemIds: savedUserItems.resourceItemIds.filter(
-          (savedId) => savedId !== action.id
+          (savedIdTuple) => savedIdTuple[0] !== action.id
         ),
         distributionItemIds: [...savedUserItems.distributionItemIds],
       };

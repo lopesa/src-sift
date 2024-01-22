@@ -5,12 +5,13 @@ import { doUserAuthTempUserCleanup } from "@/lib/utils/user-data";
 import { TemporaryUsersRecord } from "@/xata";
 import { JSONData } from "@xata.io/client";
 import { useSession } from "next-auth/react";
-import { ReactNode, createContext, useEffect } from "react";
+import { ReactNode, createContext, useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
-export const TemporaryUserContext = createContext<
-  JSONData<TemporaryUsersRecord> | undefined
->(undefined);
+export const TemporaryUserContext = createContext<{
+  temporaryUser: JSONData<TemporaryUsersRecord> | undefined;
+  tempUserAuthed: boolean;
+}>({ temporaryUser: undefined, tempUserAuthed: false });
 
 type TemporaryUserIdProviderProps = {
   children: ReactNode;
@@ -22,11 +23,12 @@ export default function TemporaryUserIdProvider({
   const [temporaryUser, setTemporaryUser] = useLocalStorage<
     JSONData<TemporaryUsersRecord> | undefined
   >("temporaryUser", undefined);
+  const [tempUserAuthed, setTempUserAuthed] = useState(false);
   const { data: session, status } = useSession();
 
   // status changing to authenticated
   useEffect(() => {
-    debugger;
+    // debugger;
 
     const lsKey = "tempUserCleanupInProgress";
     const inProgress = window.localStorage.getItem(lsKey);
@@ -46,13 +48,15 @@ export default function TemporaryUserIdProvider({
     }
 
     (async () => {
-      debugger;
+      // debugger;
       window.localStorage.setItem(lsKey, "true");
 
       await doUserAuthTempUserCleanup(sessionUserId, temporaryUser.id).catch(
         (e) => e
       );
-      // setTemporaryUser(undefined);
+      // debugger;
+      setTemporaryUser(undefined);
+      setTempUserAuthed(true);
       window.localStorage.removeItem(lsKey);
     })();
   }, [status, session]);
@@ -65,12 +69,19 @@ export default function TemporaryUserIdProvider({
   // );
 
   useEffect(() => {
-    debugger;
+    // debugger;
     const inProgress = window.localStorage.getItem("gettingTemporaryUser");
 
-    if (temporaryUser || inProgress || status === "authenticated") {
+    if (
+      temporaryUser ||
+      inProgress ||
+      status === "authenticated" ||
+      status === "loading"
+    ) {
       return;
     }
+
+    // debugger;
 
     window.localStorage.setItem("gettingTemporaryUser", "true");
 
@@ -88,25 +99,6 @@ export default function TemporaryUserIdProvider({
 
       if (tempUserJson) {
         setTemporaryUser(tempUserJson);
-
-        /**
-         * one thought on how to deal with deleting temp users occasionally.
-         * this obviously is pretty abrupt so probably will do something with
-         * vercel timed functions (cron jobs)
-         
-        window.onbeforeunload = () => {
-          debugger;
-          fetch("/api/temporary-user", {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              temporaryUserId: tempUserJson.id,
-            }),
-          });
-        };
-        */
       }
       window.localStorage.removeItem("gettingTemporaryUser");
     };
@@ -114,10 +106,10 @@ export default function TemporaryUserIdProvider({
     createAndSetTempUserId().catch((e) => {
       // console.log(e);
     });
-  }, [temporaryUser, setTemporaryUser]);
+  }, [temporaryUser, setTemporaryUser, status]);
 
   return (
-    <TemporaryUserContext.Provider value={temporaryUser}>
+    <TemporaryUserContext.Provider value={{ temporaryUser, tempUserAuthed }}>
       {children}
     </TemporaryUserContext.Provider>
   );

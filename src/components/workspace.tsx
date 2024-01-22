@@ -12,7 +12,7 @@ import AiChat from "./ai-chat";
 
 const Workspace = () => {
   const { data: session, status } = useSession();
-  const temporaryUser = useContext(TemporaryUserContext);
+  const { temporaryUser } = useContext(TemporaryUserContext);
 
   const { savedUserItems, getUserData } = useContext(SavedUserItemsContext);
 

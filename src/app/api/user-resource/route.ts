@@ -164,6 +164,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
  * @param res
  * @returns the deleted record
  */
+const deleteUserResourceBodySchema = z.union([z.string(), z.array(z.string())]);
 export async function DELETE(req: NextRequest, res: NextResponse) {
   const requestBody = await req.json().catch((error) => {
     return NextResponse.json({

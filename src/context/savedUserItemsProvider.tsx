@@ -17,22 +17,18 @@ import {
   getUserDataItem,
   getUserResourcesWithDistributionItem,
 } from "@/lib/utils/user-data";
-import {
-  DistributionItem,
-  TemporaryUsersRecord,
-  UserResourceRecord,
-} from "@/xata";
-import { JSONData } from "@xata.io/client";
+import { DistributionItem, UserResourceRecord } from "@/xata";
 import { useSession } from "next-auth/react";
 import {
   ReactNode,
   createContext,
   useCallback,
+  useContext,
   useEffect,
   useReducer,
 } from "react";
-import { useLocalStorage } from "usehooks-ts";
 import savedUserItemsReducer, { SavedUserItems } from "./savedUserItemsReducer";
+import { TemporaryUserContext } from "./temporaryUserProvider";
 
 type SavedUserItemsContextT = {
   savedUserItems: SavedUserItems;
@@ -45,17 +41,19 @@ type SavedUserItemsContextT = {
     distributionItem?: DistributionItem
   ) => Promise<boolean>;
   getUserData: () => Promise<UserResourceRecord[]>;
+  initLocalContext: () => Promise<boolean>;
 };
 
 export const SavedUserItemsContext = createContext<SavedUserItemsContextT>({
   savedUserItems: {
-    resourceItemIds: [] as string[],
+    resourceItemIds: [] as [string, string][], // [resourceId, userResourceId]
     distributionItemIds: [] as string[],
     initComplete: false,
   },
   toggleItemIsSaved: () => Promise.resolve(false),
   getItemIsSavedForUser: () => Promise.resolve(false),
   getUserData: () => Promise.resolve([] as UserResourceRecord[]),
+  initLocalContext: () => Promise.resolve(false),
 });
 
 export default function SavedUserItemsProvider({
@@ -64,20 +62,17 @@ export default function SavedUserItemsProvider({
   children: ReactNode;
 }) {
   const { data: session, status } = useSession();
-
-  const [temporaryUser, setTemporaryUser] = useLocalStorage<
-    JSONData<TemporaryUsersRecord> | undefined
-  >("temporaryUser", undefined);
-
+  const { temporaryUser, tempUserAuthed } = useContext(TemporaryUserContext);
   const [savedUserItems, dispatch] = useReducer(savedUserItemsReducer, {
     resourceItemIds: [],
     distributionItemIds: [],
     initComplete: false,
   });
 
-  const setInitComplete = () => {
+  const setInitComplete = (initComplete: boolean) => {
     dispatch({
       type: "setInitComplete",
+      initComplete,
     });
   };
 
@@ -93,10 +88,12 @@ export default function SavedUserItemsProvider({
       id: id,
     });
   };
-  const addResourceItemToContext = (id: string) => {
+  const addResourceItemToContext = (
+    resourceAndUserResourceIds: [string, string]
+  ) => {
     dispatch({
       type: "addResourceItem",
-      id: id,
+      resourceAndUserResourceIds,
     });
   };
   const removeResourceItemFromContext = (id: string) => {
@@ -116,9 +113,12 @@ export default function SavedUserItemsProvider({
   const resourceItemIsSavedForUser = (resourceId: string) => {
     return (
       !!savedUserItems.resourceItemIds.length &&
-      savedUserItems.resourceItemIds.includes(resourceId)
+      savedUserItems.resourceItemIds
+        .map((tuple) => tuple[0])
+        .includes(resourceId)
     );
   };
+
   const distributionItemIsSavedForUser = (
     distributionItemId: string,
     savedUserItems: SavedUserItems
@@ -127,6 +127,7 @@ export default function SavedUserItemsProvider({
     return savedUserItems.distributionItemIds.includes(distributionItemId);
   };
 
+  // @TODO: this exists also in user-data.ts as getUserDataItem
   const getUserData = async () => {
     const varUrl =
       status === "authenticated" && (session as SessionWithUserId)?.user?.id
@@ -211,7 +212,7 @@ export default function SavedUserItemsProvider({
         }
 
         // add it to the local saved user resources
-        addResourceItemToContext(resourceId);
+        addResourceItemToContext([resourceId, createdUserResource.id]);
 
         return true;
       }
@@ -302,35 +303,57 @@ export default function SavedUserItemsProvider({
     }
   };
 
-  useEffect(() => {
+  const initLocalContext = async () => {
+    // debugger;
+    if (savedUserItems.initComplete) {
+      return false;
+    }
+    // debugger;
     const userId = getUserId();
     if (!userId) {
+      return false;
+    }
+    const userDataJson = await getUserDataItem({
+      userId,
+      tempUser: status !== "authenticated",
+    });
+
+    if (userDataJson?.length) {
+      userDataJson.forEach((item) => {
+        if (item.resource && !item.distribution_item) {
+          addResourceItemToContext([item.resource.id, item.id]);
+        }
+        if (item.distribution_item) {
+          addDistributionItemToContext(item.distribution_item.id);
+        }
+      });
+    }
+    // debugger;
+    setInitComplete(true);
+    return true;
+  };
+
+  // initial load of local context
+  useEffect(() => {
+    if (status === "loading") {
       return;
     }
-    const getUserData = async () => {
-      const userDataJson = await getUserDataItem({
-        userId,
-        tempUser: status !== "authenticated",
-      });
-
-      if (userDataJson?.length) {
-        userDataJson.forEach((item) => {
-          if (item.resource && !item.distribution_item) {
-            addResourceItemToContext(item.resource.id);
-          }
-          if (item.distribution_item) {
-            addDistributionItemToContext(item.distribution_item.id);
-          }
-        });
-      }
-      setInitComplete();
-    };
-
-    getUserData().catch((e) => {
+    initLocalContext().catch((e) => {
       // console.log(e);
     });
     return;
-  }, [status, getUserId]);
+  }, [status, initLocalContext]);
+
+  useEffect(() => {
+    // debugger;
+    if (tempUserAuthed) {
+      // debugger;
+      setInitComplete(false);
+      initLocalContext().catch((e) => {
+        // console.log(e);
+      });
+    }
+  }, [tempUserAuthed]);
 
   return (
     <SavedUserItemsContext.Provider
@@ -339,6 +362,7 @@ export default function SavedUserItemsProvider({
         toggleItemIsSaved,
         getItemIsSavedForUser,
         getUserData,
+        initLocalContext,
       }}
     >
       {children}

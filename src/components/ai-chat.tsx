@@ -35,7 +35,6 @@ export type AiChatProps = {
 };
 
 const AiChat = ({ label, description, className }: AiChatProps) => {
-  const { savedUserItems, getUserData } = useContext(SavedUserItemsContext);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
