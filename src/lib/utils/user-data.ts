@@ -1,7 +1,7 @@
 import { UserResourceRecord } from "@/xata";
 import { InternalApiResponse, isSuccessfulInternalApiResponse } from "../types";
-import { createUserResourceParams } from "@/app/api/user-resource/route";
 import { z } from "zod";
+import { UserResourcePostBodySchema } from "@/app/api/user-resource/route";
 
 type GetUserDataItemArgs = {
   userId: string;
@@ -86,14 +86,15 @@ export const deleteUserDataItem = async ({
 
 /**
  * create a single user data item
+ * or a batch or user data items
  * @param param
  * @returns
  */
 
-export const createUserDataItem = async (
-  args: z.infer<typeof createUserResourceParams>
+export const createUserData = async (
+  args: z.infer<typeof UserResourcePostBodySchema>
 ) => {
-  const postBody = createUserResourceParams.safeParse(args);
+  const postBody = UserResourcePostBodySchema.safeParse(args);
 
   if (!postBody.success) {
     return undefined;
@@ -118,6 +119,8 @@ export const createUserDataItem = async (
   // if (!isSuccessfulInternalApiResponse(userDataItem)) {
   //   return undefined;
   // }
+
+  debugger;
 
   return userDataItem.data ? userDataItem.data : undefined;
 };
@@ -145,32 +148,71 @@ export const doUserAuthTempUserCleanup = async (
     getUserDataItem({ userId: tempUserId, tempUser: true }),
   ]);
 
-  // add non-repeated resources to auth user from temp user
-  const tempUserResourcesToAdd = tempUserResources.filter(
-    (tempUserResource) => {
-      return !authUserResources.includes(tempUserResource);
+  const authUserResourceByResourceIdSubDistributionId = authUserResources.map(
+    (res) => {
+      let returnVal = [res.resource?.id || ""];
+      if (res.distribution_item) {
+        returnVal.push(res.distribution_item.id);
+      }
+      return returnVal;
     }
   );
 
-  const additionPromises = tempUserResourcesToAdd.map((tempUserResource) => {
-    return () => {
-      let args: z.infer<typeof createUserResourceParams> = {
-        // TODO, proper typing should prevent this || ''
-        resourceId: tempUserResource?.resource?.id || "",
-        userId: authUserId,
-        tempUser: false,
-      };
-      if (tempUserResource.resource) {
-        args.resourceId = tempUserResource.resource.id;
-      }
-      if (tempUserResource.distribution_item) {
-        args.distributionItemId = tempUserResource.distribution_item.id;
-      }
-      return createUserDataItem(args);
-    };
-  });
+  debugger;
 
-  const additions = await Promise.all(additionPromises);
+  // add non-repeated resources to auth user from temp user
+  const tempUserResourcesToAdd = tempUserResources.filter(
+    (tempUserResource) => {
+      if (
+        !!authUserResourceByResourceIdSubDistributionId.find((item) => {
+          if (item[0] === tempUserResource.resource?.id) {
+            return !!item[1]
+              ? !(item[1] === tempUserResource.distribution_item?.id)
+              : false;
+          }
+          return true;
+        })
+      ) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  );
+
+  debugger;
+
+  if (tempUserResourcesToAdd.length) {
+    const createItemsArgs =
+      tempUserResourcesToAdd.length === 1
+        ? {
+            resourceId: tempUserResourcesToAdd[0].resource?.id || "", // @TODO this is a hack
+            distributionItemId: tempUserResourcesToAdd[0].distribution_item?.id,
+            userId: authUserId,
+            tempUser: false,
+          }
+        : {
+            userId: authUserId,
+            tempUser: false,
+            resources: tempUserResourcesToAdd.map((tempUserResource) => {
+              let resource: {
+                resourceId: string;
+                distributionItemId?: string;
+              } = {
+                resourceId: tempUserResource.resource?.id || "",
+              };
+              if (tempUserResource.distribution_item) {
+                resource.distributionItemId =
+                  tempUserResource.distribution_item?.id;
+              }
+              return resource;
+            }),
+          };
+
+    const itemsCreated = await createUserData(createItemsArgs);
+    debugger;
+  }
+
   debugger;
   // delete temp user user resources
   // delete temp user

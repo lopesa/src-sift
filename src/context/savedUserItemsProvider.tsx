@@ -12,7 +12,7 @@ import {
   getDistributionItem,
 } from "@/lib/utils/distribution-item";
 import {
-  createUserDataItem,
+  createUserData,
   deleteUserDataItem,
   getUserDataItem,
   getUserResourcesWithDistributionItem,
@@ -200,7 +200,7 @@ export default function SavedUserItemsProvider({
         removeResourceItemFromContext(resourceId);
         return true;
       } else {
-        const createdUserResource = await createUserDataItem({
+        const createdUserResource = await createUserData({
           userId,
           resourceId,
           tempUser: status !== "authenticated",
@@ -284,7 +284,7 @@ export default function SavedUserItemsProvider({
         return false;
       }
       // create a user_resource
-      const createdUserResource = await createUserDataItem({
+      const createdUserResource = await createUserData({
         userId,
         resourceId,
         distributionItemId,

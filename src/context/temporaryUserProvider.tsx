@@ -26,7 +26,11 @@ export default function TemporaryUserIdProvider({
 
   // status changing to authenticated
   useEffect(() => {
-    if (status === "unauthenticated" || status === "loading") {
+    debugger;
+
+    const lsKey = "tempUserCleanupInProgress";
+    const inProgress = window.localStorage.getItem(lsKey);
+    if (inProgress || status === "unauthenticated" || status === "loading") {
       return;
     }
 
@@ -41,7 +45,16 @@ export default function TemporaryUserIdProvider({
       return;
     }
 
-    // doUserAuthTempUserCleanup(sessionUserId, temporaryUser.id).catch((e) => e);
+    (async () => {
+      debugger;
+      window.localStorage.setItem(lsKey, "true");
+
+      await doUserAuthTempUserCleanup(sessionUserId, temporaryUser.id).catch(
+        (e) => e
+      );
+      // setTemporaryUser(undefined);
+      window.localStorage.removeItem(lsKey);
+    })();
   }, [status, session]);
 
   // the following doesn't work because it is executed in React cycles
@@ -52,6 +65,7 @@ export default function TemporaryUserIdProvider({
   // );
 
   useEffect(() => {
+    debugger;
     const inProgress = window.localStorage.getItem("gettingTemporaryUser");
 
     if (temporaryUser || inProgress || status === "authenticated") {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { UserResourceRecord, getXataClient } from "@/xata";
-import { JSONData } from "@xata.io/client";
+import { EditableData, Identifiable, JSONData } from "@xata.io/client";
 import { z } from "zod";
 
 export type UserResourceAPIRequestBody = Promise<
@@ -55,23 +55,34 @@ export async function GET(req: Request, res: NextResponse) {
 
 /**
  * create a user resource record
+ * or multiple user resource records
  * @param req
  * @param res
  * @returns the created record
  */
-export const createUserResourceParams = z.object({
+const createUserResourceParams = z.object({
   resourceId: z.string(),
   userId: z.string(),
   distributionItemId: z.string().optional(),
   tempUser: z.boolean().optional(),
 });
-const POSTBodySchema = z.union([
+const createUserResourcesParams = z.object({
+  userId: z.string(),
+  tempUser: z.boolean().optional(),
+  resources: z.array(
+    z.object({
+      resourceId: z.string(),
+      distributionItemId: z.string().optional(),
+    })
+  ),
+});
+export const UserResourcePostBodySchema = z.union([
   createUserResourceParams,
-  z.array(createUserResourceParams),
+  createUserResourcesParams,
 ]);
 
 export async function POST(req: NextRequest, res: NextResponse) {
-  const body = POSTBodySchema.safeParse(await req.json());
+  const body = UserResourcePostBodySchema.safeParse(await req.json());
 
   if (!body.success) {
     return NextResponse.json(
@@ -82,50 +93,68 @@ export async function POST(req: NextRequest, res: NextResponse) {
     );
   }
 
-  // single
-  const single = createUserResourceParams.safeParse(body.data);
+  // debugger;
 
-  if (single.success) {
-    const { resourceId, distributionItemId, userId, tempUser } = single.data;
+  const xata = getXataClient();
+
+  let recordData, multipleRecordData;
+
+  const singleData = createUserResourceParams.safeParse(body.data);
+  const multipleData = createUserResourcesParams.safeParse(body.data);
+
+  if (singleData.success) {
+    const { resourceId, distributionItemId, userId, tempUser } =
+      singleData.data;
 
     // @TODO: better type to require user or temp_user, but not both
-    const recordData: {
-      resource: string;
-      distribution_item?: string;
-      user?: string;
-      temp_user?: string;
-    } = { resource: resourceId };
+    recordData = buildCreateRecordParams(
+      userId,
+      !!tempUser,
+      resourceId,
+      distributionItemId
+    );
+  } else if (multipleData.success) {
+    const { resources, userId, tempUser } = multipleData.data;
 
-    if (distributionItemId) {
-      recordData.distribution_item = distributionItemId;
-    }
+    multipleRecordData = resources.map(({ resourceId, distributionItemId }) => {
+      return buildCreateRecordParams(
+        userId,
+        !!tempUser,
+        resourceId,
+        distributionItemId
+      );
+    });
+  }
 
-    if (tempUser) {
-      recordData.temp_user = userId;
-    } else {
-      recordData.user = userId;
-    }
+  const recordsToInsert = recordData ? recordData : multipleRecordData;
 
-    const xata = getXataClient();
-    // const record = await xata.db.user_resource.create(recordData).catch((e) => e);
-    const record = await xata.db.user_resource.create(recordData).catch((e) => {
+  if (!recordsToInsert) {
+    return NextResponse.json(
+      { error: "Invalid body" },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  const reply = await xata.db.user_resource
+    .create(
+      recordsToInsert as (Omit<EditableData<UserResourceRecord>, "id"> &
+        Partial<Identifiable>)[]
+    )
+    .catch((e) => {
       console.error(e);
     });
 
-    if (!record) {
-      return NextResponse.json({
-        error: "Error creating record",
-      });
-    }
-
+  if (!reply) {
     return NextResponse.json({
-      data: record.toSerializable(),
-    });
-  } else {
-    return NextResponse.json({
-      error: "Only enabled for single right now",
+      error: "Error creating record",
     });
   }
+
+  return NextResponse.json({
+    data: JSON.parse(JSON.stringify(reply)),
+  });
 }
 
 /**
@@ -181,3 +210,32 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
 
   return NextResponse.json(deletedRecord?.toSerializable());
 }
+
+/**
+ * HELPERS
+ */
+const buildCreateRecordParams = (
+  userId: string,
+  tempUser: boolean,
+  resourceId: string,
+  distributionItemId?: string
+) => {
+  const recordData: {
+    resource: string;
+    distribution_item?: string;
+    user?: string;
+    temp_user?: string;
+  } = { resource: resourceId };
+
+  if (distributionItemId) {
+    recordData.distribution_item = distributionItemId;
+  }
+
+  if (tempUser) {
+    recordData.temp_user = userId;
+  } else {
+    recordData.user = userId;
+  }
+
+  return recordData;
+};
