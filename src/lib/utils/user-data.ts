@@ -73,8 +73,15 @@ export const deleteUserDataItem = async (
     headers: {
       "Content-Type": "application/json",
     },
-  }).catch((e) => e);
-  return await deleted?.json();
+  }).catch((e) => {
+    debugger;
+    return e;
+  });
+  debugger;
+
+  let json = await deleted?.json();
+  debugger;
+  return json;
 };
 
 /**
@@ -205,5 +212,13 @@ export const doUserAuthTempUserCleanup = async (
 
   debugger;
   // delete temp user user resources
+  const deletedTempUserItems = await deleteUserDataItem(
+    tempUserResources.map((r) => r.id)
+  ).catch((e) => {
+    debugger;
+    return e;
+  });
+
+  // debugger;
   // delete temp user
 };

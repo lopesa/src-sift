@@ -193,7 +193,7 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
     .delete(body.data as SelectableColumn<UserResourceRecord, []>)
     .catch((e) => undefined);
 
-  return NextResponse.json(deletedRecord?.toSerializable());
+  return NextResponse.json({ data: JSON.parse(JSON.stringify(deletedRecord)) });
 }
 
 /**
