@@ -2,7 +2,6 @@
 
 import {
   SessionWithUserId,
-  isSuccessfulInternalApiResponse,
   isValidDistributionItemRecord,
   isValidUserResourceRecord,
 } from "@/lib/types";
@@ -17,7 +16,7 @@ import {
   getUserDataItem,
   getUserResourcesWithDistributionItem,
 } from "@/lib/utils/user-data";
-import { DistributionItem, UserResourceRecord } from "@/xata";
+import { DistributionItem } from "@/xata";
 import { useSession } from "next-auth/react";
 import {
   ReactNode,
@@ -39,7 +38,7 @@ type SavedUserItemsContextT = {
   getItemIsSavedForUser: (
     resourceId: string,
     distributionItem?: DistributionItem
-  ) => Promise<boolean>;
+  ) => Promise<boolean | undefined | string>;
   getUserId: () => string | undefined;
   initLocalContext: () => Promise<boolean>;
 };
@@ -113,24 +112,28 @@ export default function SavedUserItemsProvider({
   }, [session, status, temporaryUser]);
 
   const resourceItemIsSavedForUser = (resourceId: string) => {
-    return (
-      !!savedUserItems.resourceItemIds.length &&
+    return !!savedUserItems.resourceItemIds.length &&
       savedUserItems.resourceItemIds
         .map((tuple) => tuple[0])
         .includes(resourceId)
-    );
+      ? savedUserItems.resourceItemIds.find(
+          (tuple) => tuple[0] === resourceId
+        )?.[1]
+      : false;
   };
 
   const distributionItemIsSavedForUser = (
     distributionItemId: string,
     savedUserItems: SavedUserItems
   ) => {
-    return (
-      !!savedUserItems.distributionItemIds.length &&
+    return !!savedUserItems.distributionItemIds.length &&
       savedUserItems.distributionItemIds
         .map((tuple) => tuple[0])
         .includes(distributionItemId)
-    );
+      ? savedUserItems.distributionItemIds.find(
+          (tuple) => tuple[0] === distributionItemId
+        )?.[1]
+      : false;
   };
 
   const getItemIsSavedForUser = async (
@@ -165,7 +168,10 @@ export default function SavedUserItemsProvider({
     distributionItem?: DistributionItem
   ) => {
     const userId = getUserId();
-    const isSaved = await getItemIsSavedForUser(resourceId, distributionItem);
+    const savedUserResourceId = await getItemIsSavedForUser(
+      resourceId,
+      distributionItem
+    );
 
     if (!userId) {
       return false;
@@ -173,12 +179,10 @@ export default function SavedUserItemsProvider({
 
     if (!distributionItem) {
       // do regular resource item stuff and return
-      if (isSaved) {
-        const deletedUserResource = await deleteUserDataItem({
-          userId,
-          resourceId,
-          tempUser: status !== "authenticated",
-        });
+      if (savedUserResourceId) {
+        const deletedUserResource = await deleteUserDataItem(
+          savedUserResourceId
+        );
 
         if (!isValidUserResourceRecord(deletedUserResource)) {
           return false;
@@ -210,17 +214,12 @@ export default function SavedUserItemsProvider({
       distributionItem
     );
 
-    if (isSaved) {
+    if (savedUserResourceId) {
       if (!isValidDistributionItemRecord(existingDistributionItem)) {
         return false;
       }
       // delete the user_resource
-      const deletedUserResource = await deleteUserDataItem({
-        userId,
-        resourceId,
-        distributionItemId: existingDistributionItem?.id,
-        tempUser: status !== "authenticated",
-      });
+      const deletedUserResource = await deleteUserDataItem(savedUserResourceId);
 
       if (!isValidUserResourceRecord(deletedUserResource)) {
         return false;

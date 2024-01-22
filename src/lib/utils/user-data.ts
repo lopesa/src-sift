@@ -1,7 +1,10 @@
 import { UserResourceRecord } from "@/xata";
 import { InternalApiResponse, isSuccessfulInternalApiResponse } from "../types";
 import { z } from "zod";
-import { UserResourcePostBodySchema } from "@/app/api/user-resource/route";
+import {
+  DeleteUserResourceBodySchema,
+  UserResourcePostBodySchema,
+} from "@/app/api/user-resource/route";
 
 type GetUserDataItemArgs = {
   userId: string;
@@ -56,27 +59,17 @@ GetUserDataItemArgs) => {
   return userDataItem.data as UserResourceRecord[];
 };
 
-type DeleteUserDataItemArgs = {
-  userId: string;
-  resourceId: string;
-  distributionItemId?: string;
-  tempUser: boolean;
-};
-
-export const deleteUserDataItem = async ({
-  userId,
-  resourceId,
-  distributionItemId,
-  tempUser,
-}: DeleteUserDataItemArgs) => {
+/**
+ * delete 1 or more user_data items
+ * @param DeleteUserResourceBodySchema
+ * @returns
+ */
+export const deleteUserDataItem = async (
+  recordIds: z.infer<typeof DeleteUserResourceBodySchema>
+) => {
   const deleted = await fetch(`/api/user-resource`, {
     method: "DELETE",
-    body: JSON.stringify({
-      userId,
-      resourceId,
-      distributionItemId,
-      tempUser,
-    }),
+    body: JSON.stringify(recordIds),
     headers: {
       "Content-Type": "application/json",
     },
@@ -90,7 +83,6 @@ export const deleteUserDataItem = async ({
  * @param param
  * @returns
  */
-
 export const createUserData = async (
   args: z.infer<typeof UserResourcePostBodySchema>
 ) => {

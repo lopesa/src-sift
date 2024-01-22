@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { UserResourceRecord, getXataClient } from "@/xata";
-import { EditableData, Identifiable, JSONData } from "@xata.io/client";
+import {
+  EditableData,
+  Identifiable,
+  JSONData,
+  SelectableColumn,
+} from "@xata.io/client";
 import { z } from "zod";
 
 export type UserResourceAPIRequestBody = Promise<
@@ -159,54 +164,33 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
 /**
  * DELETE a user_resource record
+ * or multiple user_resource records
  *
- * @param req
+ * @param req DeleteUserResourceBodySchema
  * @param res
- * @returns the deleted record
+ * @returns the deleted record(s)
  */
-const deleteUserResourceBodySchema = z.union([z.string(), z.array(z.string())]);
+export const DeleteUserResourceBodySchema = z.union([
+  z.string(),
+  z.array(z.string()),
+]);
+
 export async function DELETE(req: NextRequest, res: NextResponse) {
-  const requestBody = await req.json().catch((error) => {
-    return NextResponse.json({
-      error: "Invalid request body",
-    });
-  });
+  const body = DeleteUserResourceBodySchema.safeParse(await req.json());
 
-  const { resourceId, distributionItemId, userId, tempUser } = requestBody;
-
-  if (!userId || (!distributionItemId && !resourceId)) {
-    return NextResponse.json({
-      error: "Invalid request body",
-    });
-  }
-
-  const filter: {
-    "user.id"?: string;
-    "temp_user.id"?: string;
-    "resource.id"?: string;
-    "distribution_item.id"?: string;
-  } = !!tempUser ? { "temp_user.id": userId } : { "user.id": userId };
-
-  if (distributionItemId) {
-    filter["distribution_item.id"] = distributionItemId;
-  } else if (resourceId) {
-    filter["resource.id"] = resourceId;
+  if (!body.success) {
+    return NextResponse.json(
+      { error: "Invalid body" },
+      {
+        status: 400,
+      }
+    );
   }
 
   const xata = getXataClient();
-  const recordToDelete = await xata.db.user_resource
-    .filter(filter)
-    .getFirst({ consistency: "eventual" })
-    .catch((e) => undefined);
-
-  if (!recordToDelete) {
-    return NextResponse.json({
-      error: "No record found",
-    });
-  }
 
   const deletedRecord = await xata.db.user_resource
-    .delete(recordToDelete.id)
+    .delete(body.data as SelectableColumn<UserResourceRecord, []>)
     .catch((e) => undefined);
 
   return NextResponse.json(deletedRecord?.toSerializable());

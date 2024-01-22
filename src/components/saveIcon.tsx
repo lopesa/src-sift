@@ -44,14 +44,14 @@ const SaveIconComponent = ({
         resourceId,
         distributionItem
       );
-      setIsSaved(isSavedRemotely);
+      setIsSaved(!!isSavedRemotely);
     }
   };
 
   useEffect(() => {
     const getIsSaved = async () => {
       const isSaved = await getItemIsSavedForUser(resourceId, distributionItem);
-      setIsSaved(isSaved);
+      setIsSaved(!!isSaved);
     };
     getIsSaved();
   }, [setIsSaved, getItemIsSavedForUser, resourceId, distributionItem]);
