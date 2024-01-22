@@ -47,7 +47,7 @@ type SavedUserItemsContextT = {
 export const SavedUserItemsContext = createContext<SavedUserItemsContextT>({
   savedUserItems: {
     resourceItemIds: [] as [string, string][], // [resourceId, userResourceId]
-    distributionItemIds: [] as string[],
+    distributionItemIds: [] as [string, string][],
     initComplete: false,
   },
   toggleItemIsSaved: () => Promise.resolve(false),
@@ -76,10 +76,12 @@ export default function SavedUserItemsProvider({
     });
   };
 
-  const addDistributionItemToContext = (id: string) => {
+  const addDistributionItemToContext = (
+    distributionItemAndUserResourceIds: [string, string]
+  ) => {
     dispatch({
       type: "addDistributionItem",
-      id: id,
+      distributionItemAndUserResourceIds,
     });
   };
   const removeDistributionItemFromContext = (id: string) => {
@@ -123,8 +125,12 @@ export default function SavedUserItemsProvider({
     distributionItemId: string,
     savedUserItems: SavedUserItems
   ) => {
-    // check it against the savedUserItems.distributionItemIds)
-    return savedUserItems.distributionItemIds.includes(distributionItemId);
+    return (
+      !!savedUserItems.distributionItemIds.length &&
+      savedUserItems.distributionItemIds
+        .map((tuple) => tuple[0])
+        .includes(distributionItemId)
+    );
   };
 
   // @TODO: this exists also in user-data.ts as getUserDataItem
@@ -297,7 +303,10 @@ export default function SavedUserItemsProvider({
       }
 
       // add it to the local saved user resources
-      addDistributionItemToContext(distributionItemId);
+      addDistributionItemToContext([
+        distributionItemId,
+        createdUserResource.id,
+      ]);
 
       return true;
     }
@@ -324,7 +333,7 @@ export default function SavedUserItemsProvider({
           addResourceItemToContext([item.resource.id, item.id]);
         }
         if (item.distribution_item) {
-          addDistributionItemToContext(item.distribution_item.id);
+          addDistributionItemToContext([item.distribution_item.id, item.id]);
         }
       });
     }
