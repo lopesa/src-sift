@@ -40,7 +40,7 @@ type SavedUserItemsContextT = {
     resourceId: string,
     distributionItem?: DistributionItem
   ) => Promise<boolean>;
-  getUserData: () => Promise<UserResourceRecord[]>;
+  getUserId: () => string | undefined;
   initLocalContext: () => Promise<boolean>;
 };
 
@@ -52,7 +52,7 @@ export const SavedUserItemsContext = createContext<SavedUserItemsContextT>({
   },
   toggleItemIsSaved: () => Promise.resolve(false),
   getItemIsSavedForUser: () => Promise.resolve(false),
-  getUserData: () => Promise.resolve([] as UserResourceRecord[]),
+  getUserId: () => undefined,
   initLocalContext: () => Promise.resolve(false),
 });
 
@@ -131,26 +131,6 @@ export default function SavedUserItemsProvider({
         .map((tuple) => tuple[0])
         .includes(distributionItemId)
     );
-  };
-
-  // @TODO: this exists also in user-data.ts as getUserDataItem
-  const getUserData = async () => {
-    const varUrl =
-      status === "authenticated" && (session as SessionWithUserId)?.user?.id
-        ? `userId=${(session as SessionWithUserId)?.user?.id}`
-        : `userId=${temporaryUser?.id}&tempUser=true`;
-
-    const url = `/api/user-resource?${varUrl}&getFullResourceItem=true`;
-
-    const userData = await fetch(url);
-
-    const userDataJson = await userData?.json();
-
-    if (!isSuccessfulInternalApiResponse(userDataJson)) {
-      return [] as UserResourceRecord[];
-    }
-
-    return userDataJson.data as UserResourceRecord[];
   };
 
   const getItemIsSavedForUser = async (
@@ -370,7 +350,7 @@ export default function SavedUserItemsProvider({
         savedUserItems,
         toggleItemIsSaved,
         getItemIsSavedForUser,
-        getUserData,
+        getUserId,
         initLocalContext,
       }}
     >

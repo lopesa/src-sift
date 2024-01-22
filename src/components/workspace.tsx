@@ -8,13 +8,13 @@ import { TemporaryUserContext } from "@/context/temporaryUserProvider";
 import IndexDataList from "./IndexDataList";
 import { SavedUserItemsContext } from "@/context/savedUserItemsProvider";
 import DistributionItemsAccordion from "./DistributionItemsAccordion";
-import AiChat from "./ai-chat";
+import { getUserDataItem } from "@/lib/utils/user-data";
 
 const Workspace = () => {
   const { data: session, status } = useSession();
   const { temporaryUser } = useContext(TemporaryUserContext);
 
-  const { savedUserItems, getUserData } = useContext(SavedUserItemsContext);
+  const { savedUserItems, getUserId } = useContext(SavedUserItemsContext);
 
   const [userResourceRecordIds, setUserResourceRecordIds] = useState<string[]>(
     []
@@ -29,7 +29,15 @@ const Workspace = () => {
   >([]);
 
   const getAndSetUserData = useCallback(async () => {
-    const userDataJson = await getUserData();
+    const userId = getUserId();
+    if (!userId) {
+      return;
+    }
+    const userDataJson = await getUserDataItem({
+      userId,
+      tempUser: status === "unauthenticated",
+      getFullResourceItem: true,
+    });
 
     // if (!userDataJson?.length) {
     //   return;

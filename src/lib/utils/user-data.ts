@@ -8,7 +8,7 @@ type GetUserDataItemArgs = {
   tempUser: boolean;
   resourceId?: string;
   distributionItemId?: string;
-  getFullDataItem?: boolean;
+  getFullResourceItem?: boolean;
 };
 
 /**
@@ -21,7 +21,7 @@ type GetUserDataItemArgs = {
 export const getUserDataItem = async ({
   userId,
   tempUser,
-  getFullDataItem,
+  getFullResourceItem,
 }: // resourceId,
 // distributionItemId,
 GetUserDataItemArgs) => {
@@ -39,8 +39,8 @@ GetUserDataItemArgs) => {
   // if (distributionItemId) {
   //   params.append("distributionItemId", distributionItemId);
   // }
-  if (getFullDataItem) {
-    params.append("getFullDataItem", getFullDataItem.toString());
+  if (getFullResourceItem) {
+    params.append("getFullResourceItem", getFullResourceItem.toString());
   }
   params.append("tempUser", (!!tempUser).toString());
 
@@ -119,8 +119,6 @@ export const createUserData = async (
   // if (!isSuccessfulInternalApiResponse(userDataItem)) {
   //   return undefined;
   // }
-
-  debugger;
 
   return userDataItem.data ? userDataItem.data : undefined;
 };
