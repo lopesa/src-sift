@@ -158,12 +158,14 @@ const DataItemDialog = ({
           {resourceData && (
             <>
               {resourceData?.title && (
-                <DialogHeader className="h-[50px]">
-                  <DialogTitle className="text-2xl font-light pr-10 flex items-center">
-                    <SaveIconComponent
-                      resourceId={resourceData.id}
-                      className="mr-2"
-                    />
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-light flex items-start justify-start relative mb-6">
+                    <div className="w-10">
+                      <SaveIconComponent
+                        resourceId={resourceData.id}
+                        className="mr-2 mt-2"
+                      />
+                    </div>
                     {resourceData.title as string}
                   </DialogTitle>
                 </DialogHeader>

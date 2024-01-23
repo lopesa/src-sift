@@ -45,18 +45,22 @@ const PreviewData = ({ url }: PreviewDataProps) => {
       });
 
       const data = await response?.json();
-      // debugger;
 
-      // if (!data?.data?.length) {
-      //   return;
-      // }
-      // setXMLData(data?.data);
+      debugger;
 
-      setJsonData(data?.data);
-
-      // setDataKeys(data?.data[0]);
-      // setDataSubset(data?.data.slice(1) || []);
-      // setTotalRowsAvailable(data?.totalRows || 0);
+      switch (fileExtension) {
+        case "xml":
+          setXMLData(data?.data);
+          break;
+        case "json":
+          setJsonData(data?.data);
+          break;
+        case "csv":
+          setDataKeys(data?.data[0]);
+          setDataSubset(data?.data.slice(1) || []);
+          setTotalRowsAvailable(data?.totalRows || 0);
+          break;
+      }
     };
 
     getData().catch((e) => {
@@ -78,10 +82,10 @@ const PreviewData = ({ url }: PreviewDataProps) => {
       {showDataPreview && (
         <Accordion type="single" collapsible defaultValue="item-1">
           <AccordionItem value="item-1">
-            <AccordionTrigger className="[&>svg]:left-0"></AccordionTrigger>
-            <AccordionContent className="w-full mt-4">
+            <AccordionTrigger className="[&>svg]:left-0">
               <div className="text-sm font-bold mb-1">Data Preview</div>
-
+            </AccordionTrigger>
+            <AccordionContent className="w-full mt-4">
               {fileExtension === "xml" && XMLData && (
                 <div className="text-[10px]">
                   <XMLViewer xml={XMLData} collapsible={true} />
@@ -89,7 +93,7 @@ const PreviewData = ({ url }: PreviewDataProps) => {
               )}
 
               {(fileExtension === "json" && jsonData && (
-                <DynamicReactJson src={jsonData} />
+                <DynamicReactJson src={jsonData} style={{ fontSize: "10px" }} />
               )) || <SiftLoader className="mt-10 mb-4 mx-auto" />}
 
               {fileExtension === "csv" && (

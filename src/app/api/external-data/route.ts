@@ -2,9 +2,9 @@ import { getFileExtension } from "@/lib/utils/data";
 import { NextRequest, NextResponse } from "next/server";
 import validator from "validator";
 import PapaParse from "papaparse";
-import http from "http";
-import https from "https";
-import fs, { WriteStream, promises } from "fs";
+// import http from "http";
+// import https from "https";
+// import fs, { WriteStream, promises } from "fs";
 // const http = require("http");
 // const fs = require("fs");
 
@@ -33,226 +33,209 @@ export async function GET(req: NextRequest, res: NextResponse) {
     return returnErrorResponse(`Invalid file type, got: ${fileExtension}`);
   }
 
-  // function streamToString(stream: http.IncomingMessage) {
-  //   const chunks: any[] = [];
-  //   return new Promise((resolve, reject) => {
-  //     debugger;
-  //     stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
-  //     stream.on("error", (err) => reject(err));
-  //     stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
-  //   });
-  // }
-  if (fileExtension === "xml") {
-    const optionsResponse = await fetch(url, {
-      method: "OPTIONS",
-    }).catch((e) => {
-      // debugger;
-    });
-
-    const options =
-      optionsResponse?.ok &&
-      (await optionsResponse?.json().catch((e) => {
-        // debugger;
-      }));
-
-    // debugger;
-
-    const response = await fetch(url).catch((e) => {
-      // debugger;
-    });
-
-    if (!response?.ok) {
-      // debugger;
-      return returnErrorResponse("Error fetching data");
-    }
-
-    const xmlData = await response?.text().catch((e) => {
-      // debugger;
-    });
-
-    // debugger;
-    return NextResponse.json({
-      data: xmlData,
-    });
-  }
-
-  if (fileExtension === "json") {
-    // const request = https.get(url, function (response) {
-    //   response.pipe(file);
-    // });
-    // const requestedFileStream: fs.WriteStream = await new Promise((resolve) => {
-    const response = await fetch(url).catch((e) => {
-      // debugger;
-    });
-
-    if (!response?.ok) {
-      return returnErrorResponse("Error fetching data");
-      // debugger;
-    }
-
-    const jsonData = await response?.json().catch((e) => {
-      // debugger;
-    });
-    // debugger;
-    // const requestedFileStream = await new Promise((resolve) => {
-    //   const file = fs.createWriteStream("/tmp/data.csv");
-    //   https
-    //     .get(url, async (response) => {
-    //       debugger;
-    //       // const string = await streamToString(response);
-    //       // debugger;
-    //       // return string;
-
-    //       response.pipe(file);
-    //       file.on("finish", async () => {
-    //         file.close();
-    //         // debugger;
-
-    //         resolve(file);
-    //       });
-    //     })
-    //     .on("error", (err) => {
-    //       debugger;
-    //       fs.unlink(url, () => {}); // Delete the file on error
-    //       console.error(`Error downloading file: ${err.message}`);
-    //     });
-    // });
-
-    // debugger;
-
-    // let fileContent = await fs.promises.readFile("/tmp/data.csv").catch((e) => {
-    //   debugger;
-    // });
-
-    // // const test = fileContent ? new Uint8Array(fileContent) : [];
-
-    // debugger;
-
-    // const test = await streamToString(requestedFileStream as WriteStream).catch(
-    //   (e) => {
-    //     debugger;
-    //   }
-    // );
-
-    // debugger;
-
-    // let fileContentArray = fileContent ? fileContent : [];
-    // let fileContentArray = fileContent ? fileContent.toJSON() : [];
-    // let fileContentArray = fileContent ? new Uint8Array(fileContent) : [];
-
-    // debugger;
-    // let requestedFileStreamString;
-    // if (requestedFileStream) {
-    //   debugger;
-    //   // requestedFileStreamString = await streamToString(requestedFileStream);
-    // }
-    // debugger;
-    return NextResponse.json({
-      data: jsonData,
-      // fileContent
-      //   ? {
-      //       data: fileContent.toJSON().data,
-      //     }
-      //   : {
-      //       error: "Error fetching data",
-      //     }
-    });
-  }
-
-  /**
-  // @TODO: check how large the file is before starting to download
-  // implement a max size to try to download
-
-  // @TODO: all http (not s) requests are failing
-  // now the headers seem not necessary
-  const response = await fetch(url, {
-    method: "GET",
-    // headers: {
-    //   "Content-Type": "text/csv",
-    //   "Accept-Encoding": "gzip, deflate, br",
-    //   Origin: "http://localhost:3001",
-    //   // Accept: "text/csv",
-    // },
-    // mode: "no-cors",
-  }).catch((e) => {
-    // const proxiedRequestUrl = `http://proxy:8080/${url}`;
-    // const proxiedRequestUrl = `http://localhost:8080/${url}`;
-    // const response = await fetch(proxiedRequestUrl).catch((e) => {
+  const response = await fetch(url).catch((e) => {
     // debugger;
   });
 
   if (!response?.ok) {
     return returnErrorResponse("Error fetching data");
+    // debugger;
   }
 
-  if (fileExtension === "json") {
-    const data = await response.json();
-    return NextResponse.json({
-      data,
-      totalRows: data.length,
-    });
+  switch (fileExtension) {
+    case "csv":
+      const data = await response.text();
+      const parsedCsvData = PapaParse.parse(data);
+      // const testSlice = parsedCsvData.data.slice(0, 5);
+      // const testSliceString = testSlice.join("\r\n");
+      // const blob = new Blob([testSliceString], { type: "text/csv" });
+
+      const totalRows = parsedCsvData?.data?.length;
+      const dataSubset = parsedCsvData?.data?.slice(
+        0,
+        returnAmount || DEFAULT_RETURN_AMOUNT
+      );
+
+      if (!dataSubset || !totalRows) {
+        return returnErrorResponse("Error fetching data");
+      }
+
+      return NextResponse.json({
+        data: dataSubset,
+        totalRows: totalRows,
+      });
+      break;
+    case "xls":
+      break;
+    case "json":
+      const jsonData = await response?.json().catch((e) => {
+        // debugger;
+      });
+
+      return NextResponse.json({
+        data: jsonData,
+      });
+    // break;
+    case "xml":
+      const xmlData = await response?.text().catch((e) => {
+        // debugger;
+      });
+
+      // debugger;
+      return NextResponse.json({
+        data: xmlData,
+      });
+      break;
+    default:
+      break;
   }
 
-  let data;
-  let totalRows;
-  let dataSubset;
-  let parsedCsvData: PapaParse.ParseResult<string[]> | undefined;
+  // if (fileExtension === "xml") {
+  //   const optionsResponse = await fetch(url, {
+  //     method: "OPTIONS",
+  //   }).catch((e) => {
+  //     // debugger;
+  //   });
 
-  if (fileExtension.includes("csv")) {
-    data = await response.text();
+  //   const options =
+  //     optionsResponse?.ok &&
+  //     (await optionsResponse?.json().catch((e) => {
+  //       // debugger;
+  //     }));
 
-    parsedCsvData = PapaParse.parse(data);
+  //   // debugger;
 
-    const testSlice = parsedCsvData.data.slice(0, 5);
-    const testSliceString = testSlice.join("\r\n");
+  //   const response = await fetch(url).catch((e) => {
+  //     // debugger;
+  //   });
 
-    // var stream = ss.createStream();
-    // stream.write(buffer);
-    // debugger;
-    // const buffer = Buffer.from(data);
-    const blob = new Blob([testSliceString], { type: "text/csv" });
+  //   if (!response?.ok) {
+  //     // debugger;
+  //     return returnErrorResponse("Error fetching data");
+  //   }
 
-    // debugger;
+  //   const xmlData = await response?.text().catch((e) => {
+  //     // debugger;
+  //   });
 
-    // const vizSuggestions = await getVisualizationSuggestions(blob);
+  //   // debugger;
+  //   return NextResponse.json({
+  //     data: xmlData,
+  //   });
+  // }
 
-    // parsedCsvData = PapaParse.parse(data);
-    // const vizSuggestions = await getVisualizationSuggestions(
-    //   parsedCsvData.data.join("\r\n")
-    // );
+  // if (fileExtension === "json") {
 
-    // this point should be the clean csv document
-    // debugger;
+  //   const response = await fetch(url).catch((e) => {
+  //     // debugger;
+  //   });
 
-    totalRows = parsedCsvData?.data?.length;
-    dataSubset = parsedCsvData?.data?.slice(
-      0,
-      returnAmount || DEFAULT_RETURN_AMOUNT
-    );
-    if (!dataSubset || !totalRows) {
-      return returnErrorResponse("Error fetching data");
-    }
+  //   if (!response?.ok) {
+  //     return returnErrorResponse("Error fetching data");
+  //     // debugger;
+  //   }
 
-    return NextResponse.json({
-      data: dataSubset,
-      totalRows: totalRows,
-    });
+  //   const jsonData = await response?.json().catch((e) => {
+  //     // debugger;
+  //   });
 
-    // for debugging. Exmaple Native Node
-    // http
-    //   .get(url, (res) => {
-    //     res.on("data", (chunk) => {
-    //       debugger;
-    //     });
+  //   return NextResponse.json({
+  //     data: jsonData,
+  //   });
+  // }
 
-    //     res.on("end", () => {
-    //       debugger;
-    //     });
-    //   })
-    //   .on("error", (err) => {
-    //     debugger;
-    //     console.log("Error: ", err.message);
-    //   });
-  }
-  */
+  // @TODO: check how large the file is before starting to download
+  // implement a max size to try to download
+
+  // @TODO: all http (not s) requests are failing
+  // now the headers seem not necessary
+  // const response = await fetch(url, {
+  //   method: "GET",
+  //   // headers: {
+  //   //   "Content-Type": "text/csv",
+  //   //   "Accept-Encoding": "gzip, deflate, br",
+  //   //   Origin: "http://localhost:3001",
+  //   //   // Accept: "text/csv",
+  //   // },
+  //   // mode: "no-cors",
+  // }).catch((e) => {
+  //   // const proxiedRequestUrl = `http://proxy:8080/${url}`;
+  //   // const proxiedRequestUrl = `http://localhost:8080/${url}`;
+  //   // const response = await fetch(proxiedRequestUrl).catch((e) => {
+  //   // debugger;
+  // });
+
+  // if (!response?.ok) {
+  //   return returnErrorResponse("Error fetching data");
+  // }
+
+  // if (fileExtension === "json") {
+  //   const data = await response.json();
+  //   return NextResponse.json({
+  //     data,
+  //     totalRows: data.length,
+  //   });
+  // }
+
+  // let data;
+  // let totalRows;
+  // let dataSubset;
+  // let parsedCsvData: PapaParse.ParseResult<string[]> | undefined;
+
+  // if (fileExtension.includes("csv")) {
+  //   data = await response.text();
+
+  //   parsedCsvData = PapaParse.parse(data);
+
+  //   const testSlice = parsedCsvData.data.slice(0, 5);
+  //   const testSliceString = testSlice.join("\r\n");
+
+  // var stream = ss.createStream();
+  // stream.write(buffer);
+  // debugger;
+  // const buffer = Buffer.from(data);
+  // const blob = new Blob([testSliceString], { type: "text/csv" });
+
+  // debugger;
+
+  // const vizSuggestions = await getVisualizationSuggestions(blob);
+
+  // parsedCsvData = PapaParse.parse(data);
+  // const vizSuggestions = await getVisualizationSuggestions(
+  //   parsedCsvData.data.join("\r\n")
+  // );
+
+  // this point should be the clean csv document
+  // debugger;
+
+  // totalRows = parsedCsvData?.data?.length;
+  // dataSubset = parsedCsvData?.data?.slice(
+  //   0,
+  //   returnAmount || DEFAULT_RETURN_AMOUNT
+  // );
+  // if (!dataSubset || !totalRows) {
+  //   return returnErrorResponse("Error fetching data");
+  // }
+
+  // return NextResponse.json({
+  //   data: dataSubset,
+  //   totalRows: totalRows,
+  // });
+
+  // for debugging. Exmaple Native Node
+  // http
+  //   .get(url, (res) => {
+  //     res.on("data", (chunk) => {
+  //       debugger;
+  //     });
+
+  //     res.on("end", () => {
+  //       debugger;
+  //     });
+  //   })
+  //   .on("error", (err) => {
+  //     debugger;
+  //     console.log("Error: ", err.message);
+  //   });
+  // }
 }
