@@ -184,7 +184,7 @@ export default function SavedUserItemsProvider({
           savedUserResourceId
         );
 
-        if (!isValidUserResourceRecord(deletedUserResource)) {
+        if (!deletedUserResource) {
           return false;
         }
 
@@ -221,7 +221,7 @@ export default function SavedUserItemsProvider({
       // delete the user_resource
       const deletedUserResource = await deleteUserDataItem(savedUserResourceId);
 
-      if (!isValidUserResourceRecord(deletedUserResource)) {
+      if (!deletedUserResource) {
         return false;
       }
 

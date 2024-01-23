@@ -64,14 +64,9 @@ export const deleteUserDataItem = async (
     headers: {
       "Content-Type": "application/json",
     },
-  }).catch((e) => {
-    debugger;
-    return e;
-  });
-  debugger;
+  }).catch((e) => null);
 
   let json = await deleted?.json();
-  debugger;
   return json;
 };
 
@@ -146,28 +141,34 @@ export const doUserAuthTempUserCleanup = async (
     }
   );
 
+  const getAuthedUserHasMatchingResource = (
+    tempUserResource: UserResourceRecord
+  ) => {
+    return !!authUserResourceByResourceIdSubDistributionId.find((item) => {
+      if (item[0] === tempUserResource.resource?.id) {
+        return !!item[1]
+          ? !(item[1] === tempUserResource.distribution_item?.id)
+          : true;
+      }
+      return false;
+    });
+  };
+
   // debugger;
 
   // add non-repeated resources to auth user from temp user
   // figure which are non-repeated
   const tempUserResourcesToAdd = tempUserResources.filter(
     (tempUserResource) => {
-      if (
-        !!authUserResourceByResourceIdSubDistributionId.find((item) => {
-          if (item[0] === tempUserResource.resource?.id) {
-            return !!item[1]
-              ? !(item[1] === tempUserResource.distribution_item?.id)
-              : false;
-          }
-          return true;
-        })
-      ) {
+      if (getAuthedUserHasMatchingResource(tempUserResource)) {
         return false;
       } else {
         return true;
       }
     }
   );
+
+  // debugger;
 
   // add non-repeated resources to auth user from temp user
   // build into argument for createUserData

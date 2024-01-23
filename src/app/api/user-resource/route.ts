@@ -191,7 +191,7 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
 
   const deletedRecord = await xata.db.user_resource
     .delete(body.data as SelectableColumn<UserResourceRecord, []>)
-    .catch((e) => undefined);
+    .catch((e) => null);
 
   return NextResponse.json({ data: JSON.parse(JSON.stringify(deletedRecord)) });
 }
