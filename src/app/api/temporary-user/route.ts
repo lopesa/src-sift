@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getXataClient } from "@/xata";
+import { TemporaryUsersRecord, getXataClient } from "@/xata";
+import { z } from "zod";
+import { SelectableColumn } from "@xata.io/client";
 
 const xata = getXataClient();
 
@@ -16,6 +18,42 @@ export async function POST(req: NextRequest, res: NextResponse) {
   }
 
   return NextResponse.json(tempUser.toSerializable());
+}
+
+/**
+ * DELETE a temporary user record
+ *
+ * @param req DeleteUserResourceBodySchema
+ * @param res
+ * @returns the deleted record(s)
+ */
+export const DeleteTemporaryUserBodySchema = z.string();
+
+export async function DELETE(req: NextRequest, res: NextResponse) {
+  const body = DeleteTemporaryUserBodySchema.safeParse(await req.json());
+
+  if (!body.success) {
+    return NextResponse.json(
+      { error: "Invalid body" },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  const xata = getXataClient();
+
+  const deletedRecord = await xata.db.temporary_users
+    .delete(body.data as SelectableColumn<TemporaryUsersRecord, []>)
+    .catch((e) => e);
+
+  if (!deletedRecord) {
+    return NextResponse.json({
+      error: "Error deleting temporary user",
+    });
+  }
+
+  return NextResponse.json({ data: deletedRecord?.toSerializable() });
 }
 
 // export async function DELETE(req: NextRequest, res: NextResponse) {
