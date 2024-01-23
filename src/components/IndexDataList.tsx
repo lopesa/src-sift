@@ -61,7 +61,7 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
   }, [showXml, showCsv, showXls, showJson, data]);
 
   return (
-    <div className="flex flex-col h-full bg-stone-100 pl-6 pr-8">
+    <div className="flex flex-col h-full bg-stone-100 pl-6 pr-8 mx-auto w-full max-w-screen-xl">
       {filteredData && (
         <div className="h-28 pt-6 pl-10">
           {title && <h1 className="text-xl font-light">{title}</h1>}

@@ -14,6 +14,7 @@ import DataItemDialog from "./DataItemDialog";
 import { DataItemsAccordionItem } from "@/lib/types";
 import SaveIconComponent from "./saveIcon";
 import FindSimilar from "./find-similar";
+import { AccordionHeader } from "@radix-ui/react-accordion";
 
 interface DataItemsAccordionProps {
   dataItems: DataItemsAccordionItem[];
@@ -47,14 +48,29 @@ const DataItemsAccordion = ({
         {dataItems?.length &&
           dataItems.map((dataItem, index) => (
             <AccordionItem key={index} value={dataItem.id}>
-              <AccordionTrigger className="text-sm text-left py-2 [&>svg]:ml-6">
-                <SaveIconComponent resourceId={dataItem.id} />
-                <div className="flex-1 pl-4">{dataItem.title}</div>
-              </AccordionTrigger>
+              {/* <AccordionTrigger className="text-sm text-left py-2 [&>svg]:ml-6"> */}
+              <AccordionHeader className="text-sm text-left py-2 flex [&>h3]:flex-1">
+                <SaveIconComponent
+                  resourceId={dataItem.id}
+                  // className="absolute left-5"
+                />
+                <DataItemDialog
+                  key={index}
+                  resourceId={dataItem?.id}
+                  triggerButtonType="zoom-icon"
+                  // className="absolute left-10"
+                />
+                <AccordionTrigger className="py-0">
+                  <div className="pl-2 text-left pr-4 w-full">
+                    {dataItem.title}
+                  </div>
+                </AccordionTrigger>
+              </AccordionHeader>
 
-              <AccordionContent className="text-xs [&*>]:m-0 mb-2.5 mb-6 pl-14 pr-6">
+              <AccordionContent className="text-xs pt-1 mb-2 pr-4 pl-12">
                 {dataItem.description ? (
                   <div
+                    // className="w-full min-w-full"
                     dangerouslySetInnerHTML={{
                       __html: sanitize(dataItem.description),
                     }}
@@ -62,11 +78,11 @@ const DataItemsAccordion = ({
                 ) : (
                   <div>No description available</div>
                 )}
-                <DataItemDialog
+                {/* <DataItemDialog
                   key={index}
                   resourceId={dataItem?.id}
                   className="mt-4"
-                />
+                /> */}
                 {/* {dataItem.description && (
                   <FindSimilar
                     className="mt-4"

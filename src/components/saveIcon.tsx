@@ -85,7 +85,7 @@ const SaveIconComponent = ({
         size={16}
         data-item-id={resourceId}
         className={cn(
-          isSaved ? "text-emerald-700" : "text-gray-300",
+          isSaved ? "text-emerald-700" : "text-gray-400",
           "cursor-pointer",
           className
         )}

@@ -29,11 +29,13 @@ import { cn } from "@/lib/utils";
 import SaveIconComponent from "./saveIcon";
 import Link from "next/link";
 import SiftLoader from "./sift-loader";
+import { ZoomIn } from "lucide-react";
 
 interface DataItemDialogProps {
   triggerCopy?: string;
   resourceId: string;
   className?: string;
+  triggerButtonType?: "button" | "zoom-icon";
 }
 
 const onClickDownloadXls = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -45,6 +47,7 @@ const DataItemDialog = ({
   resourceId,
   className,
   triggerCopy,
+  triggerButtonType = "button",
 }: DataItemDialogProps) => {
   const [resourceData, setResourceData] =
     useState<JSONData<ResourceItemRecord> | null>();
@@ -127,13 +130,26 @@ const DataItemDialog = ({
   return (
     <Dialog onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button
-          // asChild
-          size="xs"
-          className="bg-stone-600 hover:bg-stone-800"
-        >
-          {triggerCopy || "Details"}
-        </Button>
+        {triggerButtonType === "zoom-icon" ? (
+          <ZoomIn className="cursor-pointer text-gray-500 ml-2" size={16}>
+            <Button
+              asChild
+              onClick={(e) => {
+                debugger;
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            />
+          </ZoomIn>
+        ) : (
+          <Button
+            // asChild
+            size="xs"
+            className="bg-stone-600 hover:bg-stone-800"
+          >
+            {triggerCopy || "Details"}
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="w-[90vw] max-w-[90vw] h-[90vh] p-7 pt-10">
         <div className="h-full overflow-scroll">
@@ -143,7 +159,7 @@ const DataItemDialog = ({
             <>
               {resourceData?.title && (
                 <DialogHeader className="h-[50px]">
-                  <DialogTitle className="text-xl font-light pr-10 flex items-center">
+                  <DialogTitle className="text-2xl font-light pr-10 flex items-center">
                     <SaveIconComponent
                       resourceId={resourceData.id}
                       className="mr-2"
@@ -153,23 +169,33 @@ const DataItemDialog = ({
                 </DialogHeader>
               )}
 
-              <div
+              {/* <div
                 className={cn(
                   resourceData?.title ? "h-[calc(100%-50px)]" : "h-full",
                   "overflow-scroll"
                 )}
-              >
+              > */}
+
+              {/* KEYWORDS */}
+              <div>
                 {resourceData.keywords && (
-                  <DialogDescription className="flex flex-wrap pr-20">
-                    <span style={{ fontWeight: "bold" }}>Keywords:</span>&nbsp;
+                  <DialogDescription className="flex flex-wrap pr-20 mb-6 max-w-screen-xl items-center">
+                    <span className="font-bold text-sm">Keywords:</span>&nbsp;
                     {(resourceData.keywords as string[]).map((keyword) => {
-                      return <div key={keyword}>• {keyword}</div>;
+                      return (
+                        <div key={keyword} className="mr-1.5 text-xs">
+                          • {keyword}
+                        </div>
+                      );
                     })}
                   </DialogDescription>
                 )}
 
+                <Separator className="mt-4 mb-6" />
+
+                {/* DESCRIPTION */}
                 {resourceData.description && (
-                  <DialogDescription className="pr-20">
+                  <DialogDescription className="pr-20 mb-8 max-w-screen-xl">
                     <div
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(
@@ -180,33 +206,38 @@ const DataItemDialog = ({
                   </DialogDescription>
                 )}
 
-                <h3 className="mt-6 mb-2 font-bold">Distribution:</h3>
+                <h3 className="mt-6 mb-2 font-bold text-sm">Resource Items:</h3>
                 {resourceData.distribution &&
                   resourceData.distribution.map(
                     (distribution: DistributionItem, index: number) => {
                       return (
                         <div key={index} className="mb-6">
                           <DialogDescription>
-                            <SaveIconComponent
-                              resourceId={resourceData.id}
-                              className="mr-2"
-                              distributionItem={distribution}
-                            />
-                            <div className="text-bold">
-                              • {distribution.title || "no title available"}
+                            <div className="flex mb-1 items-center">
+                              <SaveIconComponent
+                                resourceId={resourceData.id}
+                                className="mr-2"
+                                distributionItem={distribution}
+                              />
+                              <div className="text-bold">
+                                {distribution.title || "no title available"}
+                              </div>
                             </div>
 
                             {!!getDistributionUrl(distribution) && (
-                              <Link
-                                href={
-                                  getDistributionUrl(distribution) as string
-                                }
-                                target="_blank"
-                                rel="noreferrer"
-                                className="underline"
-                              >
-                                {getDistributionUrl(distribution)}
-                              </Link>
+                              <div className="overflow-y-scroll">
+                                {/* <div className="overflow-y-scroll bg-gradient-to-r from-white from-80% to-gray-300 to-100%"> */}
+                                <Link
+                                  href={
+                                    getDistributionUrl(distribution) as string
+                                  }
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="underline text-xs ml-1 text-sky-600"
+                                >
+                                  {getDistributionUrl(distribution)}
+                                </Link>
+                              </div>
                             )}
                           </DialogDescription>
                           {getPreviewDataLink(distribution)}
@@ -217,7 +248,7 @@ const DataItemDialog = ({
 
                 <Accordion type="single" collapsible>
                   <AccordionItem value="item-1">
-                    <AccordionTrigger className="cursor-pointer underline ml-2.5 text-xs">
+                    <AccordionTrigger className="cursor-pointer underline text-xs">
                       All Data
                     </AccordionTrigger>
                     <AccordionContent>
