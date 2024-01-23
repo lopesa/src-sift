@@ -33,15 +33,6 @@ GetUserDataItemArgs) => {
   if (userId) {
     params.append("userId", userId);
   }
-
-  // see note in route handler
-  // will need these to implement get one record
-  // if (resourceId) {
-  //   params.append("resourceId", resourceId);
-  // }
-  // if (distributionItemId) {
-  //   params.append("distributionItemId", distributionItemId);
-  // }
   if (getFullResourceItem) {
     params.append("getFullResourceItem", getFullResourceItem.toString());
   }
@@ -138,7 +129,7 @@ export const doUserAuthTempUserCleanup = async (
   authUserId: string,
   tempUserId: string
 ) => {
-  debugger;
+  // debugger;
   // get all user resources for each user
   const [authUserResources, tempUserResources] = await Promise.all([
     getUserDataItem({ userId: authUserId, tempUser: false }),
@@ -155,9 +146,10 @@ export const doUserAuthTempUserCleanup = async (
     }
   );
 
-  debugger;
+  // debugger;
 
   // add non-repeated resources to auth user from temp user
+  // figure which are non-repeated
   const tempUserResourcesToAdd = tempUserResources.filter(
     (tempUserResource) => {
       if (
@@ -177,8 +169,10 @@ export const doUserAuthTempUserCleanup = async (
     }
   );
 
-  debugger;
-
+  // add non-repeated resources to auth user from temp user
+  // build into argument for createUserData
+  // (depending on if 1 or >1 resources)
+  // and call createUserData
   if (tempUserResourcesToAdd.length) {
     const createItemsArgs =
       tempUserResourcesToAdd.length === 1
@@ -206,19 +200,12 @@ export const doUserAuthTempUserCleanup = async (
             }),
           };
 
-    const itemsCreated = await createUserData(createItemsArgs);
-    debugger;
+    const itemsCreated = await createUserData(createItemsArgs).catch((e) => e);
+    // debugger;
   }
 
-  debugger;
-  // delete temp user user resources
+  // delete temp user user resources in db
   const deletedTempUserItems = await deleteUserDataItem(
     tempUserResources.map((r) => r.id)
-  ).catch((e) => {
-    debugger;
-    return e;
-  });
-
-  // debugger;
-  // delete temp user
+  ).catch((e) => e);
 };

@@ -1,7 +1,7 @@
 "use client";
 // import * as d3 from "d3";
 // import { DSVParsedArray, DSVRowString } from "d3";
-import { useEffect, useState } from "react";
+import { ComponentType, use, useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import {
   Accordion,
@@ -10,12 +10,13 @@ import {
   AccordionTrigger,
 } from "./ui/accordion";
 import { getFileExtension } from "@/lib/utils/data";
-import ReactJson from "@microlink/react-json-view";
 import XMLViewer from "react-xml-viewer";
 import SiftLoader from "./sift-loader";
-// import dynamic from "next/dynamic";
+import dynamic from "next/dynamic";
 
-// const DynamicReactJson = (await import('@microlink/react-json-view')).default
+const DynamicReactJson = dynamic(() => import("@microlink/react-json-view"), {
+  ssr: false,
+});
 
 interface PreviewDataProps {
   url: string;
@@ -49,9 +50,9 @@ const PreviewData = ({ url }: PreviewDataProps) => {
       // if (!data?.data?.length) {
       //   return;
       // }
-      setXMLData(data?.data);
+      // setXMLData(data?.data);
 
-      // setJsonData(data?.data);
+      setJsonData(data?.data);
 
       // setDataKeys(data?.data[0]);
       // setDataSubset(data?.data.slice(1) || []);
@@ -87,9 +88,9 @@ const PreviewData = ({ url }: PreviewDataProps) => {
                 </div>
               )}
 
-              {fileExtension === "json" && jsonData && (
-                <ReactJson src={jsonData} />
-              )}
+              {(fileExtension === "json" && jsonData && (
+                <DynamicReactJson src={jsonData} />
+              )) || <SiftLoader className="mt-10 mb-4 mx-auto" />}
 
               {fileExtension === "csv" && (
                 <>
