@@ -5,9 +5,9 @@ import { SavedUserItemsContext } from "@/context/savedUserItemsProvider";
 import { cn } from "@/lib/utils";
 import { useContext, useEffect, useState } from "react";
 import { DistributionItem } from "@/xata";
-import CreateAccountAlert from "./create-account-alert";
-import { useSession } from "next-auth/react";
 import { useLocalStorage } from "usehooks-ts";
+import ControlledAlertDialog from "./controlled-alert-dialog";
+import { signIn, useSession } from "next-auth/react";
 
 export type SaveIconProps = {
   resourceId: string;
@@ -73,10 +73,14 @@ const SaveIconComponent = ({
 
   return (
     <>
-      <CreateAccountAlert
+      <ControlledAlertDialog
+        title="Create a Free Account to Save Your Siftings!"
+        description="New users can immediately save their findings based on a temporary account, but it&rsquo;s tied to your browser&rsquo;s localstorage, and that makes them easy to lose. Anyway, all temp users will be deleted after one week. If you want to save your findings, please create a free account. Your temporary account&rsquo;s findings will be automatically transferred to your new account."
         open={accountAlertOpen}
         controller={setAccountAlertOpen}
+        action={signIn}
       />
+
       <SaveIcon
         size={16}
         data-item-id={resourceId}
