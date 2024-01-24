@@ -37,6 +37,13 @@ export async function GET(req: NextRequest, res: NextResponse) {
     // debugger;
   });
 
+  const headers = response?.headers;
+  const contentType = headers?.get("content-type");
+  const contentLength = headers?.get("content-length");
+  const contentEncoding = headers?.get("content-encoding");
+  const contentDisposition = headers?.get("content-disposition");
+  const redirected = response?.redirected;
+
   if (!response?.ok) {
     return returnErrorResponse("Error fetching data");
     // debugger;
@@ -44,6 +51,16 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
   switch (fileExtension) {
     case "csv":
+      if (
+        contentType !== "text/csv" &&
+        contentType !== "application/csv" &&
+        contentType !== "binary/octet-stream" &&
+        contentType !== "application/octet-stream"
+      ) {
+        return returnErrorResponse(
+          `Not csv content type, got: ${contentType}. Likely a redirect to an html page.`
+        );
+      }
       const data = await response.text();
       const parsedCsvData = PapaParse.parse(data);
       // const testSlice = parsedCsvData.data.slice(0, 5);

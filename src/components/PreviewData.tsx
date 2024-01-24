@@ -1,7 +1,7 @@
 "use client";
 // import * as d3 from "d3";
 // import { DSVParsedArray, DSVRowString } from "d3";
-import { ComponentType, use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import {
   Accordion,
@@ -31,22 +31,34 @@ const PreviewData = ({ url }: PreviewDataProps) => {
   const [fileExtension, setFileExtension] = useState<string | -1>(
     getFileExtension(url)
   );
+  const [dataLoadError, setDataLoadError] = useState("");
+  const [dataLoading, setDataLoading] = useState(false);
 
   useEffect(() => {
     if (!showDataPreview || dataSubset.length) {
       return;
     }
 
+    setDataLoading(true);
+
     const getData = async () => {
       const response = await fetch(
         `/api/external-data?url=${encodeURIComponent(url)}`
-      ).catch((error) => {
-        // return error;
-      });
+      ).catch((e) => e);
 
       const data = await response?.json();
 
-      debugger;
+      if (data?.error) {
+        setDataLoadError(data?.error);
+        setDataLoading(false);
+        return;
+      }
+
+      if (!data?.data) {
+        setDataLoadError("Error loading data");
+        setDataLoading(false);
+        return;
+      }
 
       switch (fileExtension) {
         case "xml":
@@ -61,6 +73,7 @@ const PreviewData = ({ url }: PreviewDataProps) => {
           setTotalRowsAvailable(data?.totalRows || 0);
           break;
       }
+      setDataLoading(false);
     };
 
     getData().catch((e) => {
@@ -82,59 +95,67 @@ const PreviewData = ({ url }: PreviewDataProps) => {
       {showDataPreview && (
         <Accordion type="single" collapsible defaultValue="item-1">
           <AccordionItem value="item-1">
-            <AccordionTrigger className="[&>svg]:left-0">
-              <div className="text-sm font-bold mb-1">Data Preview</div>
+            <AccordionTrigger className="justify-start items-start">
+              <div className="text-xs text-gray-500 font-bold mb-1 pl-2">
+                Data Preview
+              </div>
             </AccordionTrigger>
             <AccordionContent className="w-full mt-4">
+              {dataLoading && <SiftLoader className="mt-10 mb-4 mx-auto" />}
+              {dataLoadError && (
+                <div className="text-red-500">{dataLoadError}</div>
+              )}
+
               {fileExtension === "xml" && XMLData && (
                 <div className="text-[10px]">
                   <XMLViewer xml={XMLData} collapsible={true} />
                 </div>
               )}
 
-              {(fileExtension === "json" && jsonData && (
+              {fileExtension === "json" && jsonData && (
                 <DynamicReactJson src={jsonData} style={{ fontSize: "10px" }} />
-              )) || <SiftLoader className="mt-10 mb-4 mx-auto" />}
+              )}
 
-              {fileExtension === "csv" && (
+              {fileExtension === "csv" && dataSubset && (
                 <>
-                  <div className="text-sm mb-2">
-                    Total preview rows: {dataSubset.length} /{" "}
-                    {totalRowsAvailable} total rows
-                  </div>
-
-                  {(dataSubset.length && (
-                    <div className="w-full max-h-[400px] overflow-auto">
-                      <table className="w-full border-collapse border-spacing-0 [&>*:nth-child(odd)]:bg-stone-100 [&>*:nth-child(even)]:bg-stone-200 text-stone-800 pt-1">
-                        {dataKeys && (
-                          <tr className="sticky top-0">
-                            {dataKeys.map((key) => (
-                              <th
-                                key={key}
-                                className="p-2.5 text-sm text-left border-b border-solid"
-                              >
-                                {key}
-                              </th>
-                            ))}
-                          </tr>
-                        )}
-                        {dataSubset.map((row, index) => {
-                          return (
-                            <tr key={index}>
-                              {row.map((cell, index) => (
-                                <td
-                                  key={index}
-                                  className="p-2.5 text-xs text-left border-b border-solid"
+                  {!!dataSubset.length && (
+                    <>
+                      <div className="text-sm mb-2">
+                        Total preview rows: {dataSubset.length} /{" "}
+                        {totalRowsAvailable} total rows
+                      </div>
+                      <div className="w-full max-h-[400px] overflow-auto">
+                        <table className="w-full border-collapse border-spacing-0 [&>*:nth-child(odd)]:bg-stone-100 [&>*:nth-child(even)]:bg-stone-200 text-stone-800 pt-1">
+                          {dataKeys && (
+                            <tr className="sticky top-0">
+                              {dataKeys.map((key) => (
+                                <th
+                                  key={key}
+                                  className="p-2.5 text-sm text-left border-b border-solid"
                                 >
-                                  {cell}
-                                </td>
+                                  {key}
+                                </th>
                               ))}
                             </tr>
-                          );
-                        })}
-                      </table>
-                    </div>
-                  )) || <SiftLoader className="mt-10 mb-4 mx-auto" />}
+                          )}
+                          {dataSubset.map((row, index) => {
+                            return (
+                              <tr key={index}>
+                                {row.map((cell, index) => (
+                                  <td
+                                    key={index}
+                                    className="p-2.5 text-xs text-left border-b border-solid"
+                                  >
+                                    {cell}
+                                  </td>
+                                ))}
+                              </tr>
+                            );
+                          })}
+                        </table>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
             </AccordionContent>
