@@ -48,6 +48,8 @@ const PreviewData = ({ url }: PreviewDataProps) => {
 
       const data = await response?.json();
 
+      debugger;
+
       if (data?.error) {
         setDataLoadError(data?.error);
         setDataLoading(false);

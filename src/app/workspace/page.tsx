@@ -14,20 +14,15 @@ export const metadata: Metadata = {
 };
 
 const Workspace = async () => {
-  const session: SessionWithUserId | null = await getServerSession(
-    authOptions
-  ).catch((err) => {
-    return null;
-  });
+  // const session: SessionWithUserId | null = await getServerSession(
+  //   authOptions
+  // ).catch((err) => {
+  //   return null;
+  // });
 
   return (
     <main className="flex w-6/12 flex-col items-center p-4">
       <WorkspaceComponent />
-      {!session && (
-        <Button>
-          <Link href="/api/auth/signin">Sign In</Link>
-        </Button>
-      )}
     </main>
   );
 };

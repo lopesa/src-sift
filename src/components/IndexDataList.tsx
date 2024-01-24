@@ -32,7 +32,6 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
       includesArray.push("csv");
     }
     if (showXls) {
-      debugger;
       includesArray.push("xls");
       includesArray.push("xlsx");
     }
@@ -63,7 +62,7 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
   return (
     <div className="flex flex-col h-full bg-stone-100 pl-6 pr-8 mx-auto w-full max-w-screen-xl">
       {filteredData && (
-        <div className="h-28 pt-6 pl-10">
+        <div className="h-28 pt-10 mb-10">
           {title && <h1 className="text-xl font-light">{title}</h1>}
           <p className="text-xs font-bold">
             <span>Total Num Items: {data.length}</span>/

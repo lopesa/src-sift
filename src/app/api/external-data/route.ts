@@ -2,6 +2,7 @@ import { getFileExtension } from "@/lib/utils/data";
 import { NextRequest, NextResponse } from "next/server";
 import validator from "validator";
 import PapaParse from "papaparse";
+import xlsx from "node-xlsx";
 // import http from "http";
 // import https from "https";
 // import fs, { WriteStream, promises } from "fs";
@@ -28,7 +29,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
   if (!validator.isURL(url)) {
     return returnErrorResponse("Invalid url");
   }
-  const usableFileTypes = ["csv", "xls", "json", "xml"];
+  const usableFileTypes = ["csv", "xls", "json", "xml", "xlx", "xlsx"];
   if (fileExtension === -1 || !usableFileTypes.includes(fileExtension)) {
     return returnErrorResponse(`Invalid file type, got: ${fileExtension}`);
   }
@@ -48,6 +49,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
     return returnErrorResponse("Error fetching data");
     // debugger;
   }
+
+  debugger;
 
   switch (fileExtension) {
     case "csv":
@@ -82,8 +85,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
         totalRows: totalRows,
       });
       break;
-    case "xls":
-      break;
     case "json":
       const jsonData = await response?.json().catch((e) => {
         // debugger;
@@ -102,7 +103,33 @@ export async function GET(req: NextRequest, res: NextResponse) {
       return NextResponse.json({
         data: xmlData,
       });
-      break;
+    case "xls":
+      const xlsData = await response?.arrayBuffer().catch((e) => {
+        debugger;
+      });
+      const test2 = await response.text().catch((e) => {
+        debugger;
+      });
+      const xlxData = xlsx.parse(xlsData);
+      debugger;
+      return returnErrorResponse("return error for now");
+
+    case "xlsx":
+      const xlsxArrayBuffer = await response?.arrayBuffer().catch((e) => {
+        debugger;
+      });
+
+      if (!xlsxArrayBuffer) {
+        return returnErrorResponse("Error fetching data");
+      }
+
+      const xlsxData = xlsx.parse(xlsxArrayBuffer);
+
+      // const test = await response.text().catch((e) => {
+      //   debugger;
+      // });
+      debugger;
+      return returnErrorResponse("return error for now");
     default:
       break;
   }

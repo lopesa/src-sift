@@ -38,7 +38,7 @@ const DistributionItemsAccordion = ({
 
   return (
     <Accordion type="multiple" value={value} onValueChange={setValue}>
-      {dataItems?.length &&
+      {!!dataItems?.length &&
         dataItems.map(({ distribution_item, resource }, index) => {
           if (!distribution_item) {
             return null;

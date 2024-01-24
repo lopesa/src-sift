@@ -41,7 +41,7 @@ const HeaderMenu = () => {
                   "text-emerald-600 hover:text-emerald-800"
               )}
             >
-              Workspace
+              Saved Items
             </NavLink>
           </NavigationMenuItem>
 

@@ -9,6 +9,8 @@ import IndexDataList from "./IndexDataList";
 import { SavedUserItemsContext } from "@/context/savedUserItemsProvider";
 import DistributionItemsAccordion from "./DistributionItemsAccordion";
 import { getUserDataItem } from "@/lib/utils/user-data";
+import { Button } from "./ui/button";
+import Link from "next/link";
 
 const Workspace = () => {
   const { data: session, status } = useSession();
@@ -27,6 +29,12 @@ const Workspace = () => {
   const [finalDistributionDataItems, setFinalDistributionDataItems] = useState<
     UserResourceRecord[]
   >([]);
+
+  const hasData = () => {
+    return (
+      !!finalResourceDataItems.length || !!finalDistributionDataItems.length
+    );
+  };
 
   const getAndSetUserData = useCallback(async () => {
     const userId = getUserId();
@@ -75,7 +83,17 @@ const Workspace = () => {
 
   return (
     <div>
-      <h1>Workspace</h1>
+      {hasData() && (status === "unauthenticated" || !session) && (
+        <div className="mt-12 px-12 py-6 bg-red-300 flex items-center justify-center">
+          <Button asChild variant="link" className="px-1">
+            <Link href="/api/auth/signin">
+              Sign in or create a free account
+            </Link>
+          </Button>
+          <div className="text-sm">to keep your saved items</div>
+        </div>
+      )}
+      <h1 className="text-2xl mb-1 mt-10 text-center">Saved Items</h1>
       <div className="mx-auto my-0 max-w-[95vw] w-[760px]">
         {savedUserItems?.initComplete && !!finalResourceDataItems.length && (
           <IndexDataList data={finalResourceDataItems} />
@@ -86,6 +104,11 @@ const Workspace = () => {
           dataItems={finalDistributionDataItems}
           openAll={true}
         />
+      )}
+      {!hasData() && (
+        <div className="mt-12 px-12 py-6 bg-gray-300 flex items-center justify-center">
+          <div className="text-sm">No saved items</div>
+        </div>
       )}
       {/* {!!userResourceRecordIds.length && <AiChat />} */}
     </div>

@@ -36,7 +36,7 @@ const DataItemsAccordion = ({
 
   return (
     <Accordion type="multiple" value={value} onValueChange={setValue}>
-      {dataItems?.length &&
+      {!!dataItems?.length &&
         dataItems.map((dataItem, index) => (
           <AccordionItem key={index} value={dataItem.id}>
             <AccordionHeader className="text-sm text-left py-2 flex [&>h3]:flex-1">
