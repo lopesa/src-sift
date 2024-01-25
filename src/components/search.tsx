@@ -85,7 +85,7 @@ const Search = ({
           control={form.control}
           name="searchText"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="w-full">
               {label && <FormLabel>{label}</FormLabel>}
               <FormControl>
                 <Input placeholder="Enter Search Text" {...field} />

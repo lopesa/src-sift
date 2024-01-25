@@ -9,7 +9,7 @@ import { SessionWithUserId } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Resource Explorer - Workspace",
+  title: "Resource Explorer - Saved Items",
   description: "Investigate data from multiple sources",
 };
 

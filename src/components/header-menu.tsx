@@ -34,7 +34,7 @@ const HeaderMenu = () => {
         <NavigationMenuList className="flex justify-center bg-white p-1 rounded-md list-none m-0">
           <NavigationMenuItem>
             <NavLink
-              href="/workspace"
+              href="/saved-items"
               className={cn(
                 "px-2 py-3 outline-none font-sm rounded text-sky-600 hover:text-sky-800",
                 status === UserStatus.AUTHENTICATED &&
