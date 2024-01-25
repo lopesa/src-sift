@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { SelectedPick } from "@xata.io/client";
 import { ResourceItemRecord } from "@/xata";
 import DataItemsAccordion from "./DataItemsAccordion";
 
 interface IndexDataListProps {
-  data: Readonly<SelectedPick<ResourceItemRecord, ["*"]>>[];
+  data: ResourceItemRecord[];
   title?: string;
 }
 
@@ -64,7 +63,7 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
   }, [showXml, showCsv, showXls, showJson, showAspx, data]);
 
   return (
-    <div className="flex flex-col h-full bg-stone-100 pl-6 pr-8 mx-auto w-full max-w-screen-xl">
+    <div className="flex flex-col h-full pl-6 pr-8 mx-auto w-full">
       {filteredData && (
         <div className="h-28 pt-10 mb-10">
           {title && <h1 className="text-xl font-light">{title}</h1>}

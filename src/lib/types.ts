@@ -3,12 +3,7 @@ import {
   ResourceItemRecord,
   UserResourceRecord,
 } from "@/xata";
-import {
-  JSONData,
-  SearchXataRecord,
-  SelectedPick,
-  TotalCount,
-} from "@xata.io/client";
+import { SearchXataRecord, SelectedPick, TotalCount } from "@xata.io/client";
 import { Session } from "next-auth";
 import { z } from "zod";
 import { zodEnumFromObjKeys } from "./utils/zod";
@@ -43,17 +38,6 @@ export type AppFinalResourceItem = Readonly<
   dataTypesByFileExtension?: string[];
 };
 
-// export type DistributionItem = DataGovDistibutionItem;
-
-// export type DataGovDistibutionItem = {
-//   "@type"?: string;
-//   downloadURL?: string;
-//   accessURL?: string;
-//   forma?: string;
-//   mediaType?: string;
-//   title?: string;
-// };
-
 export interface Saved {
   isSaved?: boolean;
 }
@@ -72,18 +56,11 @@ export type SearchResults = {
   } & TotalCount;
 };
 
-// const scope = z.object({
-//   resources: z.array(z.string()),
-//   distributionItems: z.array(z.string()),
-// });
 export const aiQuestionFormat = z.object({
   question: z.string(),
   rules: z.array(z.string()).optional(),
   searchType: z.enum(["keyword", "vector"]).optional(),
-  // scope: z.array(z.string()), // not really panning out, probably remove
 });
-
-// export const ZodUserResourceRecord = z.object(<UserResourceRecord>);
 
 export function isValidDistributionItemRecord(
   item: any
@@ -94,7 +71,7 @@ export function isValidDistributionItemRecord(
 export function isValidUserResourceRecord(
   item: any
 ): item is UserResourceRecord {
-  return item && item.id;
+  return item && item.resource;
 }
 
 export function isSuccessfulInternalApiResponse(item: {
@@ -140,3 +117,8 @@ export const DeleteUserResourceBodySchema = z.union([
   z.string(),
   z.array(z.string()),
 ]);
+
+export const getFurtherReadingSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+});

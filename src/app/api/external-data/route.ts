@@ -46,14 +46,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
   switch (fileExtension) {
     case "csv":
-      if (
-        contentType !== "text/csv" &&
-        contentType !== "application/csv" &&
-        contentType !== "binary/octet-stream" &&
-        contentType !== "application/octet-stream"
-      ) {
+      if (contentType?.includes("text/html")) {
         return returnErrorResponse(
-          `Not csv content type, got: ${contentType}. Likely a redirect to an html page.`
+          `Not xls content type, got: ${contentType}. Likely a redirect to an html page.`
         );
       }
       const data = await response.text();
@@ -90,6 +85,13 @@ export async function GET(req: NextRequest, res: NextResponse) {
       });
     case "xls":
     case "xlsx":
+      // 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      // 'application/vnd.ms-excel'
+      if (contentType?.includes("text/html")) {
+        return returnErrorResponse(
+          `Not xls content type, got: ${contentType}. Likely a redirect to an html page.`
+        );
+      }
       const xlsDataBuffer = await response.arrayBuffer().catch((e) => {
         // debugger;
       });

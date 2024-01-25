@@ -3,17 +3,10 @@ import { ChatOpenAI } from "@langchain/openai";
 import { ChatPromptTemplate, PromptTemplate } from "@langchain/core/prompts";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-
-// const scope = z.object({
-//   resources: z.array(z.string()),
-//   distributionItems: z.array(z.string()),
-// });
-const bodySchema = z.object({
-  descriptions: z.string().array(),
-});
+import { getFurtherReadingSchema } from "@/lib/types";
 
 export async function POST(req: NextRequest): Promise<Response> {
-  const body = bodySchema.safeParse(await req.json());
+  const body = getFurtherReadingSchema.safeParse(await req.json());
 
   if (!body.success) {
     return new Response(JSON.stringify({ message: "Invalid body" }), {
@@ -21,21 +14,34 @@ export async function POST(req: NextRequest): Promise<Response> {
     });
   }
 
-  const result = await getSummaryFromArrayOfDescriptions(
-    body.data.descriptions
-  );
-
-  // return NextResponse.json(result.content);
-  return NextResponse.json({
-    data: result.content,
+  const result = await getFurtherReading(body.data).catch((e) => {
+    debugger;
   });
+
+  if (!result || !result.content) {
+    return NextResponse.json({ data: "No result" });
+  }
+
+  return NextResponse.json({ data: result.content });
 }
 
-// import { formatDocumentsAsString } from "langchain/util/document";
+const getFurtherReading = async (
+  current: z.infer<typeof getFurtherReadingSchema>
+) => {
+  const model = new ChatOpenAI({});
+  const promptTemplate = PromptTemplate.fromTemplate(
+    "given that I have the following data: {text}, what are the top five most helpful items to further understand the topic. Please give specific links to the items."
+  );
+  const chain = promptTemplate.pipe(model);
 
-// const systemTemplate = `You are a data analyst who considers csv data and suggests types of data visualization. A user will pass in csv data, and you should suggest the three most appropriate types of data visualizations for the dataset. ONLY return a comma separated list of data visualization types, and nothing more.`;
+  const result = await chain.invoke({
+    // text: formatDocumentsAsString(docs),
+    text: JSON.stringify(current),
+  });
 
-// const humanTemplate = "{text}";
+  debugger;
+  return result;
+};
 
 const getSummaryFromArrayOfDescriptions = async (descriptions: string[]) => {
   const bodyParsedForLangchain = descriptions.join("||");
@@ -73,6 +79,13 @@ const getSummaryFromArrayOfDescriptions = async (descriptions: string[]) => {
   });
   return result;
 };
+
+// import { formatDocumentsAsString } from "langchain/util/document";
+
+// const systemTemplate = `You are a data analyst who considers csv data and suggests types of data visualization. A user will pass in csv data, and you should suggest the three most appropriate types of data visualizations for the dataset. ONLY return a comma separated list of data visualization types, and nothing more.`;
+
+// const humanTemplate = "{text}";
+
 // export const getVisualizationSuggestions = async (data: Blob) => {
 //   debugger;
 //   const llm = new OpenAI({

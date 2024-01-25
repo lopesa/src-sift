@@ -9,13 +9,12 @@ import {
   AccordionTrigger,
 } from "./ui/accordion";
 import DataItemDialog from "./DataItemDialog";
-import { DataItemsAccordionItem } from "@/lib/types";
 import SaveIconComponent from "./saveIcon";
 import FindSimilar from "./find-similar";
-import { AccordionHeader } from "@radix-ui/react-accordion";
+import { ResourceItemRecord } from "@/xata";
 
 interface DataItemsAccordionProps {
-  dataItems: DataItemsAccordionItem[];
+  dataItems: ResourceItemRecord[];
   openAll?: boolean | "indeterminate";
 }
 
@@ -35,11 +34,16 @@ const DataItemsAccordion = ({
   }, [dataItems, openAll]);
 
   return (
-    <Accordion type="multiple" value={value} onValueChange={setValue}>
+    <Accordion
+      type="multiple"
+      value={value}
+      onValueChange={setValue}
+      className="[&>*:nth-child(odd)]:bg-stone-50 [&>*:nth-child(even)]:bg-stone-100"
+    >
       {!!dataItems?.length &&
         dataItems.map((dataItem, index) => (
           <AccordionItem key={index} value={dataItem.id}>
-            <div className="text-sm text-left py-2 flex [&>h3]:flex-1">
+            <div className="text-sm text-left py-2 px-4 flex [&>h3]:flex-1">
               <SaveIconComponent resourceId={dataItem.id} />
               <DataItemDialog
                 key={index}

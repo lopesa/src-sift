@@ -18,35 +18,33 @@ import {
 
 import { DistributionItem, ResourceItemRecord } from "@/xata";
 
-import { JSONData } from "@xata.io/client";
 import { Button } from "@/components/ui/button";
 import DOMPurify from "dompurify";
 import { useState } from "react";
 import { Separator } from "./ui/separator";
 import PreviewData from "./PreviewData";
 import { getFileExtension } from "@/lib/utils/data";
-import { cn } from "@/lib/utils";
 import SaveIconComponent from "./saveIcon";
 import Link from "next/link";
 import SiftLoader from "./sift-loader";
-import { ZoomIn } from "lucide-react";
+import { RefreshCw, ZoomIn } from "lucide-react";
+import GetFurtherReading from "./get-further-reading";
 
 interface DataItemDialogProps {
   triggerCopy?: string;
   resourceId: string;
-  triggerButtonType?: "button" | "zoom-icon";
+  triggerButtonType?: "button" | "zoom-icon" | "recircle";
 }
 
 const DataItemDialog = ({
   resourceId,
   triggerCopy,
-  triggerButtonType = "button",
+  triggerButtonType,
 }: DataItemDialogProps) => {
   const DO_NOT_PRINT_DATA_KEYS = ["id", "xata"];
   const PREVIEWABLE_DATA_TYPES = ["csv", "json", "xml", "xls", "xlsx"];
 
-  const [resourceData, setResourceData] =
-    useState<JSONData<ResourceItemRecord> | null>();
+  const [resourceData, setResourceData] = useState<ResourceItemRecord | null>();
 
   const onOpenChange = async (open: boolean) => {
     if (!open || !!resourceData) {
@@ -86,8 +84,31 @@ const DataItemDialog = ({
     );
   };
 
+  const getTriggerButton = (triggerButtonType?: string) => {
+    switch (triggerButtonType) {
+      case "zoom-icon":
+        return (
+          <ZoomIn className="cursor-pointer text-gray-500 ml-2" size={16} />
+        );
+      case "recircle":
+        return (
+          <Button size="xs" className="mt-2" variant="hoveredGhost">
+            <RefreshCw className="mr-2" size={14} />
+            {triggerCopy || "Original Resource"}
+          </Button>
+        );
+      case "button":
+      default:
+        return (
+          <Button size="xs" className="bg-stone-600 hover:bg-stone-800">
+            {triggerCopy || "Details"}
+          </Button>
+        );
+    }
+  };
+
   const getResourceDataOriginalDataHTML = (
-    resourceData: JSONData<ResourceItemRecord>
+    resourceData: ResourceItemRecord
   ) => {
     const getDataPointHTML = (key: string) => {
       if (!resourceData || !key) {
@@ -116,25 +137,21 @@ const DataItemDialog = ({
     return distributionItem?.downloadURL || distributionItem?.accessURL;
   };
 
+  const getFurtherReadingProps = (resourceData: ResourceItemRecord) => {
+    const { title = "", description = "" } = resourceData;
+    return {
+      title,
+      description,
+    } as {
+      title: string;
+      description: string;
+    };
+  };
+
   return (
     <Dialog onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        {triggerButtonType === "zoom-icon" ? (
-          <ZoomIn className="cursor-pointer text-gray-500 ml-2" size={16}>
-            <Button
-              asChild
-              onClick={(e) => {
-                debugger;
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-            />
-          </ZoomIn>
-        ) : (
-          <Button size="xs" className="bg-stone-600 hover:bg-stone-800">
-            {triggerCopy || "Details"}
-          </Button>
-        )}
+        {getTriggerButton(triggerButtonType)}
       </DialogTrigger>
       <DialogContent className="w-[90vw] max-w-[90vw] h-[90vh] p-7 pt-10">
         <div className="h-full overflow-scroll">
@@ -185,6 +202,15 @@ const DataItemDialog = ({
                     ></div>
                   </DialogDescription>
                 )}
+
+                {/* FURTHER READING */}
+                <GetFurtherReading
+                  current={getFurtherReadingProps(resourceData)}
+                />
+
+                <Separator className="mt-4 mb-6" />
+
+                {/* RESOURCE ITEMS */}
 
                 <h3 className="mt-6 mb-2 font-bold text-sm">Resource Items:</h3>
                 {resourceData.distribution &&

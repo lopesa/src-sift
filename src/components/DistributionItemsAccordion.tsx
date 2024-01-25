@@ -40,22 +40,23 @@ const DistributionItemsAccordion = ({
     <Accordion type="multiple" value={value} onValueChange={setValue}>
       {!!dataItems?.length &&
         dataItems.map(({ distribution_item, resource }, index) => {
-          if (!distribution_item) {
+          if (!distribution_item || !resource) {
             return null;
           }
           return (
             <AccordionItem key={index} value={distribution_item.id}>
-              <AccordionTrigger className="text-sm text-left py-2 [&>svg]:ml-6">
-                {resource && distribution_item && (
-                  <div className="flex-1 pl-2">
-                    <SaveIconComponent
-                      resourceId={resource.id}
-                      distributionItem={distribution_item}
-                    />
-                    <div>{distribution_item.title || "no title available"}</div>
+              <div className="text-sm text-left py-2 flex [&>h3]:flex-1">
+                <SaveIconComponent
+                  resourceId={resource.id}
+                  distributionItem={distribution_item}
+                />
+
+                <AccordionTrigger className="py-0">
+                  <div className="pl-2 text-left pr-4 w-full">
+                    {distribution_item.title || "no title available"}
                   </div>
-                )}
-              </AccordionTrigger>
+                </AccordionTrigger>
+              </div>
 
               <AccordionContent className="text-xs [&*>]:m-0 mb-2.5 mb-6 pr-6 pl-2">
                 <div>{distribution_item.description}</div>
@@ -93,7 +94,7 @@ const DistributionItemsAccordion = ({
                     <DataItemDialog
                       key={index}
                       resourceId={resource.id}
-                      triggerCopy="Original Resource"
+                      triggerButtonType="recircle"
                     />
                   )}
                 </div>

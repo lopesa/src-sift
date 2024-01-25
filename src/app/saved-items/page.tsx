@@ -21,7 +21,7 @@ const Workspace = async () => {
   // });
 
   return (
-    <main className="flex w-6/12 flex-col items-center p-4">
+    <main className="flex flex-col items-center p-4 w-full max-w-[1200px]">
       <WorkspaceComponent />
     </main>
   );

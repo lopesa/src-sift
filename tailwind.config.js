@@ -67,13 +67,13 @@ module.exports = {
         },
         wiggleLeft: {
           "0%, 50%": { transform: "translateX(0px)" },
-          "25%": { transform: "translateX(3px)" },
-          "75%": { transform: "translateX(-3px)" },
+          "25%": { transform: "translateX(4px)" },
+          "75%": { transform: "translateX(-4px)" },
         },
         wiggleRight: {
           "0%, 50%": { transform: "translateX(0px)" },
-          "25%": { transform: "translateX(-3px)" },
-          "75%": { transform: "translateX(3px)" },
+          "25%": { transform: "translateX(-4px)" },
+          "75%": { transform: "translateX(4px)" },
         },
         wiggleUp: {
           "0%, 50%": { transform: "translateY(-2px)" },
@@ -87,10 +87,10 @@ module.exports = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        wiggleLeft: "wiggleLeft 1.5s steps(1) infinite",
-        wiggleRight: "wiggleRight 1.5s steps(1) infinite",
-        wiggleUp: "wiggleUp 3s steps(1) infinite",
-        wiggleDown: "wiggleDown 3s steps(1) infinite",
+        wiggleLeft: "wiggleLeft 3s steps(1) infinite",
+        wiggleRight: "wiggleRight 3s steps(1) infinite",
+        wiggleUp: "wiggleUp 1s steps(1) infinite",
+        wiggleDown: "wiggleDown 1s steps(1) infinite",
       },
     },
   },
