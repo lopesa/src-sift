@@ -39,7 +39,7 @@ const DataItemsAccordion = ({
       {!!dataItems?.length &&
         dataItems.map((dataItem, index) => (
           <AccordionItem key={index} value={dataItem.id}>
-            <div className="text-sm text-left py-1.5 flex [&>h3]:flex-1">
+            <div className="text-sm text-left py-2 flex [&>h3]:flex-1">
               <SaveIconComponent resourceId={dataItem.id} />
               <DataItemDialog
                 key={index}

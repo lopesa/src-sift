@@ -100,7 +100,6 @@ const PreviewData = ({ url }: PreviewDataProps) => {
           break;
         case "xls":
         case "xlsx":
-          debugger;
           setXlsData({ sheets: responseJson.data, currentSheet: 0 });
           break;
       }

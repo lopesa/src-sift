@@ -11,7 +11,7 @@ interface IndexDataListProps {
   title?: string;
 }
 
-type DataType = "xml" | "csv" | "xls" | "xlsx" | "json";
+type DataType = "xml" | "csv" | "xls" | "xlsx" | "json" | "aspx";
 
 const IndexDataList = ({ data, title }: IndexDataListProps) => {
   const [filteredData, setFilteredData] = useState(data);
@@ -19,6 +19,7 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
   const [showXls, setShowXls] = useState<boolean | "indeterminate">(false);
   const [showCsv, setShowCsv] = useState<boolean | "indeterminate">(false);
   const [showJson, setShowJson] = useState<boolean | "indeterminate">(false);
+  const [showAspx, setShowAspx] = useState<boolean | "indeterminate">(false);
   const [openAllAccordions, setOpenAllAccordions] = useState<
     boolean | "indeterminate"
   >(false);
@@ -37,6 +38,9 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
     }
     if (showJson) {
       includesArray.push("json");
+    }
+    if (showAspx) {
+      includesArray.push("aspx");
     }
 
     // if no filters are set, show everything
@@ -57,7 +61,7 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
       return false;
     });
     setFilteredData(filtered);
-  }, [showXml, showCsv, showXls, showJson, data]);
+  }, [showXml, showCsv, showXls, showJson, showAspx, data]);
 
   return (
     <div className="flex flex-col h-full bg-stone-100 pl-6 pr-8 mx-auto w-full max-w-screen-xl">
@@ -71,14 +75,41 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
             )}
           </p>
           <form className="flex mt-2 mb-6 [&>label]:mr-2.5 [&>button]:mr-1">
-            <Checkbox onCheckedChange={setShowJson} />
+            <Checkbox
+              onCheckedChange={() => {
+                setShowJson(!showJson);
+              }}
+            />
             <label className="text-xs">JSON</label>
-            <Checkbox onCheckedChange={setShowXml} />
+
+            <Checkbox
+              onCheckedChange={() => {
+                setShowXml(!showXml);
+              }}
+            />
             <label className="text-xs">Xml</label>
-            <Checkbox onCheckedChange={setShowXls} />
+
+            <Checkbox
+              onCheckedChange={() => {
+                setShowXls(!showXls);
+              }}
+            />
             <label className="text-xs">Xls</label>
-            <Checkbox onCheckedChange={setShowCsv} />
+
+            <Checkbox
+              onCheckedChange={() => {
+                setShowCsv(!showCsv);
+              }}
+            />
             <label className="text-xs">Csv</label>
+
+            <Checkbox
+              onCheckedChange={() => {
+                setShowAspx(!showAspx);
+              }}
+            />
+            <label className="text-xs">Aspx</label>
+
             <Checkbox onCheckedChange={setOpenAllAccordions} />
             <label className="text-xs">Open all accordions</label>
           </form>
