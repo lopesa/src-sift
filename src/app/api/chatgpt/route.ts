@@ -25,7 +25,10 @@ export async function POST(req: NextRequest): Promise<Response> {
     body.data.descriptions
   );
 
-  return NextResponse.json(result.content);
+  // return NextResponse.json(result.content);
+  return NextResponse.json({
+    data: result.content,
+  });
 }
 
 // import { formatDocumentsAsString } from "langchain/util/document";
@@ -34,9 +37,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
 // const humanTemplate = "{text}";
 
-export const getSummaryFromArrayOfDescriptions = async (
-  descriptions: string[]
-) => {
+const getSummaryFromArrayOfDescriptions = async (descriptions: string[]) => {
   const bodyParsedForLangchain = descriptions.join("||");
 
   const promptTemplate = PromptTemplate.fromTemplate(

@@ -1,12 +1,17 @@
 "use client";
 
-import { DeleteTemporaryUserBodySchema } from "@/app/api/temporary-user/route";
-import { SessionWithUserId } from "@/lib/types";
+import { DeleteTemporaryUserBodySchema, SessionWithUserId } from "@/lib/types";
 import { doUserAuthTempUserCleanup } from "@/lib/utils/user-data";
 import { TemporaryUsersRecord } from "@/xata";
 import { JSONData } from "@xata.io/client";
 import { useSession } from "next-auth/react";
-import { ReactNode, createContext, useEffect, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { z } from "zod";
 
@@ -31,7 +36,7 @@ export default function TemporaryUserIdProvider({
   /**
    * create a temporary user and set it in localstorage
    */
-  const createAndSetTempUserId = async () => {
+  const createAndSetTempUserId = useCallback(async () => {
     const tempUser = await fetch("/api/temporary-user", {
       method: "POST",
       headers: {
@@ -45,26 +50,27 @@ export default function TemporaryUserIdProvider({
       setTemporaryUser(tempUserJson);
     }
     window.localStorage.removeItem("gettingTemporaryUser");
-  };
+  }, [setTemporaryUser]);
 
   /**
    * delete a temporary user
    * @param id delete a temporary user
    */
-  const deleteTemporaryUser = async (
-    id: z.infer<typeof DeleteTemporaryUserBodySchema>
-  ) => {
-    const deleted = await fetch(`/api/temporary-user`, {
-      method: "DELETE",
-      body: JSON.stringify(id),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).catch((e) => e);
+  const deleteTemporaryUser = useCallback(
+    async (id: z.infer<typeof DeleteTemporaryUserBodySchema>) => {
+      const deleted = await fetch(`/api/temporary-user`, {
+        method: "DELETE",
+        body: JSON.stringify(id),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).catch((e) => e);
 
-    let json = await deleted?.json();
-    return json;
-  };
+      let json = await deleted?.json();
+      return json;
+    },
+    []
+  );
 
   /**
    * status changing to authenticated
@@ -126,7 +132,7 @@ export default function TemporaryUserIdProvider({
     window.localStorage.setItem("gettingTemporaryUser", "true");
 
     createAndSetTempUserId().catch((e) => e);
-  }, [temporaryUser, setTemporaryUser, status]);
+  }, [temporaryUser, setTemporaryUser, status, createAndSetTempUserId]);
 
   return (
     <TemporaryUserContext.Provider value={{ temporaryUser, tempUserAuthed }}>

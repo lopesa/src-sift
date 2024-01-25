@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { TemporaryUsersRecord, getXataClient } from "@/xata";
 import { z } from "zod";
 import { SelectableColumn } from "@xata.io/client";
+import { DeleteTemporaryUserBodySchema } from "@/lib/types";
 
 const xata = getXataClient();
 
@@ -27,7 +28,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
  * @param res
  * @returns the deleted record(s)
  */
-export const DeleteTemporaryUserBodySchema = z.string();
 
 export async function DELETE(req: NextRequest, res: NextResponse) {
   const body = DeleteTemporaryUserBodySchema.safeParse(await req.json());

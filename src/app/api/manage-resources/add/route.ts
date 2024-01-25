@@ -6,16 +6,9 @@ import {
 import { NextRequest, NextResponse } from "next/server";
 
 import { getXataClient } from "@/xata";
-import { z } from "zod";
-import { DataSources, DataSourcesKeys } from "@/lib/const";
-import { zodEnumFromObjKeys } from "@/lib/utils/zod";
+import { addResourceBody } from "@/lib/types";
 
 const xata = getXataClient();
-
-export const addResourceBody = z.object({
-  // @TODO make optional and if no source, add all
-  source: zodEnumFromObjKeys(DataSources),
-});
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const body = addResourceBody.safeParse(await req.json());

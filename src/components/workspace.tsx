@@ -62,7 +62,7 @@ const Workspace = () => {
     setUserResourceRecordIds(userDataJson.map((item) => item.id));
     setFinalResourceDataItems(resourceData);
     setFinalDistributionDataItems(distributionData);
-  }, [session, status, temporaryUser]);
+  }, [status, getUserId]);
 
   useEffect(() => {
     if (
@@ -72,14 +72,14 @@ const Workspace = () => {
       return;
     }
     getAndSetUserData().catch((e) => e);
-  }, [getAndSetUserData, temporaryUser, session]);
+  }, [getAndSetUserData, temporaryUser, session, status]);
 
   useEffect(() => {
     if (!savedUserItems?.initComplete) {
       return;
     }
     getAndSetUserData().catch((e) => e);
-  }, [savedUserItems]);
+  }, [savedUserItems, getAndSetUserData]);
 
   return (
     <div>

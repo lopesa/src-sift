@@ -8,6 +8,12 @@ import {
   SelectableColumn,
 } from "@xata.io/client";
 import { z } from "zod";
+import {
+  DeleteUserResourceBodySchema,
+  UserResourcePostBodySchema,
+  createUserResourceParams,
+  createUserResourcesParams,
+} from "@/lib/types";
 
 export type UserResourceAPIRequestBody = Promise<
   | NextResponse<{
@@ -65,27 +71,6 @@ export async function GET(req: Request, res: NextResponse) {
  * @param res
  * @returns the created record
  */
-const createUserResourceParams = z.object({
-  resourceId: z.string(),
-  userId: z.string(),
-  distributionItemId: z.string().optional(),
-  tempUser: z.boolean().optional(),
-});
-const createUserResourcesParams = z.object({
-  userId: z.string(),
-  tempUser: z.boolean().optional(),
-  resources: z.array(
-    z.object({
-      resourceId: z.string(),
-      distributionItemId: z.string().optional(),
-    })
-  ),
-});
-export const UserResourcePostBodySchema = z.union([
-  createUserResourceParams,
-  createUserResourcesParams,
-]);
-
 export async function POST(req: NextRequest, res: NextResponse) {
   const body = UserResourcePostBodySchema.safeParse(await req.json());
 
@@ -170,11 +155,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
  * @param res
  * @returns the deleted record(s)
  */
-export const DeleteUserResourceBodySchema = z.union([
-  z.string(),
-  z.array(z.string()),
-]);
-
 export async function DELETE(req: NextRequest, res: NextResponse) {
   const body = DeleteUserResourceBodySchema.safeParse(await req.json());
 

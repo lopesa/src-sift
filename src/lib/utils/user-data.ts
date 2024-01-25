@@ -1,10 +1,11 @@
 import { UserResourceRecord } from "@/xata";
-import { InternalApiResponse, isSuccessfulInternalApiResponse } from "../types";
-import { z } from "zod";
 import {
   DeleteUserResourceBodySchema,
+  InternalApiResponse,
   UserResourcePostBodySchema,
-} from "@/app/api/user-resource/route";
+  isSuccessfulInternalApiResponse,
+} from "../types";
+import { z } from "zod";
 
 type GetUserDataItemArgs = {
   userId: string;

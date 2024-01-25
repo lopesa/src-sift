@@ -11,6 +11,8 @@ import {
 } from "@xata.io/client";
 import { Session } from "next-auth";
 import { z } from "zod";
+import { zodEnumFromObjKeys } from "./utils/zod";
+import { DataSources } from "./const";
 
 export type InternalApiResponse<T> = {
   data?: T;
@@ -101,3 +103,40 @@ export function isSuccessfulInternalApiResponse(item: {
 }): item is { data: any } {
   return item && item.data && !item.error;
 }
+
+/**\
+ * route handler types
+ */
+
+export const addResourceBody = z.object({
+  // @TODO make optional and if no source, add all
+  source: zodEnumFromObjKeys(DataSources),
+});
+
+export const DeleteTemporaryUserBodySchema = z.string();
+
+export const createUserResourceParams = z.object({
+  resourceId: z.string(),
+  userId: z.string(),
+  distributionItemId: z.string().optional(),
+  tempUser: z.boolean().optional(),
+});
+export const createUserResourcesParams = z.object({
+  userId: z.string(),
+  tempUser: z.boolean().optional(),
+  resources: z.array(
+    z.object({
+      resourceId: z.string(),
+      distributionItemId: z.string().optional(),
+    })
+  ),
+});
+export const UserResourcePostBodySchema = z.union([
+  createUserResourceParams,
+  createUserResourcesParams,
+]);
+
+export const DeleteUserResourceBodySchema = z.union([
+  z.string(),
+  z.array(z.string()),
+]);

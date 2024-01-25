@@ -291,7 +291,7 @@ export default function SavedUserItemsProvider({
     }
   };
 
-  const initLocalContext = async () => {
+  const initLocalContext = useCallback(async () => {
     // debugger;
     if (savedUserItems.initComplete) {
       return false;
@@ -319,7 +319,7 @@ export default function SavedUserItemsProvider({
     // debugger;
     setInitComplete(true);
     return true;
-  };
+  }, [savedUserItems, getUserId, status]);
 
   // initial load of local context
   useEffect(() => {
@@ -341,7 +341,7 @@ export default function SavedUserItemsProvider({
         // console.log(e);
       });
     }
-  }, [tempUserAuthed]);
+  }, [tempUserAuthed, initLocalContext]);
 
   return (
     <SavedUserItemsContext.Provider

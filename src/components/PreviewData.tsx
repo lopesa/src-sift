@@ -111,7 +111,7 @@ const PreviewData = ({ url }: PreviewDataProps) => {
       setDataLoadError(e.message || "Error loading data");
       setDataLoading(false);
     });
-  }, [showDataPreview, dataSubset, url]);
+  }, [showDataPreview, dataSubset, url, fileExtension]);
 
   return (
     <>
