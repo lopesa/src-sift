@@ -39,7 +39,7 @@ const DataItemsAccordion = ({
       {!!dataItems?.length &&
         dataItems.map((dataItem, index) => (
           <AccordionItem key={index} value={dataItem.id}>
-            <AccordionHeader className="text-sm text-left py-2 flex [&>h3]:flex-1">
+            <div className="text-sm text-left py-1.5 flex [&>h3]:flex-1">
               <SaveIconComponent resourceId={dataItem.id} />
               <DataItemDialog
                 key={index}
@@ -51,7 +51,7 @@ const DataItemsAccordion = ({
                   {dataItem.title}
                 </div>
               </AccordionTrigger>
-            </AccordionHeader>
+            </div>
 
             <AccordionContent className="text-xs pt-1 mb-2 pr-4 pl-12">
               {dataItem.description ? (

@@ -85,8 +85,9 @@ const SaveIconComponent = ({
         size={16}
         data-item-id={resourceId}
         className={cn(
-          isSaved ? "text-emerald-700" : "text-gray-400",
+          isSaved ? "text-emerald-500" : "text-gray-400",
           "cursor-pointer",
+          "hover:text-emerald-500",
           className
         )}
         onClick={(e) => {

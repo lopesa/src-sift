@@ -34,21 +34,17 @@ import { ZoomIn } from "lucide-react";
 interface DataItemDialogProps {
   triggerCopy?: string;
   resourceId: string;
-  className?: string;
   triggerButtonType?: "button" | "zoom-icon";
 }
 
-const onClickDownloadXls = (e: React.MouseEvent<HTMLButtonElement>) => {
-  console.log(e.currentTarget.value);
-  debugger;
-};
-
 const DataItemDialog = ({
   resourceId,
-  className,
   triggerCopy,
   triggerButtonType = "button",
 }: DataItemDialogProps) => {
+  const DO_NOT_PRINT_DATA_KEYS = ["id", "xata"];
+  const PREVIEWABLE_DATA_TYPES = ["csv", "json", "xml", "xls", "xlsx"];
+
   const [resourceData, setResourceData] =
     useState<JSONData<ResourceItemRecord> | null>();
 
@@ -79,14 +75,7 @@ const DataItemDialog = ({
     const extension = getFileExtension(url);
     const shouldOfferPreviewData =
       typeof extension === "string" &&
-      (extension.includes("csv") ||
-        extension.includes("json") ||
-        extension.includes("xml") ||
-        extension.includes("xls") ||
-        extension.includes("xlsx"));
-    // const shouldOfferPreviewData =
-    //   typeof extension === "string" &&
-    //   (extension.includes("csv") || extension.includes("xls"));
+      PREVIEWABLE_DATA_TYPES.includes(extension);
 
     return (
       shouldOfferPreviewData && (
@@ -119,15 +108,13 @@ const DataItemDialog = ({
     };
 
     return Object.keys(resourceData).map((key) => {
-      return !doNotPrintDataKeys.includes(key) && getDataPointHTML(key);
+      return !DO_NOT_PRINT_DATA_KEYS.includes(key) && getDataPointHTML(key);
     });
   };
 
   const getDistributionUrl = (distributionItem: DistributionItem) => {
     return distributionItem?.downloadURL || distributionItem?.accessURL;
   };
-
-  const doNotPrintDataKeys = ["id", "xata"];
 
   return (
     <Dialog onOpenChange={onOpenChange}>
@@ -144,11 +131,7 @@ const DataItemDialog = ({
             />
           </ZoomIn>
         ) : (
-          <Button
-            // asChild
-            size="xs"
-            className="bg-stone-600 hover:bg-stone-800"
-          >
+          <Button size="xs" className="bg-stone-600 hover:bg-stone-800">
             {triggerCopy || "Details"}
           </Button>
         )}
@@ -172,13 +155,6 @@ const DataItemDialog = ({
                   </DialogTitle>
                 </DialogHeader>
               )}
-
-              {/* <div
-                className={cn(
-                  resourceData?.title ? "h-[calc(100%-50px)]" : "h-full",
-                  "overflow-scroll"
-                )}
-              > */}
 
               {/* KEYWORDS */}
               <div>
@@ -230,7 +206,6 @@ const DataItemDialog = ({
 
                             {!!getDistributionUrl(distribution) && (
                               <div className="overflow-y-scroll">
-                                {/* <div className="overflow-y-scroll bg-gradient-to-r from-white from-80% to-gray-300 to-100%"> */}
                                 <Link
                                   href={
                                     getDistributionUrl(distribution) as string
