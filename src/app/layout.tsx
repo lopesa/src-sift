@@ -5,6 +5,7 @@ import Nav from "@/components/nav";
 import NextAuthProvider from "@/context/nextAuthProvider";
 import TemporaryUserProvider from "@/context/temporaryUserProvider";
 import SavedUserItemsProvider from "@/context/savedUserItemsProvider";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,20 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* <!-- Google tag (gtag.js) --> */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-V9J9266ML6"
+        ></Script>
+        <Script id="google-analytics">
+          {`window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-V9J9266ML6');`}
+        </Script>
+      </head>
       <body
         className={`${inter.className} flex relative flex-col items-center justify-center`}
       >
