@@ -1,13 +1,13 @@
 "use client";
 
 import IndexDataList from "@/components/IndexDataList";
-import AiChat from "@/components/ai-chat";
 import Search from "@/components/search";
 import SiftLoader from "@/components/sift-loader";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { DataSourceMetadataRecord } from "@/lib/const";
 import { SearchResults } from "@/lib/types";
+import { ResourceItemRecord } from "@/xata";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -68,7 +68,7 @@ export default function Home() {
             Clear Search
           </Button>
           <IndexDataList
-            data={searchResults?.results?.records}
+            data={searchResults?.results?.records as ResourceItemRecord[]}
             title="Search Results"
           />
         </>
@@ -76,11 +76,6 @@ export default function Home() {
 
       {/* for debugging the SiftLoader */}
       {/* <SiftLoader className="mt-10 mb-4 mx-auto" /> */}
-
-      {/* AI CHAT */}
-      {/* not seeming terribly feasable even over one resource meta-source (USDA - 2k+ entries) */}
-      {/* <h1 className="mb-1 mt-10">Ask AI, Considering All Resources</h1> */}
-      {/* <AiChat /> */}
     </main>
   );
 }

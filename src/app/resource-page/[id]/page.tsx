@@ -7,7 +7,9 @@ import {
 import { getXataClient } from "@/xata";
 
 export function generateStaticParams() {
-  return [{ id: "us-department-of-agriculture" }];
+  return Object.values(DataSourceMetadataRecord).map((record) => {
+    return { id: record.route };
+  });
 }
 
 const ResourcePage = async ({ params }: { params: { id: string } }) => {
