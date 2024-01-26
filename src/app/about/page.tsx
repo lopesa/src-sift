@@ -19,7 +19,7 @@ const About = async () => {
         </p>
         <p>
           The project is in its early stages and any feedback is welcome. Please
-          don't hesitate to reach out to me at{" "}
+          don&rsquo;t hesitate to reach out to me at{" "}
           <a href="mailto:tony@srcsift.io" className="underline">
             tony@srcsift.io
           </a>
