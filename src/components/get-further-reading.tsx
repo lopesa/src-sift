@@ -22,6 +22,9 @@ const GetFurtherReading = ({ current }: GetFurtherReadingProps) => {
   const [error, setError] = useState<string>("");
 
   const doGetFurtherReading = async () => {
+    gtag("event", "doGetFurtherReading", {
+      title: current.title,
+    });
     setGettingFurtherReading(true);
     const response = await fetch("/api/chatgpt", {
       method: "POST",

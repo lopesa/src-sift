@@ -66,6 +66,10 @@ const PreviewData = ({ url }: PreviewDataProps) => {
       return;
     }
 
+    gtag("event", "showDataPreview", {
+      url,
+    });
+
     setDataLoading(true);
 
     const getData = async () => {

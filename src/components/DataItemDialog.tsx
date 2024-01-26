@@ -55,6 +55,10 @@ const DataItemDialog = ({
       // throw new Error("Problem getting resource id");
     }
 
+    gtag("event", "openDataItemDialog", {
+      resourceId,
+    });
+
     const response = await fetch(`/api/resource-item?id=${resourceId}`).catch(
       (error) => {
         return error;
