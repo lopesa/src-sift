@@ -10,6 +10,7 @@ import {
 } from "./ui/accordion";
 import { Microscope } from "lucide-react";
 import SiftLoader from "./sift-loader";
+import { sendGtagEvent } from "@/lib/utils/logging";
 
 type GetFurtherReadingProps = {
   current: z.infer<typeof getFurtherReadingSchema>;
@@ -22,9 +23,10 @@ const GetFurtherReading = ({ current }: GetFurtherReadingProps) => {
   const [error, setError] = useState<string>("");
 
   const doGetFurtherReading = async () => {
-    gtag("event", "doGetFurtherReading", {
+    sendGtagEvent("doGetFurtherReading", {
       title: current.title,
     });
+
     setGettingFurtherReading(true);
     const response = await fetch("/api/chatgpt", {
       method: "POST",

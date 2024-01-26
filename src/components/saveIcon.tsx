@@ -8,6 +8,7 @@ import { DistributionItem } from "@/xata";
 import { useLocalStorage } from "usehooks-ts";
 import ControlledAlertDialog from "./controlled-alert-dialog";
 import { signIn, useSession } from "next-auth/react";
+import { sendGtagEvent } from "@/lib/utils/logging";
 
 export type SaveIconProps = {
   resourceId: string;
@@ -59,8 +60,11 @@ const SaveIconComponent = ({
   const onClickSave = async (e: React.MouseEvent<SVGElement>) => {
     if (isSaving) return;
     setIsSaving(true);
-
     e.preventDefault();
+
+    sendGtagEvent("saveButtonClicked", {
+      action: isSaved ? "unsave" : "save",
+    });
 
     if (status === "unauthenticated" && !hasSeenAccountAlert) {
       setHasSeenAccountAlert(true);

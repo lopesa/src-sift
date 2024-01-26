@@ -14,6 +14,8 @@ import SiftLoader from "./sift-loader";
 import dynamic from "next/dynamic";
 import HtmlDataTable from "./html-data-table";
 import { ArrowLeftSquare, ArrowRightSquare, ScanEye } from "lucide-react";
+import { send } from "process";
+import { sendGtagEvent } from "@/lib/utils/logging";
 
 const DynamicReactJson = dynamic(() => import("@microlink/react-json-view"), {
   ssr: false,
@@ -66,7 +68,7 @@ const PreviewData = ({ url }: PreviewDataProps) => {
       return;
     }
 
-    gtag("event", "showDataPreview", {
+    sendGtagEvent("showDataPreview", {
       url,
     });
 

@@ -12,6 +12,8 @@ import DataItemDialog from "./DataItemDialog";
 import SaveIconComponent from "./saveIcon";
 import FindSimilar from "./find-similar";
 import { ResourceItemRecord } from "@/xata";
+import { sendGtagEvent } from "@/lib/utils/logging";
+import { set } from "zod";
 
 interface DataItemsAccordionProps {
   dataItems: ResourceItemRecord[];
@@ -37,7 +39,12 @@ const DataItemsAccordion = ({
     <Accordion
       type="multiple"
       value={value}
-      onValueChange={setValue}
+      onValueChange={(value) => {
+        sendGtagEvent("dataItemAccordionOpened", {
+          dataItem: value[0],
+        });
+        setValue(value);
+      }}
       className="[&>*:nth-child(odd)]:bg-stone-50 [&>*:nth-child(even)]:bg-stone-100"
     >
       {!!dataItems?.length &&

@@ -29,6 +29,7 @@ import Link from "next/link";
 import SiftLoader from "./sift-loader";
 import { RefreshCw, ZoomIn } from "lucide-react";
 import GetFurtherReading from "./get-further-reading";
+import { sendGtagEvent } from "@/lib/utils/logging";
 
 interface DataItemDialogProps {
   triggerCopy?: string;
@@ -55,9 +56,7 @@ const DataItemDialog = ({
       // throw new Error("Problem getting resource id");
     }
 
-    gtag("event", "openDataItemDialog", {
-      resourceId,
-    });
+    sendGtagEvent("openDataItemDialog", { resourceId });
 
     const response = await fetch(`/api/resource-item?id=${resourceId}`).catch(
       (error) => {
