@@ -79,38 +79,38 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
                 setShowJson(!showJson);
               }}
             />
-            <label className="text-xs">JSON</label>
+            <label className="text-xs">json</label>
 
             <Checkbox
               onCheckedChange={() => {
                 setShowXml(!showXml);
               }}
             />
-            <label className="text-xs">Xml</label>
+            <label className="text-xs">xml</label>
 
             <Checkbox
               onCheckedChange={() => {
                 setShowXls(!showXls);
               }}
             />
-            <label className="text-xs">Xls</label>
+            <label className="text-xs">xls</label>
 
             <Checkbox
               onCheckedChange={() => {
                 setShowCsv(!showCsv);
               }}
             />
-            <label className="text-xs">Csv</label>
+            <label className="text-xs">csv</label>
 
             <Checkbox
               onCheckedChange={() => {
                 setShowAspx(!showAspx);
               }}
             />
-            <label className="text-xs">Aspx</label>
+            <label className="text-xs">aspx</label>
 
-            <Checkbox onCheckedChange={setOpenAllAccordions} />
-            <label className="text-xs">Open all accordions</label>
+            <Checkbox onCheckedChange={setOpenAllAccordions} className="ml-4" />
+            <label className="text-xs">open all accordions</label>
           </form>
         </div>
       )}

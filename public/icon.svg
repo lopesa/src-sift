@@ -1,0 +1,36 @@
+<svg width="239" height="239" viewBox="0 0 239 239" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+    <style>
+      .rectangle {
+        fill: none;
+      }
+      .circle {
+        fill: #000;
+      }
+      .horizontal-bar {
+        fill: #B6B6B6;
+      }
+      
+      @media (prefers-color-scheme:dark){
+        .rectangle {
+          fill:none
+        }
+        .circle {
+          fill:#e7e5e4
+        }
+        .horizontal-bar {
+          fill:#4d4d4d
+        }
+      }
+
+    </style>
+  </defs>
+<rect width="239" height="239" class="rectangle"/>
+<circle cx="119.5" cy="119.5" r="119.5" class="circle"/>
+<rect x="26" y="92" width="186" height="5" class="horizontal-bar"/>
+<rect x="26" y="100" width="186" height="5" class="horizontal-bar"/>
+<rect x="53" y="125" width="4" height="25" fill="#FCD34D"/>
+<rect x="96" y="125" width="5" height="25" fill="#FCD34D"/>
+<rect x="140" y="125" width="4" height="25" fill="#FCD34D"/>
+<rect x="183" y="125" width="5" height="25" fill="#FCD34D"/>
+</svg>

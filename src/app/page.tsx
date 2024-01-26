@@ -22,11 +22,24 @@ export default function Home() {
   };
   return (
     <main className="flex w-full min-h-screen flex-col items-center p-14">
+      {/* INTRO */}
+      <h2 className="text-4xl mt-14 text-teal-700 font-light">
+        Browse Intuitively. Preview. Save. Ask AI.
+      </h2>
+      <SiftLoader className="mt-10 mb-6 mx-auto w-14 h-14" active={false} />
+
       {/* BROWSE RESOURCES */}
-      <h1 className="text-xl mb-1 mt-10">Browse a Source Provider:</h1>
+      <h1 className="text-2xl font-light text-slate-900 mb-1">
+        Browse a Source Provider:
+      </h1>
       {Object.values(DataSourceMetadataRecord).map((record) => {
         return (
-          <Button asChild variant="link" key={record.displayName}>
+          <Button
+            asChild
+            variant="link"
+            key={record.displayName}
+            className="text-slate-700"
+          >
             <Link href={`/resource-page/${record.route}`}>
               {record.displayName}
             </Link>
@@ -37,7 +50,9 @@ export default function Home() {
       <Separator className="my-10" />
 
       {/* SEARCH */}
-      <h1 className="text-xl mb-1 mt-10">Search All Source Providers:</h1>
+      <h1 className="text-2xl font-light text-slate-900 mb-4 mt-4">
+        Search All Source Providers:
+      </h1>
       <Search
         className="w-72"
         onSearchLoading={() => {
