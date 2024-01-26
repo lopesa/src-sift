@@ -2,7 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Src Sift",
-  description: "Browse Intuitively. Preview. Save. Ask AI.",
+  description: "Browse Easily. Preview. Save. Ask AI.",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

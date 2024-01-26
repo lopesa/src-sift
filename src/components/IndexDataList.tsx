@@ -65,15 +65,15 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
   return (
     <div className="flex flex-col h-full pl-6 pr-8 mx-auto w-full">
       {filteredData && (
-        <div className="h-28 pt-10 mb-10">
-          {title && <h1 className="text-xl font-light">{title}</h1>}
+        <div className="h-28 pt-10 pl-4 mb-6">
+          {title && <h1 className="text-2xl font-light mb-1">{title}</h1>}
           <p className="text-xs font-bold">
             <span>Total Num Items: {data.length}</span>/
             {filteredData && (
               <span> Current Num Items: {filteredData.length}</span>
             )}
           </p>
-          <form className="flex mt-2 mb-6 [&>label]:mr-2.5 [&>button]:mr-1">
+          <form className="flex mt-2 [&>label]:mr-2.5 [&>button]:mr-1">
             <Checkbox
               onCheckedChange={() => {
                 setShowJson(!showJson);

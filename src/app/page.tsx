@@ -23,22 +23,23 @@ export default function Home() {
   return (
     <main className="flex w-full min-h-screen flex-col items-center p-14">
       {/* INTRO */}
-      <h2 className="text-4xl mt-14 text-teal-700 font-light">
-        Browse Intuitively. Preview. Save. Ask AI.
+      <h2 className="text-4xl mt-14 text-cyan-800">Src Sift</h2>
+      <h2 className="text-2xl mt-2 mb-12 text-cyan-800 font-light">
+        Browse Easily. Preview. Save. Ask AI.
       </h2>
-      <SiftLoader className="mt-10 mb-6 mx-auto w-14 h-14" active={false} />
+      <SiftLoader className="mb-6 mx-auto w-14 h-14" active={false} />
 
       {/* BROWSE RESOURCES */}
-      <h1 className="text-2xl font-light text-slate-900 mb-1">
-        Browse a Source Provider:
+      <h1 className="text-xl text-cyan-800 font-bold mb-4">
+        Browse a Source Provider
       </h1>
       {Object.values(DataSourceMetadataRecord).map((record) => {
         return (
           <Button
             asChild
-            variant="link"
+            variant="hoveredGhost"
             key={record.displayName}
-            className="text-slate-700"
+            className="text-slate-700 min-w-80 my-1"
           >
             <Link href={`/resource-page/${record.route}`}>
               {record.displayName}
@@ -47,11 +48,12 @@ export default function Home() {
         );
       })}
 
-      <Separator className="my-10" />
+      {/* <Separator className="my-10" /> */}
+      {/* <SiftLoader className="mt-14 mb-6 mx-auto w-14 h-14" active={false} /> */}
 
       {/* SEARCH */}
-      <h1 className="text-2xl font-light text-slate-900 mb-4 mt-4">
-        Search All Source Providers:
+      <h1 className="text-xl font-bold text-cyan-800 mb-4 mt-24">
+        Search All Source Providers
       </h1>
       <Search
         className="w-72"
@@ -89,8 +91,11 @@ export default function Home() {
         </>
       )}
 
-      {/* for debugging the SiftLoader */}
-      {/* <SiftLoader className="mt-10 mb-4 mx-auto" /> */}
+      <div className="grow flex flex-col justify-end">
+        <Link href="/about" className="text-xs underline pt-14">
+          about
+        </Link>
+      </div>
     </main>
   );
 }

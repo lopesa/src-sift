@@ -3,7 +3,7 @@ import WorkspaceComponent from "@/components/workspace";
 
 export const metadata: Metadata = {
   title: "Src Sift",
-  description: "Browse Intuitively. Preview. Save. Ask AI.",
+  description: "Browse Easily. Preview. Save. Ask AI.",
 };
 
 const Workspace = async () => {

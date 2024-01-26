@@ -79,7 +79,7 @@ const Search = ({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={`flex flex-col items-center ${className}`}
+        className={`flex items-center ${className}`}
       >
         <FormField
           control={form.control}
@@ -95,8 +95,8 @@ const Search = ({
             </FormItem>
           )}
         />
-        <Button type="submit" size="sm" className="mt-2 flex-none w-20">
-          Submit
+        <Button type="submit" className="flex-none ml-1" variant="hoveredGhost">
+          Go
         </Button>
       </form>
     </Form>
