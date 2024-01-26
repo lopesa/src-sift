@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Src Sift",
-  description: "Explore publically available datasets, apis, and more",
+  description: "Browse Intuitively. Preview. Save. Ask AI.",
 };
 
 export default async function RootLayout({

@@ -1,3 +1,10 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Src Sift",
+  description: "Browse Intuitively. Preview. Save. Ask AI.",
+};
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="h-[calc(100vh-3.5rem)] mt-14 w-full">
