@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getFurtherReadingSchema } from "@/lib/types";
 
+// @TODO: look at streaming these replies from chatgpt
 export const maxDuration = 300;
 
 export async function POST(req: NextRequest): Promise<Response> {
