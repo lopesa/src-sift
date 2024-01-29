@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getFurtherReadingSchema } from "@/lib/types";
 
+export const maxDuration = 300;
+
 export async function POST(req: NextRequest): Promise<Response> {
   const body = getFurtherReadingSchema.safeParse(await req.json());
 
