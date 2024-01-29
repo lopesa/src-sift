@@ -11,6 +11,7 @@ import {
 import { Microscope } from "lucide-react";
 import SiftLoader from "./sift-loader";
 import { sendGtagEvent } from "@/lib/utils/logging";
+import DOMPurify from "dompurify";
 
 type GetFurtherReadingProps = {
   current: z.infer<typeof getFurtherReadingSchema>;
@@ -68,7 +69,16 @@ const GetFurtherReading = ({ current }: GetFurtherReadingProps) => {
               </div>
             </AccordionTrigger>
             <AccordionContent className="w-full mt-4">
-              <div className="mt-1">{furtherReading}</div>
+              <div>
+                <ul
+                  className="list-disc list-inside [&>li]:mt-2 [&_a]:underline"
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(furtherReading as string, {
+                      ADD_ATTR: ["target"],
+                    }),
+                  }}
+                ></ul>
+              </div>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

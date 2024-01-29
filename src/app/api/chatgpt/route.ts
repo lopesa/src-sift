@@ -33,16 +33,14 @@ const getFurtherReading = async (
 ) => {
   const model = new ChatOpenAI({});
   const promptTemplate = PromptTemplate.fromTemplate(
-    "given that I have the following data: {text}, what are the top five most helpful items to further understand the topic. Please give specific links to the items."
+    "given that I have the following data: {text}, what are the top five most helpful items to further understand the topic. Please give specific links to the items and prepend each of the five items with '<li>' and append each of the five items with '</li>'. Give each of the <a> tags a target of '_blank' and a rel of 'noopener noreferrer'. Show the link text in addition to the title of the link. Provide a description of the link in addition to the title of the link."
   );
   const chain = promptTemplate.pipe(model);
 
   const result = await chain.invoke({
-    // text: formatDocumentsAsString(docs),
     text: JSON.stringify(current),
   });
 
-  debugger;
   return result;
 };
 

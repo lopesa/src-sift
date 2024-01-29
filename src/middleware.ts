@@ -5,7 +5,11 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const headers = request?.headers;
   const host = headers?.get("host");
-  if (host !== "srcsift.io" && host !== "www.srcsift.io") {
+  if (
+    process.env.NODE_ENV !== "development" &&
+    host !== "srcsift.io" &&
+    host !== "www.srcsift.io"
+  ) {
     return NextResponse.json({ error: "error" }, { status: 500 });
   }
   return NextResponse.next();
