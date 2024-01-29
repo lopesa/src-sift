@@ -32,12 +32,12 @@ export const authOptions: AuthOptions = {
           // for further details.
           body: JSON.stringify({
             personalizations: [{ to: [{ email }] }],
-            from: { email: "loginToResourceExplorer@em1579.teamtedtile.com" },
-            subject: "Sign in to Resource Explorer",
+            from: { email: "signin@em2038.srcsift.io" },
+            subject: "Sign in to Src Sift",
             content: [
               {
                 type: "text/plain",
-                value: `Please click here to authenticate - ${url}`,
+                value: `Click here to authenticate - ${url}`,
               },
             ],
           }),
