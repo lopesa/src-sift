@@ -24,7 +24,7 @@ export default function Home() {
     <main className="flex w-full min-h-screen flex-col items-center p-14">
       {/* INTRO */}
       <h2 className="text-4xl mt-14 text-cyan-800">Src Sift</h2>
-      <h2 className="text-2xl mt-2 mb-12 text-cyan-800 font-light">
+      <h2 className="text-2xl text-center mt-2 mb-12 text-cyan-800 font-light">
         Browse Easily. Preview. Save. Ask AI.
       </h2>
       <SiftLoader className="mb-6 mx-auto w-14 h-14" active={false} />

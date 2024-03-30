@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ResourceItemRecord } from "@/xata";
 import DataItemsAccordion from "./DataItemsAccordion";
@@ -62,10 +62,35 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
     setFilteredData(filtered);
   }, [showXml, showCsv, showXls, showJson, showAspx, data]);
 
+  type CheckBoxAndLabelLockupProps = {
+    checkChangeMethod: Dispatch<SetStateAction<boolean | "indeterminate">>;
+    checkChangeProp: boolean | "indeterminate";
+    label: string;
+  };
+
+  const CheckBoxAndLabelLockup = ({
+    checkChangeMethod,
+    checkChangeProp,
+    label,
+  }: CheckBoxAndLabelLockupProps) => {
+    return (
+      <div className="flex align-center">
+        <Checkbox
+          checked={checkChangeProp}
+          className="mr-1"
+          onCheckedChange={() => {
+            checkChangeMethod(!checkChangeProp);
+          }}
+        />
+        <label className="text-xs">{label}</label>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col h-full pl-6 pr-8 mx-auto w-full">
       {filteredData && (
-        <div className="h-28 pt-10 pl-4 mb-6">
+        <div className="pt-10 pl-4 mb-6">
           {title && <h1 className="text-2xl font-light mb-1">{title}</h1>}
           <p className="text-xs font-bold">
             <span>Total Num Items: {data.length}</span>/
@@ -73,44 +98,42 @@ const IndexDataList = ({ data, title }: IndexDataListProps) => {
               <span> Current Num Items: {filteredData.length}</span>
             )}
           </p>
-          <form className="flex mt-2 [&>label]:mr-2.5 [&>button]:mr-1">
-            <Checkbox
-              onCheckedChange={() => {
-                setShowJson(!showJson);
-              }}
-            />
-            <label className="text-xs">json</label>
+          <form className="flex flex-row flex-wrap mt-2 [&>button]:mr-1 [&>*]:mr-2 [&>*]:mb-1.5">
+            <CheckBoxAndLabelLockup
+              checkChangeMethod={setShowJson}
+              checkChangeProp={showJson}
+              label="json"
+            ></CheckBoxAndLabelLockup>
 
-            <Checkbox
-              onCheckedChange={() => {
-                setShowXml(!showXml);
-              }}
-            />
-            <label className="text-xs">xml</label>
+            <CheckBoxAndLabelLockup
+              checkChangeMethod={setShowXml}
+              checkChangeProp={showXml}
+              label="xml"
+            ></CheckBoxAndLabelLockup>
 
-            <Checkbox
-              onCheckedChange={() => {
-                setShowXls(!showXls);
-              }}
-            />
-            <label className="text-xs">xls</label>
+            <CheckBoxAndLabelLockup
+              checkChangeMethod={setShowXls}
+              checkChangeProp={showXls}
+              label="xls"
+            ></CheckBoxAndLabelLockup>
 
-            <Checkbox
-              onCheckedChange={() => {
-                setShowCsv(!showCsv);
-              }}
-            />
-            <label className="text-xs">csv</label>
+            <CheckBoxAndLabelLockup
+              checkChangeMethod={setShowCsv}
+              checkChangeProp={showCsv}
+              label="csv"
+            ></CheckBoxAndLabelLockup>
 
-            <Checkbox
-              onCheckedChange={() => {
-                setShowAspx(!showAspx);
-              }}
-            />
-            <label className="text-xs">aspx</label>
+            <CheckBoxAndLabelLockup
+              checkChangeMethod={setShowAspx}
+              checkChangeProp={showAspx}
+              label="aspx"
+            ></CheckBoxAndLabelLockup>
 
-            <Checkbox onCheckedChange={setOpenAllAccordions} className="ml-4" />
-            <label className="text-xs">open all accordions</label>
+            <CheckBoxAndLabelLockup
+              checkChangeMethod={setOpenAllAccordions}
+              checkChangeProp={openAllAccordions}
+              label="open all accordions"
+            ></CheckBoxAndLabelLockup>
           </form>
         </div>
       )}
